@@ -461,9 +461,9 @@ void PlotXYDemo::onTimeOut()
 				ui.actionStop->setEnabled(false);
 
 			}
+		}
 		else
 			ui.timeSlider->setValue(curValue - step);
-		}
 	}
 }
 
