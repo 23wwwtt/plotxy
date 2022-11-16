@@ -229,12 +229,11 @@ void AddPlotPair::onChangeStackIndex(PlotType index)
 		break;
 	case Type_PlotBar:
 	case Type_PlotDial:
+    case Type_PlotTrack:
 		ui.stackedWidget->setCurrentIndex(0);
 		break;
 	case Type_PlotAttitude:
 		ui.stackedWidget->setCurrentIndex(2);
-		break;
-	case Type_PlotTrack:
 		break;
 	case Type_PlotDoppler:
 		break;
