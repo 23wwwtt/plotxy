@@ -16,8 +16,6 @@
 #include "PlotText.h"
 #include "PlotLight.h"
 
-
-
 PlotXYDemo::PlotXYDemo(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -40,6 +38,7 @@ PlotXYDemo::PlotXYDemo(QWidget* parent)
 
 	connect(this, &PlotXYDemo::sgn_sliderValueChanged, m_timeCtrl, &TimeControls::onRemoteSliderValueChanged);
 	connect(m_timeCtrl, &TimeControls::sgn_sliderValueChanged, this, &PlotXYDemo::onRemoteSliderValueChanged);
+	connect(this, &PlotXYDemo::sgn_enableActionStop, m_timeCtrl, &TimeControls::onEnableActionStop);
 
 	m_curBaseInfo.Base_TabName = nullptr;
 	m_curBaseInfo.Base_PlotName = nullptr;
@@ -441,6 +440,7 @@ void PlotXYDemo::onTimeOut()
 			{
 				m_timer->stop();
 				ui.actionStop->setEnabled(false);
+				emit sgn_enableActionStop(false);
 			}
 
 		}
@@ -459,7 +459,7 @@ void PlotXYDemo::onTimeOut()
 			{
 				m_timer->stop();
 				ui.actionStop->setEnabled(false);
-
+				emit sgn_enableActionStop(false);
 			}
 		}
 		else
@@ -481,12 +481,14 @@ void PlotXYDemo::onActionPlay()
 		m_timer->stop();
 	m_timer->start(m_timerInterval);
 	ui.actionStop->setEnabled(true);
+	emit sgn_enableActionStop(true);
 }
 
 void PlotXYDemo::onActionStop()
 {
 	m_timer->stop();
 	ui.actionStop->setEnabled(false);
+	emit sgn_enableActionStop(false);
 }
 
 void PlotXYDemo::onActionReverse()
@@ -496,6 +498,7 @@ void PlotXYDemo::onActionReverse()
 		m_timer->stop();
 	m_timer->start(m_timerInterval);
 	ui.actionStop->setEnabled(true);
+	emit sgn_enableActionStop(true);
 }
 
 void PlotXYDemo::onActionFrameReverse()
@@ -507,6 +510,7 @@ void PlotXYDemo::onActionFrameReverse()
 	int step = m_timeCtrl->getStepFactor() * m_timeCtrl->getMultiplizer();
 	ui.timeSlider->setValue(curValue - step);
 	ui.actionStop->setEnabled(false);
+	emit sgn_enableActionStop(false);
 }
 
 void PlotXYDemo::onActionFrameForward()
@@ -518,6 +522,7 @@ void PlotXYDemo::onActionFrameForward()
 	int step = m_timeCtrl->getStepFactor() * m_timeCtrl->getMultiplizer();
 	ui.timeSlider->setValue(curValue + step);
 	ui.actionStop->setEnabled(false);
+	emit sgn_enableActionStop(false);
 }
 
 void PlotXYDemo::onActionDecreseStep()
@@ -531,6 +536,7 @@ void PlotXYDemo::onActionDecreseStep()
 	m_timerInterval *= 2;
 	m_timer->start(m_timerInterval);
 	ui.actionStop->setEnabled(true);
+	emit sgn_enableActionStop(true);
 }
 
 void PlotXYDemo::onActionIncreaseStep()
@@ -544,6 +550,7 @@ void PlotXYDemo::onActionIncreaseStep()
 	m_timerInterval /= 2;
 	m_timer->start(m_timerInterval);
 	ui.actionStop->setEnabled(true);
+	emit sgn_enableActionStop(true);
 }
 
 void PlotXYDemo::onActionTimeServer()

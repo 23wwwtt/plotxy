@@ -71,6 +71,7 @@ signals:
 	void sgn_loadDataReady();
 	void sgn_sliderValueChanged(int);
 	void sgn_sendCurrentSeconds(double);
+	void sgn_enableActionStop(bool);
 private:
     Ui::PlotXYDemo ui;
 	QWidget* m_nowFocusWidget;

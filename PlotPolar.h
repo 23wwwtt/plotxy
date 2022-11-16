@@ -44,7 +44,6 @@ public:
 private:
 	QCustomPlot *m_customPlot;
 	QCPPolarAxisAngular *m_angularAxis;
-	QLabel* m_titleLabel;
 	QMap<QString, QMap<int, QColor>> m_thresholdColorMap;
 
 	QString m_title;
