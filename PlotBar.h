@@ -5,7 +5,7 @@
 *  */
 
 #ifndef  _PLOT_BAR_H_
-#define  _PLOT_BAR_H_ 
+#define  _PLOT_BAR_H_
 
 #include "PlotItemBase.h"
 #include "BaseData.h"
@@ -13,42 +13,42 @@
 #include <QMap>
 #include <QString>
 
-class PlotBar :public PlotItemBase
+class PlotBar : public PlotItemBase
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-    PlotBar(QWidget* parent = Q_NULLPTR);
+    PlotBar(QWidget *parent = Q_NULLPTR);
     ~PlotBar();
-       
+
     void setPlotItemExtentionDirec(bool);
 
     void setLeftPadding(int);
     void setRightPadding(int);
     void setInterPadding(int);
 
-    void addPlotDataPair(const QString&, const QString&);
+    void addPlotDataPair(const QString &, const QString &);
 
     void updateItems(); //实现核心绘制逻辑
 
-    void drawRect(int itemIndex,bool bHorizontal,int itemLength,int leftBoundary, int rightBoundary, QColor color);
+    void drawRect(int itemIndex, bool bHorizontal, int itemLength, int leftBoundary, int rightBoundary, QColor color);
+
 public:
-	static int m_instanceCount;			//实体个数
+    static int m_instanceCount;         //实体个数
+
 public slots:
-    void onSwitch(bool);
-    void onTimeout();
     void onUpdateColorThresholdMap(QMap<QString, QMap<int, QColor>>);
+    void onGetCurrentSecond(double secs);
 
 protected:
-    virtual void paintEvent(QPaintEvent* event);
-
+    virtual void paintEvent(QPaintEvent *event);
+    void getDataInfo(double secs);
+    void updateData(int itemIndex, QString x, QString y, double secs);
 
 private:
-    QTimer* m_timer;
-
     bool m_bHorizontal;
 
-    QLine   m_xAxis;
-    QLine   m_yAxis; 
+    QLine m_xAxis;
+    QLine m_yAxis;
 
     int m_leftPadding;
     int m_rightPadding;
@@ -60,7 +60,7 @@ private:
     QStringList m_entityTypeList;
     QStringList m_entityAttrList;
 
-    QMap<QString,QMap<int, QColor>> m_thresholdColorMap;    //key:entityType+entityAttr, threshold,QColor
+    QMap<QString, QMap<int, QColor>> m_thresholdColorMap;   //key:entityType+entityAttr, threshold,QColor
     QColor m_defaultColor;
 
     QColor m_gridColor;
@@ -70,7 +70,7 @@ private:
     int m_horiGridNum;
     int m_verGridNum;
 
-    bool m_started;
+    double m_seconds;
 };
 
 #endif // _PLOT_BAR_H_ 
