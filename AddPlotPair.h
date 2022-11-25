@@ -59,9 +59,8 @@ private:
 	bool getCurrentSelectParam(QString&, QString&);
 	
 signals:
-    void sigAddPlotPair(QString,QString);
 	void sgn_addPlotPair(QString, QString, QString, QString);
-
+	void sgn_updatePlotPair();
 public slots:
     void onBtnAddClicked();
 	void onBtnUpdateClicked();

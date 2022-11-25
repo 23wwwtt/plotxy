@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1097</width>
-    <height>788</height>
+    <width>1338</width>
+    <height>824</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,25 +16,49 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
-     <widget class="QTreeWidget" name="treeWidget_xy">
+     <widget class="QTableWidget" name="tableWidget_plotpair">
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>250</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
       <column>
        <property name="text">
-        <string>X 轴</string>
+        <string>X轴</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Y 轴</string>
+        <string>Y轴</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
       <column>
        <property name="text">
         <string>图表名称</string>
        </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
       </column>
       <column>
        <property name="text">
         <string>所在Tab</string>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
        </property>
       </column>
      </widget>
@@ -211,7 +235,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_choosecolor">
+                <widget class="ColorButton" name="pushButton_choosecolor">
                  <property name="maximumSize">
                   <size>
                    <width>20</width>
@@ -219,7 +243,7 @@
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(0, 255, 0);</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string/>
@@ -399,7 +423,7 @@ p, li { white-space: pre-wrap; }
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_color">
+                     <widget class="ColorButton" name="pushButton_color">
                       <property name="maximumSize">
                        <size>
                         <width>20</width>
@@ -407,7 +431,7 @@ p, li { white-space: pre-wrap; }
                        </size>
                       </property>
                       <property name="styleSheet">
-                       <string notr="true">background-color: rgb(0, 255, 0);</string>
+                       <string notr="true"/>
                       </property>
                       <property name="text">
                        <string/>
@@ -613,7 +637,7 @@ p, li { white-space: pre-wrap; }
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_4">
+                  <widget class="ColorButton" name="pushButton_4">
                    <property name="maximumSize">
                     <size>
                      <width>20</width>
@@ -621,7 +645,7 @@ p, li { white-space: pre-wrap; }
                     </size>
                    </property>
                    <property name="styleSheet">
-                    <string notr="true">background-color: rgb(0, 255, 0);</string>
+                    <string notr="true"/>
                    </property>
                    <property name="text">
                     <string/>
@@ -762,6 +786,13 @@ p, li { white-space: pre-wrap; }
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>colorbutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

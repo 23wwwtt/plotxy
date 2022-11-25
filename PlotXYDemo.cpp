@@ -16,6 +16,9 @@
 #include "PlotText.h"
 #include "PlotLight.h"
 #include "PlotTrack.h"
+#include "PlotAScope.h"
+#include "PlotRTI.h"
+#include "PlotDoppler.h"
 
 PlotXYDemo::PlotXYDemo(QWidget *parent)
     : QMainWindow(parent)
@@ -30,8 +33,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
     m_plotManager = new PlotManager();
     m_addPlotPair = AddPlotPair::m_getInstance();
 
-    connect(m_addPlotPair, SIGNAL(sigAddPlotPair(QString, QString)), m_plotManager, SLOT(onAddPlotPair(QString, QString)));
-    connect(m_addPlotPair, SIGNAL(sigAddPlotPair(QString, QString)), m_AdvancedDataManager, SLOT(onAdvancedDataManagerAddPair(QString, QString)));
+	connect(m_addPlotPair, &AddPlotPair::sgn_updatePlotPair, m_AdvancedDataManager, &AdvancedDataManager::onUpdatePlotPair);
     connect(this, SIGNAL(sgn_loadDataReady()), m_addPlotPair, SLOT(onUpdateData()));
     connect(this, SIGNAL(sgn_loadDataReady()), m_timeCtrl, SLOT(onUpdateData()));
     connect(m_timeCtrl, &TimeControls::sgn_setSliderRange, m_timeCtrl, &TimeControls::onSetSliderRange);
@@ -100,10 +102,6 @@ void PlotXYDemo::onAddPlotPair()
 {
     if (!m_addPlotPair) {
         m_addPlotPair = AddPlotPair::m_getInstance();
-        connect(m_addPlotPair, SIGNAL(sigAddPlotPair(QString, QString)),
-                m_plotManager, SLOT(onAddPlotPair(QString, QString)));
-        connect(m_addPlotPair, SIGNAL(sigAddPlotPair(QString, QString)),
-                m_AdvancedDataManager, SLOT(onAdvancedDataManagerAddPair(QString, QString)));
         connect(this, SIGNAL(sgn_loadDataReady()), m_addPlotPair, SLOT(onUpdateData()));
         m_addPlotPair->init(getCurrentFocusPlot());
     }
@@ -181,7 +179,10 @@ void PlotXYDemo::onContextMenu(const QPoint &point)
     QAction *addTextPlot = new QAction(QString::fromLocal8Bit("添加Text组件"), this);
     QAction *addPolarPlot = new QAction(QString::fromLocal8Bit("添加Polar组件"), this);
     QAction *addLightPlot = new QAction(QString::fromLocal8Bit("添加Light组件"), this);
-    QAction *addTrackPlot = new QAction(QString::fromLocal8Bit("添加Track组件"), this);
+    QAction *addTrackPlot = new QAction(QString::fromLocal8Bit("添加Track Status组件"), this);
+	QAction *addAScopePlot = new QAction(QString::fromLocal8Bit("添加A-Scope组件"), this);
+	QAction *addRTIPlot = new QAction(QString::fromLocal8Bit("添加Scrolling RTI组件"), this);
+	QAction *addDopplerPlot = new QAction(QString::fromLocal8Bit("添加Range Doppler组件"), this);
     /* 添加菜单项 */
     createPlotMenu->addAction(addBarPlot);
     createPlotMenu->addAction(addAttitudePlot);
@@ -189,6 +190,9 @@ void PlotXYDemo::onContextMenu(const QPoint &point)
     createPlotMenu->addAction(addPolarPlot);
     createPlotMenu->addAction(addLightPlot);
     createPlotMenu->addAction(addTrackPlot);
+	createPlotMenu->addAction(addAScopePlot);
+	createPlotMenu->addAction(addRTIPlot);
+	createPlotMenu->addAction(addDopplerPlot);
     /* 连接槽函数 */
     connect(addBarPlot, SIGNAL(triggered()), this, SLOT(onAddBarPlot()));
     connect(addAttitudePlot, SIGNAL(triggered()), this, SLOT(onAddAttitudePlot()));
@@ -196,6 +200,9 @@ void PlotXYDemo::onContextMenu(const QPoint &point)
     connect(addPolarPlot, SIGNAL(triggered()), this, SLOT(onAddPolarPlot()));
     connect(addLightPlot, SIGNAL(triggered()), this, SLOT(onAddLightPlot()));
     connect(addTrackPlot, SIGNAL(triggered()), this, SLOT(onAddTrackPlot()));
+	connect(addAScopePlot, SIGNAL(triggered()), this, SLOT(onAddAScopePlot()));
+	connect(addRTIPlot, SIGNAL(triggered()), this, SLOT(onAddRTIPlot()));
+	connect(addDopplerPlot, SIGNAL(triggered()), this, SLOT(onAddDopplerPolt()));
 
     //QAction
     QAction *Undo_Action = new QAction(QString::fromLocal8Bit("撤销"), this);
@@ -309,6 +316,7 @@ void PlotXYDemo::onAddBarPlot()
     m_lastSelectedType = PlotType::Type_PlotBar;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 void PlotXYDemo::onAddTextPlot()
 {
@@ -366,6 +374,7 @@ void PlotXYDemo::onAddLightPlot()
     m_lastSelectedType = PlotType::Type_PlotLight;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddTrackPlot()
@@ -392,6 +401,76 @@ void PlotXYDemo::onAddTrackPlot()
     m_lastSelectedType = PlotType::Type_PlotTrack;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+}
+
+void PlotXYDemo::onAddAScopePlot()
+{
+	int currTabIndex = ui.tabWidget->currentIndex();
+	QString currTabText = ui.tabWidget->tabText(currTabIndex);
+
+	PlotAScope *plotItem = new PlotAScope(ui.tabWidget->currentWidget());
+	plotItem->setTabName(currTabText);
+//	connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotAScope::slot_getCurrentSeconds);
+
+	initWidget(plotItem);
+	// 控制其自由移动和缩放
+	FreeWidgetWraper *m_freeWidgetWraper = new FreeWidgetWraper();
+	m_freeWidgetWraper->setWidget(plotItem);
+	m_freeWidgetWraper->setMoveEnable(true);
+
+	plotItem->show();
+
+	m_lastSelectedType = PlotType::Type_PlotAScope;
+	m_plotManager->addPlot(currTabText, plotItem);
+	m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+}
+
+void PlotXYDemo::onAddRTIPlot()
+{
+	int currTabIndex = ui.tabWidget->currentIndex();
+	QString currTabText = ui.tabWidget->tabText(currTabIndex);
+
+	PlotRTI *plotItem = new PlotRTI(ui.tabWidget->currentWidget());
+	plotItem->setTabName(currTabText);
+	//	connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotRTI::slot_getCurrentSeconds);
+
+	initWidget(plotItem);
+	// 控制其自由移动和缩放
+	FreeWidgetWraper *m_freeWidgetWraper = new FreeWidgetWraper();
+	m_freeWidgetWraper->setWidget(plotItem);
+	m_freeWidgetWraper->setMoveEnable(true);
+
+	plotItem->show();
+
+	m_lastSelectedType = PlotType::Type_PlotRTI;
+	m_plotManager->addPlot(currTabText, plotItem);
+	m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+}
+
+void PlotXYDemo::onAddDopplerPolt()
+{
+	int currTabIndex = ui.tabWidget->currentIndex();
+	QString currTabText = ui.tabWidget->tabText(currTabIndex);
+
+	PlotDoppler *plotItem = new PlotDoppler(ui.tabWidget->currentWidget());
+	plotItem->setTabName(currTabText);
+	//	connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotDoppler::slot_getCurrentSeconds);
+
+	initWidget(plotItem);
+	// 控制其自由移动和缩放
+	FreeWidgetWraper *m_freeWidgetWraper = new FreeWidgetWraper();
+	m_freeWidgetWraper->setWidget(plotItem);
+	m_freeWidgetWraper->setMoveEnable(true);
+
+	plotItem->show();
+
+	m_lastSelectedType = PlotType::Type_PlotDoppler;
+	m_plotManager->addPlot(currTabText, plotItem);
+	m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddPolarPlot()
@@ -414,6 +493,7 @@ void PlotXYDemo::onAddPolarPlot()
     m_lastSelectedType = PlotType::Type_PlotPolar;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 
 void PlotXYDemo::onFocusChanged(QWidget *oldWidget, QWidget *newWidget)
@@ -584,7 +664,6 @@ void PlotXYDemo::onAddAttitudePlot()
 
     PlotAttitude *plotItem = new PlotAttitude(ui.tabWidget->currentWidget());
     plotItem->setTabName(currTabText);
-//  connect(ui.actionStop, &QAction::triggered, plotItem, &PlotAttitude::onSwitch);
     connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotAttitude::slot_getCurrentSeconds);
     initWidget(plotItem);
 
@@ -600,6 +679,7 @@ void PlotXYDemo::onAddAttitudePlot()
     m_lastSelectedType = PlotType::Type_PlotAttitude;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 
 void PlotXYDemo::init()

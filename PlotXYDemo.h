@@ -46,6 +46,9 @@ public slots:
 	void onAddPolarPlot();
 	void onAddLightPlot();
     void onAddTrackPlot();
+	void onAddAScopePlot();
+	void onAddRTIPlot();
+	void onAddDopplerPolt();
 
 	void onFocusChanged(QWidget* oldWidget, QWidget* newWidget);
 

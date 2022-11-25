@@ -31,28 +31,18 @@ PlotPolar::~PlotPolar()
 
 void PlotPolar::initPlot()
 {
-	//for (auto i:this->children())
-	//{
-	//	QString classname = i->metaObject()->className();
-	//	if (classname == "QPushButton" && i->isWidgetType())
-	//	{
-	//		((QWidget*)i)->setParent(m_titleLabel);
-	//		break;
-	//	}
-	//}
-
 	m_customPlot = new QCustomPlot(this);
-	m_customPlot->installEventFilter(this);
+	m_customPlot->setSelectionRectMode(QCP::srmNone);
+	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
 	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
-//	m_customPlot->setGeometry(0,20,qMin(width(),height()), qMin(width(), height()));
 	m_customPlot->plotLayout()->clear();
 
 	m_angularAxis = new QCPPolarAxisAngular(m_customPlot);
 	m_angularAxis->setBasePen(QPen(QColor(255, 255, 255), 2));
 	m_customPlot->plotLayout()->addElement(0, 0, m_angularAxis);
 	
-	m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+//	m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 	m_angularAxis->setRangeDrag(false);
 	m_angularAxis->setTickLabelMode(QCPPolarAxisAngular::lmUpright);
 	m_angularAxis->setFormat(m_angularUnit);
@@ -104,20 +94,6 @@ void PlotPolar::paintEvent(QPaintEvent * event)
 		m_customPlot->setGeometry(0, (height + h - radius)/2, radius, radius);
 		painter.drawText(QPoint((width - w) / 2, (height + h - radius) / 2), m_title);
 	}
-}
-
-bool PlotPolar::eventFilter(QObject * watched, QEvent * event)
-{
-	/*if (watched == m_customPlot)
-	{
-	if (event->type() == QEvent::MouseButtonPress)
-	{
-	parent()->event(event);
-	qDebug() << parent()->objectName();
-	return true;
-	}
-	}*/
-	return false;
 }
 
 void PlotPolar::slot_setTitle(QString title)
@@ -197,6 +173,11 @@ void PlotPolar::slot_getCurrentSeconds(double secs)
 
 	qDeleteAll(graph);
 	graph.clear();
+}
+
+void PlotPolar::slot_setMouseEventEnable(bool on)
+{
+	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, on);
 }
 
 void PlotPolar::onUpdateColorThresholdMap(QMap<QString, QMap<int, QColor>> targetMap)
