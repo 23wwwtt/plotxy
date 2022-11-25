@@ -317,10 +317,12 @@ void PlotXYDemo::onAddTextPlot()
 	int currTabIndex = ui.tabWidget->currentIndex();
 	QString currTabText = ui.tabWidget->tabText(currTabIndex);
 
+
 	PlotText* plotItem = new PlotText(ui.tabWidget->currentWidget());
 	plotItem->setTabName(currTabText);
 	//bool res = connect(ui.actionStop,SIGNAL(triggered(bool)), plotItem, SLOT(onSwitch(bool)));
-	connect(ui.actionStop, &QAction::triggered, plotItem, &PlotText::onSwitch);
+	connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotText::slot_getCurrentSeconds);
+	//connect(ui.actionStop, &QAction::triggered, plotItem, &PlotText::onSwitch);
 	//connect(m_AdvancedDataManager, &AdvancedDataManager::updateColorThresholdMap,
 	//	plotItem, &PlotText::onUpdateColorThresholdMap);
 	// 好像是数据处理有关的东西
@@ -335,6 +337,7 @@ void PlotXYDemo::onAddTextPlot()
 	m_freeWidgetWraper->setMoveEnable(true);
 
 	plotItem->show();
+	plotItem->update();
 
 	m_lastSelectedType = PlotType::Type_PlotText;
 	m_plotManager->addPlot(currTabText, plotItem);
@@ -461,11 +464,12 @@ void PlotXYDemo::onTimeOut()
 				ui.actionStop->setEnabled(false);
 
 			}
+		}
 		else
 			ui.timeSlider->setValue(curValue - step);
-		}
 	}
 }
+
 
 void PlotXYDemo::onUpdateLocalTime()
 {

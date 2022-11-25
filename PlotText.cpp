@@ -9,6 +9,7 @@
 #include <QList>
 #include <QDebug>
 
+
 int PlotText::m_instanceCount = 1;
 PlotText::PlotText(QWidget* parent)
 	:PlotItemBase(parent)
@@ -29,7 +30,7 @@ PlotText::PlotText(QWidget* parent)
 
 	m_defaultColor = Qt::gray;
 	m_timer = new QTimer(this);
-	connect(m_timer, &QTimer::timeout, this, &PlotText::onTimeout);
+	//connect(m_timer, &QTimer::timeout, this, &PlotText::onTimeout);
 }
 
 PlotText::~PlotText()
@@ -37,19 +38,7 @@ PlotText::~PlotText()
 
 }
 
-void PlotText::onSwitch(bool bOn)
-{
-	if (!m_started)
-	{
-		m_timer->start(500);
-		m_started = true;
-	}
-	else
-	{
-		m_timer->stop();
-		m_started = false;
-	}
-}
+
 
 void PlotText::paintEvent(QPaintEvent* event)
 {
@@ -58,18 +47,200 @@ void PlotText::paintEvent(QPaintEvent* event)
 	QPen pen;
 	QFont font;
 	QRect rect;
-
+	QList<QPair<QString, QString>> dataList;
+	QSet<QString> xset, yset;
+	int i = 0, j = 0;
+	int horGT = 0;
+	int verGT = 0;
 	pen.setColor(Qt::white);
 	painter.setPen(pen);
 	font.setPointSize(20);
 	painter.setFont(font);
 	rect.setRect(0, 0, width(), 0.1*height());
-	painter.drawText(rect,Qt::AlignCenter|Qt::TextWordWrap,"Text Plot");
-
+	int horiGridWidth = 0;
+	if (m_horiGridNum)		//item水平方向延展
+	{
+		horiGridWidth = 0.9*width() / m_horiGridNum;
+	}
+	int verGridWidth = 0;
+	if (m_verGridNum)		//item水平方向延展
+	{
+		verGridWidth = 0.85*height() / m_verGridNum;
+	}
+	//以下为绘制表格title名字
+	setTitle(painter, rect);
 	//以下绘制n×m的格子
-	QList<QPair<QString, QString>> dataList;
-	QSet<QString> xset, yset;
-	int i = 0,j = 0;
+	drawNMCell(painter, xset, yset, dataList, horiGridWidth, verGridWidth);
+	//以下为绘制X/Y轴item名字
+	drawXYTitle(painter, horiGridWidth, verGridWidth);
+	//以下为绘制对应的数据
+	if (temValueList.isEmpty())
+		return;
+	else
+	{
+		for (int i = m_entityName.size() - 1; i != -1; i--)
+		{
+			for (int j = m_attriName.size() - 1; j != -1; j--)
+			{
+				rect.setRect(0.05*width() + (1 + horGT)*horiGridWidth, 0.1*height() + (1 + verGT)*verGridWidth, horiGridWidth, verGridWidth);
+				//painter.drawText(rect, QString::number(*(m_valueListVector.at(j).end()),'f',2));
+				painter.drawText(rect, QString::number(temValueList.at(temValueList.size() - 1 - j - i*m_attriName.size()).back(), 'f', 2));
+				update();
+				verGT++;
+			}
+			horGT++;
+			verGT = 0;
+		}
+	}
+	//drawData(xset, yset, horiGridWidth, verGridWidth);
+}
+
+//以下为用户自定义数据
+//QList<textUserData> list1;
+//QRect rect, rectErase;
+//list1 = addPP->getUserText();
+//for (int i = 0; i < list1.size(); i++)
+//{
+//	int x = list1.at(i).row;
+//	int y = list1.at(i).column;
+//	if (x <= m_verGridNum || y <= m_horiGridNum)
+//	{
+
+//		rect.setRect(y*horiGridWidth, x*verGridWidth, horiGridWidth, verGridWidth);
+//		rectErase.setRect(y*horiGridWidth + 3, x*verGridWidth + 3, horiGridWidth - 3, verGridWidth - 3);
+//		painter.eraseRect(rectErase);
+//		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, list1.at(i).str);
+//	}
+//	else
+//	{
+//		m_verGridNum = x;
+//		m_horiGridNum = y;
+
+
+//		rect.setRect(y*horiGridWidth, x*verGridWidth, horiGridWidth, verGridWidth);
+//		painter.eraseRect(rect);
+//		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, list1.at(i).str);
+
+//	}
+//}
+
+
+void PlotText::setTitle(QPainter& painter, QRect& rect)
+{
+	painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, "Text Plot");
+}
+
+void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridWidth, int& verGridWidth)
+{
+	if (getPlotPairData().isEmpty())
+	{
+		return;
+	}
+	if (temValueList.isEmpty())
+	{
+		return;
+	}
+	int i = 0;
+	int j = 0;
+	QRect rect;
+	QPainter painter;
+	for (auto it = xset.begin(); it != xset.end(); it++)
+	{
+		for (auto it2 = yset.begin(); it2 != yset.end(); it2++)
+		{
+			j++;
+			//动态数据
+		/*	QString currEntityType = *it;
+			QString currEntityAttr = *it2;*/
+			//auto dataMap = DataManager::getInstance()->getDataMap();
+			//if (!dataMap.contains(currEntityType))
+			//{
+			//	continue;
+			//}
+			//if (!dataMap.value(currEntityType).contains(currEntityAttr))
+			//{
+			//	continue;
+			//}
+			//if (m_currTimeIndex >= dataMap.value(currEntityType).value(currEntityAttr).size())
+			//{
+			//	continue;
+			//}
+			//*获取当前Attr值
+
+			rect.setRect(0.05*width() + (1 + i)*horiGridWidth, 0.1*height() + j*verGridWidth, horiGridWidth, verGridWidth);
+			painter.drawText(rect, Qt::AlignCenter | Qt::TextWrapAnywhere, QString::number((temValueList.at(j).back()), 'f', 2));
+		}
+		i++;
+		j = 0;
+	}
+}
+
+
+void PlotText::slot_getCurrentSeconds(double secs)
+{
+	if (getPlotPairData().isEmpty())
+		return;
+	int isize = getPlotPairData().size();
+	int entityNum = 0;
+	int attriNum = 0;
+	m_entityName.clear();
+	m_attriName.clear();
+	for (int i = 0; i < isize; i++)
+	{
+		QString column = getPlotPairData().at(i).first;
+		QList<QString> valueList = column.split("+");
+		for (int i = 0; i < m_entityName.size(); i++)
+			m_entityName.push_back(valueList.front());
+		//for (int i = 0; i < m_entityName.size(); i++)
+		//{
+		//	if (valueList.front() == m_entityName.at(i))
+		//		entityNum++;
+		//}
+		//if (entityNum == 0)
+		//	m_entityName.push_back(valueList.front());
+
+		if (m_attriName.isEmpty())
+			m_attriName.push_back(valueList.back());
+		for (int i = 0; i < m_attriName.size(); i++)
+		{
+			if (valueList.back() == m_attriName.at(i))
+				attriNum++;
+		}
+		if (attriNum == 0)
+			m_attriName.push_back(valueList.back());
+	}
+	for (auto ite = m_entityName.begin(); ite != m_entityName.end(); ite++)
+	{
+		for (auto ita = m_attriName.begin(); ita != m_attriName.end(); ita++)
+		{
+			m_valueList = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(*ite, *ita, secs);
+			temValueList.push_back(m_valueList);
+		}
+	}
+	update();
+}
+
+void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth)
+{
+	QRect rectXName, rectYName;
+	int i = 0, j = 0;
+	for (auto it = m_entityName.begin(); it != m_entityName.end(); it++)
+	{
+		rectXName.setRect(0.05*width() + (i + 1)* horiGridWidth, 0.1*height(), horiGridWidth, verGridWidth);
+		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
+		i++;
+	}
+	for (auto it = m_attriName.begin(); it != m_attriName.end(); it++)
+	{
+		rectXName.setRect(0.05*width(), 0.1*height() + (1 + j)*verGridWidth, horiGridWidth, verGridWidth);
+		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
+		j++;
+	}
+}
+
+void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>& yset, QList<QPair<QString, QString>> dataList,
+	int& horiGridWidth, int& verGridWidth)
+{
 	dataList = getPlotPairData();
 	for (int i = 0; i < dataList.size(); i++)
 	{
@@ -77,7 +248,6 @@ void PlotText::paintEvent(QPaintEvent* event)
 		int pos = xIncludePlus.indexOf("+");
 		QString xColumn = xIncludePlus.mid(0, pos);
 		QString yColumn = xIncludePlus.mid(pos + 1);
-		
 		xset.insert(xColumn);
 		yset.insert(yColumn);
 		m_horiGridNum = xset.size() + 1;
@@ -85,12 +255,6 @@ void PlotText::paintEvent(QPaintEvent* event)
 	}
 	if (!dataList.empty())
 	{
-		int horiGridWidth = 0;
-		if (m_horiGridNum)		//item水平方向延展
-		{
-			horiGridWidth = 0.9*width() / m_horiGridNum;
-		}
-
 		for (int i = 0; i < m_horiGridNum; i++)
 		{
 			QRect gridRect;
@@ -98,111 +262,11 @@ void PlotText::paintEvent(QPaintEvent* event)
 			//painter.drawRect(gridRect);
 			painter.drawLine(0.05*width() + i* horiGridWidth, 0.1*height(), 0.05*width() + i* horiGridWidth, 0.95*height());
 		}
-
-		int verGridWidth = 0;
-		if (m_verGridNum)		//item水平方向延展
-		{
-			verGridWidth = 0.85*height() / m_verGridNum;
-		}
-
 		for (int i = 0; i < m_verGridNum; i++)
 		{
 			QRect gridRect;
 			gridRect.setRect(0.05*width(), i * verGridWidth + 0.1*height(), 0.9*width(), verGridWidth);
 			painter.drawRect(gridRect);
-
-		}
-
-		//以下为绘制X/Y轴item名字
-		QRect rectXName, rectYName;
-		for (auto it = xset.begin(); it != xset.end(); it++)
-		{
-			rectXName.setRect(0.05*width() + (i+1)* horiGridWidth, 0.1*height(),horiGridWidth,verGridWidth);
-			painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
-			i++;
-		}
-		for (auto it = yset.begin(); it != yset.end(); it++)
-		{
-			rectXName.setRect(0.05*width(), 0.1*height()+(1+j)*verGridWidth, horiGridWidth, verGridWidth);
-			painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
-			j++;
-		}
-		//以下为绘制对应的数据
-		i = j = 0;
-		for (auto it = xset.begin(); it != xset.end(); it++)
-		{
-			i++;
-			for (auto it2 = yset.begin(); it2 != yset.end(); it2++)
-			{
-				j++;
-				//动态数据
-				QString currEntityType = *it;
-				QString currEntityAttr = *it2;
-				auto dataMap = DataManager::getInstance()->getDataMap();
-				if (!dataMap.contains(currEntityType))
-				{
-					continue;
-				}
-				if (!dataMap.value(currEntityType).contains(currEntityAttr))
-				{
-					continue;
-				}
-
-				if (m_currTimeIndex >= dataMap.value(currEntityType).value(currEntityAttr).size())
-				{
-					continue;
-				}
-
-				//*获取当前Attr值
-				double currValue = dataMap.value(currEntityType).value(currEntityAttr).at(m_currTimeIndex);
-				rect.setRect(0.05*width()+i*horiGridWidth, 0.1*height()+j*verGridWidth, horiGridWidth, verGridWidth);
-				painter.drawText(rect,Qt::AlignCenter|Qt::TextWrapAnywhere, QString::number(currValue, 'f', 2));
-			}
-			j = 0;
 		}
 	}
-
-
-
-
-	//以下为用户自定义数据
-	//QList<textUserData> list1;
-	//QRect rect, rectErase;
-	//list1 = addPP->getUserText();
-	//for (int i = 0; i < list1.size(); i++)
-	//{
-	//	int x = list1.at(i).row;
-	//	int y = list1.at(i).column;
-	//	if (x <= m_verGridNum || y <= m_horiGridNum)
-	//	{
-
-	//		rect.setRect(y*horiGridWidth, x*verGridWidth, horiGridWidth, verGridWidth);
-	//		rectErase.setRect(y*horiGridWidth + 3, x*verGridWidth + 3, horiGridWidth - 3, verGridWidth - 3);
-	//		painter.eraseRect(rectErase);
-	//		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, list1.at(i).str);
-	//	}
-	//	else
-	//	{
-	//		m_verGridNum = x;
-	//		m_horiGridNum = y;
-
-
-	//		rect.setRect(y*horiGridWidth, x*verGridWidth, horiGridWidth, verGridWidth);
-	//		painter.eraseRect(rect);
-	//		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, list1.at(i).str);
-
-	//	}
-	//}
 }
-
-
-
-
-void PlotText::onTimeout()
-{
-	m_currTimeIndex++;
-	update();
-}
-
-
-

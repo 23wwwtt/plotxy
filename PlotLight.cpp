@@ -83,17 +83,7 @@ void PlotLight::paintEvent(QPaintEvent* event)
 		painter.fillPath(path, Qt::red);
 		painter.drawEllipse(0.1*width(), 0.1*height() + (i + 0.5)*verGridWidth - 0.05*height(), 0.1*height(), 0.1*height());
 	}
-	
-
-
-	
-
-
-
-
-
-
-																//绘制网格
+	//绘制网格
 	//m_gridColor = Qt::white;
 	//pen.setColor(m_gridColor);
 	//painter.setPen(pen);
@@ -102,9 +92,4 @@ void PlotLight::paintEvent(QPaintEvent* event)
 	//m_gridFillColor = Qt::white;
 	//brush.setColor(m_gridFillColor);
 	//brush.setStyle(Qt::SolidPattern);
-
-
-
-
-
 }
