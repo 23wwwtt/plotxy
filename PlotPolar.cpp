@@ -23,9 +23,6 @@ PlotPolar::PlotPolar(QWidget * parent)
 	m_radialRange_upper = 90.0;
 
 	initPlot();
-	//m_layout = new QVBoxLayout(this);
-	//m_layout->addWidget(m_titleLabel);
-	//m_layout->addWidget(m_customPlot, 1);
 }
 
 PlotPolar::~PlotPolar()
@@ -34,34 +31,18 @@ PlotPolar::~PlotPolar()
 
 void PlotPolar::initPlot()
 {
-	m_titleLabel = new QLabel(this);
-	m_titleLabel->setText(m_title);
-	m_titleLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	m_titleLabel->setFont(m_titleFont);
-	m_titleLabel->setStyleSheet(QString("color:%1;").arg(m_titleColor.name()));
-//	m_titleLabel->setGeometry(0, 0, width(), 20);
-	//for (auto i:this->children())
-	//{
-	//	QString classname = i->metaObject()->className();
-	//	if (classname == "QPushButton" && i->isWidgetType())
-	//	{
-	//		((QWidget*)i)->setParent(m_titleLabel);
-	//		break;
-	//	}
-	//}
-
 	m_customPlot = new QCustomPlot(this);
-	m_customPlot->installEventFilter(this);
+	m_customPlot->setSelectionRectMode(QCP::srmNone);
+	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
 	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
-//	m_customPlot->setGeometry(0,20,qMin(width(),height()), qMin(width(), height()));
 	m_customPlot->plotLayout()->clear();
 
 	m_angularAxis = new QCPPolarAxisAngular(m_customPlot);
 	m_angularAxis->setBasePen(QPen(QColor(255, 255, 255), 2));
 	m_customPlot->plotLayout()->addElement(0, 0, m_angularAxis);
 	
-	m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+//	m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 	m_angularAxis->setRangeDrag(false);
 	m_angularAxis->setTickLabelMode(QCPPolarAxisAngular::lmUpright);
 	m_angularAxis->setFormat(m_angularUnit);
@@ -100,45 +81,37 @@ void PlotPolar::paintEvent(QPaintEvent * event)
 	double h = fm.size(Qt::TextSingleLine, m_title).height();
 
 	int radius = qMin(width, int(height - h));
+
+	painter.setFont(m_titleFont);
+	painter.setPen(m_titleColor);
 	if (width > (height - h))
 	{
 		m_customPlot->setGeometry((width - radius)/2, h, radius, radius);
-		m_titleLabel->setGeometry(0, 0, width, h);
+		painter.drawText(QPoint((width - w) / 2, h), m_title);
 	} 
 	else
 	{
 		m_customPlot->setGeometry(0, (height + h - radius)/2, radius, radius);
-		m_titleLabel->setGeometry(0, (height - h - radius) / 2, width, h);
+		painter.drawText(QPoint((width - w) / 2, (height + h - radius) / 2), m_title);
 	}
-}
-
-bool PlotPolar::eventFilter(QObject * watched, QEvent * event)
-{
-	/*if (watched == m_customPlot)
-	{
-	if (event->type() == QEvent::MouseButtonPress)
-	{
-	parent()->event(event);
-	qDebug() << parent()->objectName();
-	return true;
-	}
-	}*/
-	return false;
 }
 
 void PlotPolar::slot_setTitle(QString title)
 {
-	m_titleLabel->setText(title);
+	m_title = title;
+	update();
 }
 
 void PlotPolar::slot_setTitleColor(const QColor & color)
 {
-	m_titleLabel->setStyleSheet(QString("color:%1;").arg(color.name()));
+	m_titleColor = color;
+	update();
 }
 
 void PlotPolar::slot_setTitleFont(const QFont & font)
 {
-	m_titleLabel->setFont(font);
+	m_titleFont = font;
+	update();
 }
 
 void PlotPolar::slot_setAngularUnit(QString unit)
@@ -200,6 +173,11 @@ void PlotPolar::slot_getCurrentSeconds(double secs)
 
 	qDeleteAll(graph);
 	graph.clear();
+}
+
+void PlotPolar::slot_setMouseEventEnable(bool on)
+{
+	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, on);
 }
 
 void PlotPolar::onUpdateColorThresholdMap(QMap<QString, QMap<int, QColor>> targetMap)

@@ -6,6 +6,7 @@
 #include <QColorDialog>
 #include <QVBoxLayout>
 #include "ui_AdvancedDataManager.h"
+#include "PlotItemBase.h"
 
 
 class AdvancedDataManager : public QMainWindow
@@ -22,19 +23,17 @@ signals:
     void updateColorThresholdMap(QMap<QString, QMap<int, QColor>>);
 
 public slots:
-    void onBtnColorChooseClicked();
-
     void onBtnMore();
     void onBtnColorMore();
     void onBtnAdd();
-    void onBtnColorClicked();
 	void onEventBtnMoreClicked();
-
-    void onAdvancedDataManagerAddPair(QString,QString);
+	void onAddPlot(const QString&, PlotItemBase*);
+	void onUpdatePlotPair();
     void onCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*);
 
 private:
     Ui::AdvancedDataManager ui;
+	QMap<QString, QList<PlotItemBase*>> m_plotManager; //tabName
 
 };
 

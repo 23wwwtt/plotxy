@@ -1,6 +1,5 @@
 #pragma once
 #include "PlotItemBase.h"
-#include <qtimer.h>
 #include "qcustomplot.h"
 class PlotPolar :
 	public PlotItemBase
@@ -39,12 +38,14 @@ public slots:
 	//接收当前时间
 	void slot_getCurrentSeconds(double);
 
+	//mouseEvent
+	void slot_setMouseEventEnable(bool);
+
 public:
 	static int m_instanceCount;			//实体个数
 private:
 	QCustomPlot *m_customPlot;
 	QCPPolarAxisAngular *m_angularAxis;
-	QLabel* m_titleLabel;
 	QMap<QString, QMap<int, QColor>> m_thresholdColorMap;
 
 	QString m_title;
@@ -63,6 +64,5 @@ private:
 
 protected:
 	virtual void paintEvent(QPaintEvent* event);
-	bool eventFilter(QObject *watched, QEvent *event);
 };
 

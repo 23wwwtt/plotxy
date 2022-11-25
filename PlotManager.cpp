@@ -320,7 +320,7 @@ void PlotManager::onAddPlotPair(QString entityType, QString entityAttr)
 	if (currItem)
 	{
 		PlotBar* currBarItem = dynamic_cast<PlotBar*>(currItem);
-		currBarItem->addPlotDataPair(entityType, entityAttr);
+//		currBarItem->addPlotDataPair(entityType, entityAttr);
 	}
 }
 

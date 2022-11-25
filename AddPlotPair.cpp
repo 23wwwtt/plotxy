@@ -229,12 +229,11 @@ void AddPlotPair::onChangeStackIndex(PlotType index)
 		break;
 	case Type_PlotBar:
 	case Type_PlotDial:
+    case Type_PlotTrack:
 		ui.stackedWidget->setCurrentIndex(0);
 		break;
 	case Type_PlotAttitude:
 		ui.stackedWidget->setCurrentIndex(2);
-		break;
-	case Type_PlotTrack:
 		break;
 	case Type_PlotDoppler:
 		break;
@@ -349,7 +348,7 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 			strEntity1 = ui.tableWidget_Entity->currentItem()->text();
 			strNameUnit1 = ui.tableWidget_nameUnits->item(ui.tableWidget_nameUnits->currentRow(), 0)->text();
 
-			strSum1 = strEntity1 + "+" + strNameUnit1;
+//			strSum1 = strEntity1 + "+" + strNameUnit1;
 		}
 		else if (ui.radioButton_2->isChecked())
 		{
@@ -358,15 +357,13 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 
 			strEntity1 = ui.tableWidget_Entity_9->currentItem()->text();
 			strNameUnit1 = ui.tableWidget_Entity_10->currentItem()->text();
-			strSum1 = strEntity1 + "+" + strNameUnit1;
+//			strSum1 = strEntity1 + "+" + strNameUnit1;
 		}
 
-
 		strSum1 = strEntity1 + "+" + strNameUnit1;
-
 		strSum2 = "Time";
 
-		emit sigAddPlotPair(strEntity1, strNameUnit1);
+//		emit sigAddPlotPair(strEntity1, strNameUnit1);
 		break;
 
 	case 1:
@@ -495,6 +492,7 @@ void AddPlotPair::onBtnAddClicked()
 				break;
 			}
 		}
+		emit sgn_updatePlotPair();
 	}
 
 	QTableWidgetItem* addplot1 = new QTableWidgetItem(strSum1);
@@ -847,6 +845,7 @@ void AddPlotPair::onBtnUpdateClicked()
 					break;
 				}
 			}
+			emit sgn_updatePlotPair();
 		}
 
 	}
@@ -873,6 +872,7 @@ void AddPlotPair::onBtnRemoveClicked()
 					break;
 				}
 			}
+			emit sgn_updatePlotPair();
 		}
 
 		ui.tableWidget_union->removeRow(row);

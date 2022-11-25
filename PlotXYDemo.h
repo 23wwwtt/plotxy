@@ -45,6 +45,10 @@ public slots:
 	void onAddTextPlot();
 	void onAddPolarPlot();
 	void onAddLightPlot();
+    void onAddTrackPlot();
+	void onAddAScopePlot();
+	void onAddRTIPlot();
+	void onAddDopplerPolt();
 
 	void onFocusChanged(QWidget* oldWidget, QWidget* newWidget);
 
@@ -71,6 +75,7 @@ signals:
 	void sgn_loadDataReady();
 	void sgn_sliderValueChanged(int);
 	void sgn_sendCurrentSeconds(double);
+	void sgn_enableActionStop(bool);
 private:
     Ui::PlotXYDemo ui;
 	QWidget* m_nowFocusWidget;
