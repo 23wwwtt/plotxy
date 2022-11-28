@@ -3,7 +3,6 @@
 
 #include "PlotItemBase.h"
 #include "BaseData.h"
-#include <QTimer>
 #include <QMap>
 #include <QString>
 
@@ -24,9 +23,7 @@ public:
     void setRightPadding(int);
     void setInterPadding(int);
 
-    void updateItems(); //实现核心绘制逻辑
-
-    void drawRect(int itemIndex, TrackStatus status, int leftBoundary, int rightBoundary, QColor color);
+    void drawRect(int itemIndex, QList<QColor> dataList);
 public:
     static int m_instanceCount;         //实体个数
 
@@ -37,7 +34,7 @@ public slots:
 protected:
     virtual void paintEvent(QPaintEvent *event);
     void getDataInfo(double secs);
-    void updateData(int itemIndex, QString entityType, double secs);
+    void updateData(int itemIndex, QString entityType, double secs); //实现核心绘制逻辑
 
 private:
     QLine   m_xAxis;
@@ -46,7 +43,7 @@ private:
     int m_leftPadding;
     int m_rightPadding;
     int m_interPadding;
-    int m_verPadding;
+    int m_contextPadding;
 
     //QMap<QString,QString> m_plotDataPair;   //注：实体类型，实体属性   //这里不能用map
     QStringList m_entityTypeList;
