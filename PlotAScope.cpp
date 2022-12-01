@@ -58,6 +58,21 @@ void PlotAScope::initPlot()
 	m_customPlot->yAxis->setTickLabelColor(QColor(255, 255, 255));
 }
 
+void PlotAScope::slot_getCurrentSeconds(double secs)
+{
+	if (getPlotPairData().isEmpty())
+	{
+		return;
+	}
+	int isize = getPlotPairData().size();
+	for (int i = 0; i < isize; ++i)
+	{
+		QString xcolumn = getPlotPairData().at(i).first;
+		QString ycolumn = getPlotPairData().at(i).second;
+	}
+	
+}
+
 void PlotAScope::paintEvent(QPaintEvent * event)
 {
 	int width = this->width();
@@ -71,13 +86,7 @@ void PlotAScope::paintEvent(QPaintEvent * event)
 	double h = fm.size(Qt::TextSingleLine, m_title).height();
 	double as = fm.ascent();
 
-	if (!m_titleShow)
-	{
-		w = 0.0;
-		h = 0.0;
-		as = 0.0;
-	}
-	else
+	if (m_titleShow)
 	{
 		painter.setFont(m_titleFont);
 		painter.setPen(m_titleColor);

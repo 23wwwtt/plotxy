@@ -38,13 +38,14 @@ public:
     QString currName();
     QString currTabName();
 
-	void addPlotPairData(QPair<QString, QString>);
-	void delPlotPairData(QPair<QString, QString>);
-	void updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair);
+	virtual void addPlotPairData(QPair<QString, QString>);
+	virtual void delPlotPairData(QPair<QString, QString>);
+	virtual void updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair);
 	QList<QPair<QString, QString>> getPlotPairData();
 
 protected:
     //virtual void paintEvent(QPaintEvent* event);
+	QList<QPair<QString, QString>> m_plotPairData;
 
 private:
     QPoint  m_position;
@@ -53,7 +54,6 @@ private:
     QString m_plotItemName;
     QString m_tabName;
     bool    m_bVisible;
-	QList<QPair<QString, QString>> m_plotPairData;
 
     Ui::PlotItemBase ui;
 };

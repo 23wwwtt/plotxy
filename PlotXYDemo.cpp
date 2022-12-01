@@ -188,17 +188,18 @@ void PlotXYDemo::onContextMenu(const QPoint &point)
     QAction *addScatterPlot = new QAction(QString::fromLocal8Bit("添加Scatter组件"), this);
     QAction *addDialPlot = new QAction(QString::fromLocal8Bit("添加Dial组件"), this);
     /* 添加菜单项 */
+	createPlotMenu->addAction(addScatterPlot);
+	createPlotMenu->addAction(addAScopePlot);
+	createPlotMenu->addAction(addRTIPlot);
+	createPlotMenu->addAction(addTextPlot);
+	createPlotMenu->addAction(addLightPlot);
     createPlotMenu->addAction(addBarPlot);
+	createPlotMenu->addAction(addDialPlot);
     createPlotMenu->addAction(addAttitudePlot);
-    createPlotMenu->addAction(addTextPlot);
-    createPlotMenu->addAction(addPolarPlot);
-    createPlotMenu->addAction(addLightPlot);
-    createPlotMenu->addAction(addTrackPlot);
-    createPlotMenu->addAction(addAScopePlot);
-    createPlotMenu->addAction(addRTIPlot);
+    createPlotMenu->addAction(addPolarPlot);   
+    createPlotMenu->addAction(addTrackPlot);   
     createPlotMenu->addAction(addDopplerPlot);
-    createPlotMenu->addAction(addScatterPlot);
-    createPlotMenu->addAction(addDialPlot);
+       
     /* 连接槽函数 */
     connect(addBarPlot, SIGNAL(triggered()), this, SLOT(onAddBarPlot()));
     connect(addAttitudePlot, SIGNAL(triggered()), this, SLOT(onAddAttitudePlot()));
@@ -506,11 +507,12 @@ void PlotXYDemo::onAddScatterPlot()
     m_freeWidgetWraper->setMoveEnable(true);
 
     plotItem->show();
-    plotItem->update();
+//    plotItem->update();
 
     m_lastSelectedType = PlotType::Type_PlotScatter;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddDialPlot()
@@ -536,6 +538,7 @@ void PlotXYDemo::onAddDialPlot()
     m_lastSelectedType = PlotType::Type_PlotDial;
     m_plotManager->addPlot(currTabText, plotItem);
     m_addPlotPair->onAddPlot(currTabText, plotItem);
+	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddPolarPlot()

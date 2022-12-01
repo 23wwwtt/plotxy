@@ -465,7 +465,7 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 			strSum1 = strEntity1 + "+" + strNameUnit1;
 			strSum2 = "Time";
 		}
-			break;
+		break;
 	}
 
 	}

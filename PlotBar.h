@@ -25,11 +25,6 @@ public:
     void setLeftPadding(int);
     void setRightPadding(int);
     void setInterPadding(int);
-
-    void addPlotDataPair(const QString &, const QString &);
-
-    void updateItems(); //实现核心绘制逻辑
-
     void drawRect(int itemIndex, bool bHorizontal, int itemLength, int leftBoundary, int rightBoundary, QColor color);
 
 public:
@@ -46,6 +41,7 @@ protected:
 
 private:
     bool m_bHorizontal;
+	bool m_titleShow;				//标题是否显示
 
     QLine m_xAxis;
     QLine m_yAxis;
@@ -53,16 +49,20 @@ private:
     int m_leftPadding;
     int m_rightPadding;
     int m_interPadding;
+	int m_topPadding;
+	int m_bottomPadding;
 
     int m_currTimeIndex;
 
     //QMap<QString,QString> m_plotDataPair;   //注：实体类型，实体属性   //这里不能用map
-    QStringList m_entityTypeList;
-    QStringList m_entityAttrList;
+//     QStringList m_entityTypeList;
+//     QStringList m_entityAttrList;
 
     QMap<QString, QMap<int, QColor>> m_thresholdColorMap;   //key:entityType+entityAttr, threshold,QColor
     QColor m_defaultColor;
-
+	QColor m_titleColor;				//标题颜色
+	QFont m_titleFont;					//标题字体
+	QString m_title;					//标题
     QColor m_gridColor;
     QColor m_gridFillColor;
     QColor m_axisColor;

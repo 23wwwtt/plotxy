@@ -6,12 +6,8 @@
 #include "DataManager.h"
 
 int PlotDial::m_instanceCount = 1;
-
-const double PI = 3.141592653589793;
-
 PlotDial::PlotDial(QWidget *parent)
     : PlotItemBase(parent)
-    , m_contentPadding(20)
 {
     m_bThinStyle = true;
 
@@ -21,6 +17,20 @@ PlotDial::PlotDial(QWidget *parent)
     QString name = QString("Dial%1").arg(m_instanceCount);
     this->setName(name);
     m_instanceCount += 1;
+
+	m_title = "Dial";
+	m_titleColor = Qt::white;
+	m_titleFont.setFamily("Microsoft YaHei");
+	m_titleFont.setPointSizeF(16.0);
+	m_titleShow = true;
+
+	m_axisFont.setFamily("Microsoft YaHei");
+	m_axisFont.setPointSizeF(12.0);
+
+	m_leftPadding = 20;
+	m_rightPadding = 20;
+	m_topPadding = 0;
+	m_bottomPadding = 20;
 }
 
 PlotDial::~PlotDial()
@@ -48,8 +58,8 @@ void PlotDial::updatePointer(double secs)
     double angle = (int)currValue % 360;
 
     QPoint endPoint;
-    endPoint.setX(m_circleRadius * qCos(angle * PI / 180.0) + m_centerPoint.x());
-    endPoint.setY(-m_circleRadius * sin(angle * PI / 180.0) + m_centerPoint.y());
+    endPoint.setX( m_circleRadius * cos(qDegreesToRadians(angle)) + m_centerPoint.x());
+    endPoint.setY(-m_circleRadius * sin(qDegreesToRadians(angle)) + m_centerPoint.y());
 
     QVector2D vec(endPoint.x() - m_centerPoint.x(),
                   endPoint.y() - m_centerPoint.y());
@@ -86,14 +96,32 @@ void PlotDial::onGetCurrentSeconds(double secs)
 
 void PlotDial::paintEvent(QPaintEvent *event)
 {
-    //绘制表盘圆圈
     QPainter painter(this);
+	painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+
+	//绘制标题
+	QFontMetricsF fm(m_titleFont);
+	double w = fm.size(Qt::TextSingleLine, m_title).width();
+	double h = fm.size(Qt::TextSingleLine, m_title).height();
+	double as = fm.ascent();
+
+	m_circleRadius = (width() - m_leftPadding - m_rightPadding) < (height() - h - m_topPadding - m_bottomPadding) ? (width() - m_leftPadding - m_rightPadding) / 2 : (height() - h - m_topPadding - m_bottomPadding) / 2;
+	m_centerPoint = QPoint((width() + m_leftPadding - m_rightPadding) / 2, (height() + h + m_topPadding - m_bottomPadding) / 2);
+	
+	if (m_titleShow)
+	{
+		painter.setFont(m_titleFont);
+		painter.setPen(m_titleColor);
+		painter.drawText(QPoint((width() + m_leftPadding - m_rightPadding - w) / 2, m_centerPoint.y() - m_circleRadius + (as - h)), m_title);
+	}
+
+	//绘制表盘圆圈
     QPen pen;
     pen.setColor(m_dialColor);
     pen.setWidth(2);
     painter.setPen(pen);
-    m_circleRadius = width() < height() ? width() / 2 - m_contentPadding : height() / 2 - m_contentPadding;
-    m_centerPoint = QPoint(width() / 2, height() / 2);
+    
+    
     painter.drawEllipse(m_centerPoint, m_circleRadius, m_circleRadius);
 
     // 绘制表盘圆弧
@@ -131,13 +159,23 @@ void PlotDial::paintEvent(QPaintEvent *event)
     painter.drawLine(QPointF(0, m_circleRadius * 0.95), QPointF(0, m_circleRadius));
 
     // 绘制表盘文字
-    QFont font;
-    font.setFamily("Microsoft YaHei");
-    font.setPointSize(14);
-    painter.drawText(-m_circleRadius * 0.9, 0, QString("-50°"));
-    painter.drawText(0, -m_circleRadius * 0.9, QString("0°"));
-    painter.drawText(m_circleRadius * 0.9, 0, QString("50°"));
-    painter.drawText(0, m_circleRadius * 0.9, QString("100°"));
+	painter.setFont(m_axisFont);
+	QFontMetricsF fm1(m_axisFont);
+ 	w = fm1.size(Qt::TextSingleLine, QString("-50°")).width();
+ 	h = fm1.size(Qt::TextSingleLine, QString("-50°")).height();
+    painter.drawText(-m_circleRadius * 0.93, h/3, QString("-50°"));
+
+	w = fm1.size(Qt::TextSingleLine, QString("0°")).width();
+	h = fm1.size(Qt::TextSingleLine, QString("0°")).height();
+    painter.drawText(-w/2, -m_circleRadius * 0.95 + h, QString("0°"));
+
+	w = fm1.size(Qt::TextSingleLine, QString("50°")).width();
+	h = fm1.size(Qt::TextSingleLine, QString("50°")).height();
+    painter.drawText(m_circleRadius*0.93 - w, h/3, QString("50°"));
+
+	w = fm1.size(Qt::TextSingleLine, QString("100°")).width();
+	h = fm1.size(Qt::TextSingleLine, QString("100°")).height();
+    painter.drawText(-w/2, m_circleRadius * 0.93, QString("100°"));
 
     updatePointer(m_seconds);
 

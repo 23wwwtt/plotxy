@@ -67,6 +67,8 @@ public slots:
 	//mouseEvent
 	void slot_setMouseEventEnable(bool on);
 
+	void slot_getCurrentSeconds(double secs);
+
 protected:
 	virtual void paintEvent(QPaintEvent* event);
 	bool eventFilter(QObject *watched, QEvent *event);
