@@ -38,8 +38,6 @@ PlotText::~PlotText()
 
 }
 
-
-
 void PlotText::paintEvent(QPaintEvent* event)
 {
 	//以下绘制标题“Text Plot”
@@ -72,19 +70,20 @@ void PlotText::paintEvent(QPaintEvent* event)
 	//以下绘制n×m的格子
 	drawNMCell(painter, xset, yset, dataList, horiGridWidth, verGridWidth);
 	//以下为绘制X/Y轴item名字
-	drawXYTitle(painter, horiGridWidth, verGridWidth);
+	drawXYTitle(painter, horiGridWidth, verGridWidth,dataList);
 	//以下为绘制对应的数据
-	if (temValueList.isEmpty())
+	if (m_temValueList.isEmpty())
 		return;
 	else
 	{
+		painter.drawText(0.05*width(),0.1*height(),horiGridWidth,verGridWidth, Qt::AlignCenter | Qt::TextWrapAnywhere,QString::fromLocal8Bit("0表示0或无数据"));
 		for (int i = m_entityName.size() - 1; i != -1; i--)
 		{
 			for (int j = m_attriName.size() - 1; j != -1; j--)
 			{
 				rect.setRect(0.05*width() + (1 + horGT)*horiGridWidth, 0.1*height() + (1 + verGT)*verGridWidth, horiGridWidth, verGridWidth);
 				//painter.drawText(rect, QString::number(*(m_valueListVector.at(j).end()),'f',2));
-				painter.drawText(rect, QString::number(temValueList.at(temValueList.size() - 1 - j - i*m_attriName.size()).back(), 'f', 2));
+				painter.drawText(rect, Qt::AlignCenter | Qt::TextWrapAnywhere, QString::number(m_temValueList.at(m_temValueList.size() - 1 - j - i*m_attriName.size()).back(), 'f', 6));
 				update();
 				verGT++;
 			}
@@ -136,7 +135,7 @@ void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridW
 	{
 		return;
 	}
-	if (temValueList.isEmpty())
+	if (m_temValueList.isEmpty())
 	{
 		return;
 	}
@@ -168,12 +167,13 @@ void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridW
 			//*获取当前Attr值
 
 			rect.setRect(0.05*width() + (1 + i)*horiGridWidth, 0.1*height() + j*verGridWidth, horiGridWidth, verGridWidth);
-			painter.drawText(rect, Qt::AlignCenter | Qt::TextWrapAnywhere, QString::number((temValueList.at(j).back()), 'f', 2));
+			painter.drawText(rect, Qt::AlignCenter | Qt::TextWrapAnywhere, QString::number((m_temValueList.at(j).back()), 'f', 2));
 		}
 		i++;
 		j = 0;
 	}
 }
+
 
 
 void PlotText::slot_getCurrentSeconds(double secs)
@@ -183,59 +183,77 @@ void PlotText::slot_getCurrentSeconds(double secs)
 	int isize = getPlotPairData().size();
 	int entityNum = 0;
 	int attriNum = 0;
-	m_entityName.clear();
-	m_attriName.clear();
+	//m_entityName.clear();
+	//m_attriName.clear();
 	for (int i = 0; i < isize; i++)
 	{
-		QString column = getPlotPairData().at(i).first;
-		QList<QString> valueList = column.split("+");
+		QString getTextData = getPlotPairData().at(i).first;
+		QList<QString> textValueList = getTextData.split("+");
+		if (m_entityName.isEmpty())
+			m_entityName.push_back(textValueList.front());
 		for (int i = 0; i < m_entityName.size(); i++)
-			m_entityName.push_back(valueList.front());
-		//for (int i = 0; i < m_entityName.size(); i++)
-		//{
-		//	if (valueList.front() == m_entityName.at(i))
-		//		entityNum++;
-		//}
-		//if (entityNum == 0)
-		//	m_entityName.push_back(valueList.front());
+		{
+			if (textValueList.front() == m_entityName.at(i))
+				entityNum++;
+		}
+		if (entityNum == 0)
+			m_entityName.push_back(textValueList.front());
+		entityNum = 0;
 
 		if (m_attriName.isEmpty())
-			m_attriName.push_back(valueList.back());
+			m_attriName.push_back(textValueList.back());
 		for (int i = 0; i < m_attriName.size(); i++)
 		{
-			if (valueList.back() == m_attriName.at(i))
+			if (textValueList.back() == m_attriName.at(i))
 				attriNum++;
 		}
 		if (attriNum == 0)
-			m_attriName.push_back(valueList.back());
+			m_attriName.push_back(textValueList.back());
+		attriNum = 0;
 	}
 	for (auto ite = m_entityName.begin(); ite != m_entityName.end(); ite++)
 	{
 		for (auto ita = m_attriName.begin(); ita != m_attriName.end(); ita++)
 		{
 			m_valueList = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(*ite, *ita, secs);
-			temValueList.push_back(m_valueList);
+			if (m_valueList.isEmpty())
+				m_valueList.push_back(0);
+			m_temValueList.push_back(m_valueList);
+
 		}
 	}
 	update();
 }
 
-void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth)
+void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth,QList<QPair<QString, QString>>& dataList)
 {
 	QRect rectXName, rectYName;
 	int i = 0, j = 0;
-	for (auto it = m_entityName.begin(); it != m_entityName.end(); it++)
+	dataList = getPlotPairData();
+	for (int i = 0; i < dataList.size(); i++)
 	{
+		QString xIncludePlus = dataList.at(i).first;
+		int pos = xIncludePlus.indexOf("+");
+		QString xColumn = xIncludePlus.mid(0, pos);
+		QString yColumn = xIncludePlus.mid(pos + 1);
 		rectXName.setRect(0.05*width() + (i + 1)* horiGridWidth, 0.1*height(), horiGridWidth, verGridWidth);
-		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
-		i++;
+		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, xColumn);
+		rectXName.setRect(0.05*width(), 0.1*height() + (1 + i)*verGridWidth, horiGridWidth, verGridWidth);
+		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, yColumn);
 	}
-	for (auto it = m_attriName.begin(); it != m_attriName.end(); it++)
-	{
-		rectXName.setRect(0.05*width(), 0.1*height() + (1 + j)*verGridWidth, horiGridWidth, verGridWidth);
-		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
-		j++;
-	}
+	//for (auto it = m_entityName.begin(); it != m_entityName.end(); it++)
+	//{
+	//	rectXName.setRect(0.05*width() + (i + 1)* horiGridWidth, 0.1*height(), horiGridWidth, verGridWidth);
+	//	painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
+	//	i++;
+	//}
+	//for (auto it = m_attriName.begin(); it != m_attriName.end(); it++)
+	//{
+	//	rectXName.setRect(0.05*width(), 0.1*height() + (1 + j)*verGridWidth, horiGridWidth, verGridWidth);
+	//	painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
+	//	j++;
+	//}
+	update();
 }
 
 void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>& yset, QList<QPair<QString, QString>> dataList,
@@ -269,4 +287,5 @@ void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>&
 			painter.drawRect(gridRect);
 		}
 	}
+	update();
 }

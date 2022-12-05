@@ -61,14 +61,14 @@ private:
 	QVector<QList<double>> m_valueListVector;
 	QColor m_defaultColor;
 	QList<double> m_valueList;
-	QList<QList<double>> temValueList;
+	QList<QList<double>> m_temValueList;
 	QList<QString> m_entityName, m_attriName;
 
 
 	double m_secValue;
 
 	void setTitle(QPainter& painter, QRect& rect);
-	void drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth);
+	void drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth , QList<QPair<QString, QString>> & dataList );
 	void drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>& yset, QList<QPair<QString, QString>> dataList,
 		int& horiGridWidth, int& verGridWidth);
 	void drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridWidth, int& verGridWidth);

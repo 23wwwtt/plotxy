@@ -382,7 +382,9 @@ void PlotXYDemo::onAddLightPlot()
     //connect(ui.actionStop, &QAction::triggered, plotItem, &PlotText::onSwitch);
     //connect(m_AdvancedDataManager, &AdvancedDataManager::updateColorThresholdMap,
     //  plotItem, &PlotText::onUpdateColorThresholdMap);
-
+//	connect(m_addPlotPair, &AddPlotPair::sgn_addPlotPair, plotItem, &PlotLight::slot_getCurrentSeconds);
+	connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotLight::slot_getCurrentSeconds);
+	connect(m_addPlotPair, &AddPlotPair::sgn_getLightData, plotItem, &PlotLight::slot_getLightData);
 
     initWidget(plotItem);
 
