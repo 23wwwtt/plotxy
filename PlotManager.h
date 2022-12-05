@@ -26,7 +26,8 @@ public:
 
 	int m_hrozGrids;
 	int m_vertGrids;
-
+private:
+	void refreshGeneralUI(PlotItemBase* plot);
 public slots:
     void onTWSclicked(QTreeWidgetItem* item, int i);
     void onTWSPclicked(QTreeWidgetItem* item, int i);
@@ -41,6 +42,11 @@ public slots:
 
 	void onAddPlotPair(QString,QString);
 	void onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn);
+
+	void onRadioPixelClicked();
+	void onRadioPercentClicked();
+
+	void onGetTabWidgetRect(QRect);
 
 signals:
 	void sigAddPlotPair();
@@ -69,6 +75,8 @@ private:
 	QTreeWidgetItem* m_itemRangeDoppler;
 
     QMap<QString/*int*/, QList<PlotItemBase*>> m_plotManager;	//tabName
+	bool m_radioPixelChecked;
+	QRect m_tabWidgetRect;
 };
 
 #endif // ! 

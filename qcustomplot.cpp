@@ -14379,6 +14379,19 @@ bool QCustomPlot::hasPlottable(QCPAbstractPlottable *plottable) const
   return mPlottables.contains(plottable);
 }
 
+QCPGraph *QCustomPlot::graph(QString name) const
+{
+	foreach(QCPGraph* i, mGraphs)
+	{
+		if (i->name() == name)
+		{
+			return i;
+		}
+	}
+	qDebug() << Q_FUNC_INFO << "no gragh's name is : " << name;
+	return nullptr;
+}
+
 /*!
   Returns the graph with \a index. If the index is invalid, returns \c nullptr.
   
