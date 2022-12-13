@@ -70,11 +70,13 @@ private:
 	int m_interPadding;
 	int m_currTimeIndex;
 
-	void drawLight();
+	void judgeLight();
+	void drawLight(QPainter &,double &);
 
 public slots:
 	void slot_getLightData(QList<QList<QString>>);
 	void slot_getCurrentSeconds(double secs);
+	void slot_onAddButtonClicked();
 
 
 
