@@ -30,21 +30,12 @@ AddPlotPair::AddPlotPair(QWidget *parent) :
 
 	this->setWindowTitle("Add Plot Pair");
 
-	ui.tableWidget_Entity->setStyleSheet("QHeaderView::section{background:lightgray;}");
-	ui.tableWidget_Entity_2->setStyleSheet("QHeaderView::section{background:lightgray;}");
-	ui.tableWidget_Entity_3->setStyleSheet("QHeaderView::section{background:lightgray;}");
-	ui.tableWidget_Entity_4->setStyleSheet("QHeaderView::section{background:lightgray;}");
-	ui.tableWidget_Entity_5->setStyleSheet("QHeaderView::section{background:lightgray;}");
-	ui.tableWidget_Entity_Attitude1->setStyleSheet("QHeaderView::section{background:lightgray;}");
-	ui.tableWidget_Entity_Attitude2->setStyleSheet("QHeaderView::section{background:lightgray;}");
-
-
 	initStackedWidget_page1();
 	initStackedWidget_page2();
 	initStackedWidget_page3();
 	initStackedWidget_page4();
 	initStackedWidget_page5();
-
+	initStackedWidget_pageAScope();
 
 	initTreePlot();
 
@@ -195,6 +186,14 @@ void AddPlotPair::initStackedWidget_page5()
 
 }
 
+void AddPlotPair::initStackedWidget_pageAScope()
+{
+	ui.tableWidget_AScopeEntity->setStyleSheet("QHeaderView::section{background:lightgray;}");
+	ui.tableWidget_AScopeEntity->horizontalHeader()->setStretchLastSection(true);
+	ui.tableWidget_AScopeEntity->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	ui.tableWidget_AScopeEntity->verticalHeader()->hide();
+}
+
 
 void AddPlotPair::initTreePlot()
 {
@@ -224,12 +223,24 @@ void AddPlotPair::onChangeStackIndex(PlotType index)
 	switch (index)
 	{
 	case Type_PlotScatter:
+		ui.groupBox_3->setTitle(QString::fromLocal8Bit("X轴数据源"));
+		ui.groupBox_2->setTitle(QString::fromLocal8Bit("Y轴数据源"));
+		ui.stackedWidget->setCurrentIndex(1);
+		break;
 	case Type_PlotPolar:
+		ui.groupBox_3->setTitle(QString::fromLocal8Bit("角度数据源"));
+		ui.groupBox_2->setTitle(QString::fromLocal8Bit("幅度数据源"));
 		ui.stackedWidget->setCurrentIndex(1);
 		break;
 	case Type_PlotAScope:
+		ui.label_XAxis->setText(QString::fromLocal8Bit("X轴：Range(m)"));
+		ui.label_YAxis->setText(QString::fromLocal8Bit("Y轴：Voltage(v)"));
+		ui.stackedWidget->setCurrentIndex(5);
 		break;
 	case Type_PlotRTI:
+		ui.label_XAxis->setText(QString::fromLocal8Bit("X轴：Range(m)"));
+		ui.label_YAxis->setText(QString::fromLocal8Bit("Y轴：Time(s)"));
+		ui.stackedWidget->setCurrentIndex(5);
 		break;
 	case Type_PlotText:
 		ui.stackedWidget->setCurrentIndex(3);
@@ -246,6 +257,9 @@ void AddPlotPair::onChangeStackIndex(PlotType index)
 		ui.stackedWidget->setCurrentIndex(2);
 		break;
 	case Type_PlotDoppler:
+		ui.label_XAxis->setText(QString::fromLocal8Bit("X轴：Range(m)"));
+		ui.label_YAxis->setText(QString::fromLocal8Bit("Y轴：Range(m)"));
+		ui.stackedWidget->setCurrentIndex(5);
 		break;
 	default:
 		ui.stackedWidget->setCurrentIndex(0);

@@ -86,7 +86,13 @@ void PlotAScope::paintEvent(QPaintEvent * event)
 	double h = fm.size(Qt::TextSingleLine, m_title).height();
 	double as = fm.ascent();
 
-	if (m_titleShow)
+	if (!m_titleShow)
+	{
+		w = 0.0;
+		h = 0.0;
+		as = 0.0;
+	}
+	else
 	{
 		painter.setFont(m_titleFont);
 		painter.setPen(m_titleColor);

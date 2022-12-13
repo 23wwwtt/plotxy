@@ -49,16 +49,6 @@ background-color: rgb(85, 85, 85);
         <string>Tab 1</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Tab 2</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>Tab 3</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
     <item>

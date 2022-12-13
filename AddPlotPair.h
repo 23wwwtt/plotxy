@@ -52,6 +52,7 @@ private:
 	void initStackedWidget_page3();
 	void initStackedWidget_page4();
 	void initStackedWidget_page5();
+	void initStackedWidget_pageAScope();
 
 	
 	void initTreePlot();

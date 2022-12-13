@@ -3852,6 +3852,7 @@ public:
   bool hasPlottable(QCPAbstractPlottable *plottable) const;
  
   // specialized interface for QCPGraph:
+  QCPGraph *graph(QString name) const;
   QCPGraph *graph(int index) const;
   QCPGraph *graph() const;
   QCPGraph *addGraph(QCPAxis *keyAxis=nullptr, QCPAxis *valueAxis=nullptr);

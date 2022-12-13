@@ -57,16 +57,16 @@ PlotManager::PlotManager(QWidget* parent)
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
 	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
 
-	m_itemGOG->setDisabled(true); 
-	m_itemScatterPlot->setDisabled(true);
-	m_itemAScope->setDisabled(true);
-	m_itemRTI->setDisabled(true);
-	m_itemTextLight->setDisabled(true);
-	m_itemBar->setDisabled(true);
-	m_itemDial->setDisabled(true);
-	m_itemAttitude->setDisabled(true);
-	m_itemTrackStatus->setDisabled(true);
-	m_itemRangeDoppler->setDisabled(true);
+// 	m_itemGOG->setDisabled(true); 
+// 	m_itemScatterPlot->setDisabled(true);
+// 	m_itemAScope->setDisabled(true);
+// 	m_itemRTI->setDisabled(true);
+// 	m_itemTextLight->setDisabled(true);
+// 	m_itemBar->setDisabled(true);
+// 	m_itemDial->setDisabled(true);
+// 	m_itemAttitude->setDisabled(true);
+// 	m_itemTrackStatus->setDisabled(true);
+// 	m_itemRangeDoppler->setDisabled(true);
 
 	ui.stackedWidget->setCurrentIndex(0);
 	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
@@ -101,12 +101,18 @@ PlotManager::PlotManager(QWidget* parent)
 	ui.pushButton_axisColor->setFixedSize(21, 21);
 	ui.pushButton_gridColor->setFixedSize(21, 21);
 	ui.pushButton_gridFill->setFixedSize(21, 21);
-	ui.textEdit->setFixedHeight(24);
-	ui.textEdit_2->setFixedHeight(24);
+// 	ui.textEdit->setFixedHeight(24);
+// 	ui.textEdit_2->setFixedHeight(24);
 	ui.pushButton_10->setFixedSize(21, 21);
 	ui.pushButton_21->setFixedSize(21, 21);
 	ui.pushButton_22->setFixedSize(21, 21);
 	ui.pushButton_23->setFixedSize(21, 21);
+
+	ui.radioButton_percent->setChecked(true);
+	m_radioPixelChecked = false;
+	connect(ui.radioButton_percent, &QRadioButton::clicked, this, &PlotManager::onRadioPercentClicked);
+	connect(ui.radioButton_pixel, &QRadioButton::clicked, this, &PlotManager::onRadioPixelClicked);
+
 }
 
 PlotManager::~PlotManager()
@@ -141,10 +147,34 @@ void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
 
 		QTreeWidgetItem* itemselPlotI = new QTreeWidgetItem(QStringList() << plotItem->currName());
 		itemselPlotH->addChild(itemselPlotI);
+
+		//comboBox_tabName
+		ui.comboBox_tabName->addItem(tabName);
 	}
 
 	//数据层更新
 	m_plotManager[tabName].append(plotItem);
+}
+
+void PlotManager::refreshGeneralUI(PlotItemBase * plot)
+{
+	ui.lineEdit_plotName->setText(plot->currName());
+	ui.comboBox_tabName->setCurrentText(plot->currTabName());
+	if (ui.radioButton_pixel->isChecked())
+	{
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg(plot->currPosition().x()));
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg(plot->currPosition().y()));
+		ui.lineEdit_plotWidth->setText(QString("%1").arg(plot->currWidth()));
+		ui.lineEdit_plotHeight->setText(QString("%1").arg(plot->currHeight()));
+
+	}
+	else if (ui.radioButton_percent->isChecked())
+	{
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg((float)plot->currPosition().x() / m_tabWidgetRect.width()));
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg((float)plot->currPosition().y() / m_tabWidgetRect.height()));
+		ui.lineEdit_plotWidth->setText(QString("%1").arg((float)plot->currWidth() / m_tabWidgetRect.width()));
+		ui.lineEdit_plotHeight->setText(QString("%1").arg((float)plot->currHeight() / m_tabWidgetRect.height()));
+	}
 }
 
 void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int i)
@@ -163,8 +193,11 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int i)
 			PlotItemBase *tempPlot = m_plotManager[parent_text].at(i);
 			if (child_text == tempPlot->currName())
 			{
-				ui.treeWidget_4->clear();
+				//general界面
+				refreshGeneralUI(tempPlot);
 
+				//plotPair界面
+				ui.treeWidget_4->clear();
 				QList<QPair<QString, QString>> plotPairData = tempPlot->getPlotPairData();
 				for (int k = 0; k < plotPairData.size(); ++k)
 				{
@@ -385,6 +418,79 @@ void PlotManager::onAddPlotPair(QString tabName, QString plotName, QString xColu
 			
 		}
 	}
+}
+
+void PlotManager::onRadioPixelClicked()
+{
+	ui.label_xPos->setText("pixel");
+	ui.label_yPos->setText("pixel");
+	ui.label_widthPos->setText("pixel");
+	ui.label_heightPos->setText("pixel");
+
+	if (ui.lineEdit_plotPositionX->text() == nullptr || ui.lineEdit_plotPositionY->text() == nullptr ||
+		ui.lineEdit_plotWidth->text() == nullptr || ui.lineEdit_plotHeight->text() == nullptr)
+	{
+		m_radioPixelChecked = true;
+		return;
+	}
+	if (!m_radioPixelChecked)
+	{
+		float percent = ui.lineEdit_plotPositionX->text().toFloat();
+		int pixel = (int)(percent * m_tabWidgetRect.width());
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg(pixel));
+
+		percent = ui.lineEdit_plotPositionY->text().toFloat();
+		pixel = (int)(percent * m_tabWidgetRect.height());
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg(pixel));
+
+		percent = ui.lineEdit_plotWidth->text().toFloat();
+		pixel = (int)(percent * m_tabWidgetRect.width());
+		ui.lineEdit_plotWidth->setText(QString("%1").arg(pixel));
+
+		percent = ui.lineEdit_plotHeight->text().toFloat();
+		pixel = (int)(percent * m_tabWidgetRect.height());
+		ui.lineEdit_plotHeight->setText(QString("%1").arg(pixel));
+	}
+	m_radioPixelChecked = true;
+}
+
+void PlotManager::onRadioPercentClicked()
+{
+	ui.label_xPos->setText("%");
+	ui.label_yPos->setText("%");
+	ui.label_widthPos->setText("%");
+	ui.label_heightPos->setText("%");
+
+	if (ui.lineEdit_plotPositionX->text() == nullptr || ui.lineEdit_plotPositionY->text() == nullptr ||
+		ui.lineEdit_plotWidth->text() == nullptr || ui.lineEdit_plotHeight->text() == nullptr)
+	{
+		m_radioPixelChecked = false;
+		return;
+	}
+	if (m_radioPixelChecked)
+	{
+		int pixel = ui.lineEdit_plotPositionX->text().toInt();
+		float percent = (float)pixel / m_tabWidgetRect.width();
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg(percent));
+
+		pixel = ui.lineEdit_plotPositionY->text().toInt();
+		percent = (float)pixel / m_tabWidgetRect.height();
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg(percent));
+
+		pixel = ui.lineEdit_plotWidth->text().toInt();
+		percent = (float)pixel / m_tabWidgetRect.width();
+		ui.lineEdit_plotWidth->setText(QString("%1").arg(percent));
+
+		pixel = ui.lineEdit_plotHeight->text().toInt();
+		percent = (float)pixel / m_tabWidgetRect.height();
+		ui.lineEdit_plotHeight->setText(QString("%1").arg(percent));
+	}
+	m_radioPixelChecked = false;
+}
+
+void PlotManager::onGetTabWidgetRect(QRect rect)
+{
+	m_tabWidgetRect = rect;
 }
 
 void PlotManager::onBtnAxisColorClicked()

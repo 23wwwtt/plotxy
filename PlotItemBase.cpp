@@ -36,30 +36,37 @@ void PlotItemBase::setPosition(int x, int y)
 {
     m_position.setX(x);
     m_position.setY(y);
+	this->setGeometry(x, y, currWidth(), currHeight());
+	update();
 }
 
 void PlotItemBase::setWidth(int width)
 {
     m_width = width;
+	update();
 }
 
 void PlotItemBase::setHeight(int height)
 {
     m_height = height;
+	update();
 }
 
 QPoint PlotItemBase::currPosition()
 {
+	m_position = this->pos();
     return m_position;
 }
 
 int PlotItemBase::currWidth()
 {
+	m_width = this->width();
     return m_width;
 }
 
 int PlotItemBase::currHeight()
 {
+	m_height = this->height();
     return m_height;
 }
 

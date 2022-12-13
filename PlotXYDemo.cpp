@@ -21,11 +21,14 @@
 #include "PlotDoppler.h"
 #include "PlotScatter.h"
 #include "PlotDial.h"
+#include "renameTab.h"
 
 PlotXYDemo::PlotXYDemo(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+	setMinimumSize(1600, 900);
+	showMaximized();
 
     initTime();
 
@@ -49,15 +52,6 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
     m_curBaseInfo.Base_PlotName = nullptr;
     qRegisterMetaType<BaseInfo>("BaseInfo");
 
-	//QPalette palette(ui.tabWidget->palette());
-	//palette.setColor(QPalette::Background, Qt::darkGray);
-	//ui.tabWidget->setPalette(palette);
-
-	/*ui.tabWidget->setStyleSheet("QTabWidget#tabWidget{backgroungd-color:darkgray}");*/
-	
-
-    setMinimumSize(1600, 900);
-    showMaximized();
 
     //statusbar设置左侧信息提示
     /*QLabel* info = new QLabel;
@@ -71,6 +65,9 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
     connect(ui.actionopen, &QAction::triggered, this, &PlotXYDemo::onOpenFile);
 
     connect(m_plotManager, SIGNAL(sigAddPlotPair()), this, SLOT(onAddPlotPair()));
+	connect(this, &PlotXYDemo::sgn_sendTabWidgetRect, m_plotManager, &PlotManager::onGetTabWidgetRect);
+	QRect tabRect = ui.tabWidget->rect();
+	emit sgn_sendTabWidgetRect(tabRect);
 
     //右键菜单栏
     ui.tabWidget->tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -301,9 +298,14 @@ void PlotXYDemo::onRemoveTabPage()
 
 void PlotXYDemo::onRenameTabPage()
 {
-    //todo:
-    int currTabIndex = ui.tabWidget->currentIndex();
-    ui.tabWidget->setTabText(currTabIndex, QString());
+	renameTab* renameDlg = new renameTab(this);
+	int ret = renameDlg->exec();
+	if (ret == QDialog::Accepted)
+	{
+		//todo:
+		int currTabIndex = ui.tabWidget->currentIndex();
+		ui.tabWidget->setTabText(currTabIndex, renameDlg->getNewTabName());
+	}
 }
 
 void PlotXYDemo::onAddBarPlot()
