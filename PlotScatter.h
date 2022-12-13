@@ -22,9 +22,6 @@ public:
 	};
 
     static int m_instanceCount;         //Plot实体个数
-	void addPlotPairData(QPair<QString, QString>);
-	void delPlotPairData(QPair<QString, QString>);
-	void updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair);
 
 	QBrush getBackground() const { return m_backgroundBrush; }
 	QString getTitle() const { return m_title; }
@@ -89,7 +86,6 @@ private:
 	QString m_yAxisLabel;
 
     QList<QColor> m_clrList;
-	QMap<QPair<QString, QString>, QColor> m_graphColorMap; //存储 数据对和color对应关系
 };
 
 #endif // PLOTSCATTER_H

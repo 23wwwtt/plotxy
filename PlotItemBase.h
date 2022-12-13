@@ -9,7 +9,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_PlotItemBase.h"
-
+#include "DataPair.h"
 
 class PlotItemBase : public QWidget
 {
@@ -25,10 +25,12 @@ public:
     void setPosition(int x,int y);      //设置包围盒左上角位置
     void setWidth(int width);           //设置宽度
     void setHeight(int height);         //设置包围盒高度
+	void setRect(QRect rect);
 
     QPoint currPosition();
     int currWidth();
     int currHeight();
+	QRect currRect();
 
     void setName(const QString&);
     void setTabName(const QString&);
@@ -42,10 +44,15 @@ public:
 	virtual void delPlotPairData(QPair<QString, QString>);
 	virtual void updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair);
 	QList<QPair<QString, QString>> getPlotPairData();
+	QVector<DataPair*> getDataPair() { return m_dataPair; }
 
 protected:
     //virtual void paintEvent(QPaintEvent* event);
 	QList<QPair<QString, QString>> m_plotPairData;
+	QVector<DataPair*> m_dataPair;
+
+public slots:
+	void slot_updateRect(QRect);
 
 private:
     QPoint  m_position;

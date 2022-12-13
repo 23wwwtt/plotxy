@@ -44,53 +44,6 @@ PlotScatter::~PlotScatter()
 	
 }
 
-void PlotScatter::addPlotPairData(QPair<QString, QString> pair)
-{
-	m_plotPairData.append(pair);
-	m_graphColorMap.insert(pair, m_clrList.at(m_plotPairData.size() % 20));
-}
-
-void PlotScatter::delPlotPairData(QPair<QString, QString> pair)
-{
-	if (m_plotPairData.isEmpty())
-		return;
-
-	for (auto &i : m_plotPairData)
-	{
-		if (i == pair)
-		{
-			m_plotPairData.removeOne(i);
-
-			if (m_graphColorMap.contains(pair))
-			{
-				m_graphColorMap.remove(pair);
-			}			
-			break;
-		}
-	}
-}
-
-void PlotScatter::updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair)
-{
-	if (m_plotPairData.isEmpty())
-		return;
-
-	for (int i = 0; i < m_plotPairData.size(); ++i)
-	{
-		if (m_plotPairData.at(i) == oldPair)
-		{
-			m_plotPairData.replace(i, newPair);
-
-			if (m_graphColorMap.contains(oldPair))
-			{
-				m_graphColorMap.insert(newPair, m_graphColorMap[oldPair]);
-				m_graphColorMap.remove(oldPair);
-			}
-			break;
-		}
-	}
-}
-
 void PlotScatter::initPlot()
 {
 	m_customPlot = new QCustomPlot(this);
@@ -123,15 +76,24 @@ void PlotScatter::getDataInfo(double secs)
 		return;
 	}
 
-    int itemCnt = m_plotPairData.size();
 	m_customPlot->clearGraphs();
-    for (int i = 0; i < itemCnt; i++) 
+//     int itemCnt = m_plotPairData.size();
+//     for (int i = 0; i < itemCnt; i++) 
+// 	{
+// 		QColor color = m_graphColorMap[m_plotPairData.at(i)];
+// 		QString xcolumn = m_plotPairData.at(i).first;
+// 		QString ycolumn = m_plotPairData.at(i).second;
+// 		updateData(xcolumn, ycolumn, secs, i, color);
+//     }
+
+	int itemCnt = m_dataPair.size();
+	for (int i = 0; i < itemCnt; ++i)
 	{
-		QColor color = m_graphColorMap[m_plotPairData.at(i)];
-		QString xcolumn = m_plotPairData.at(i).first;
-		QString ycolumn = m_plotPairData.at(i).second;
+		QColor color = m_dataPair.at(i)->dataColor();
+		QString xcolumn = m_dataPair.at(i)->getDataPair().first;
+		QString ycolumn = m_dataPair.at(i)->getDataPair().second;
 		updateData(xcolumn, ycolumn, secs, i, color);
-    }
+	}
 	m_customPlot->replot(QCustomPlot::rpQueuedRefresh);
 //	update();
 }

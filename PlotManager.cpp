@@ -6,57 +6,22 @@
 #include <QAction>
 #include <QString>
 #include <QStyleFactory>
+#include "PlotItemBase.h"
 
-#include "PlotBar.h"
+//#include "PlotBar.h"
 
 PlotManager::PlotManager(QWidget* parent)
     : QWidget(parent)
 {
     ui.setupUi(this);
 
-	this->resize(800, 600);
+	connect(ui.pushButton_close, &QPushButton::clicked, this, &PlotManager::onBtnCloseClicked);
 	this->setWindowTitle(QString::fromLocal8Bit("图表管理器"));
+	init();
 	ui.treeWidget_selectedPlots->setStyle(QStyleFactory::create("windows"));
-
-	/*QTreeWidgetItem* itemselPlotH = new QTreeWidgetItem;
-	QTreeWidgetItem* itemselPlotI = new QTreeWidgetItem;
-	itemselPlotH->setText(0, "test");
-	itemselPlotI->setText(0, "Bar");
-
-	ui.treeWidget_selectedPlots->setHeaderItem(itemselPlotH);
-	ui.treeWidget_selectedPlots->addTopLevelItem(itemselPlotI);*/
 	ui.treeWidget_selectedPlots->setHeaderHidden(true);
 	ui.treeWidget_selectedPlots->expandAll();
-
-	ui.treeWidget_settings->setHeaderHidden(false);
-	ui.treeWidget_settings->setHeaderLabel(QString::fromLocal8Bit("设置"));
-	ui.treeWidget_settings->setIndentation(15);
-
-	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("总体设置")));
-	m_itemAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("坐标轴和网格设置")));
-	m_itemPlotData = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("数据设置")));
-	m_itemText = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("文本信息")));
-	m_itemGOG = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("GOG曲线")));
-	m_itemLinkedAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("相关的轴")));
-	m_itemScatterPlot = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Scatter设置")));
-	m_itemAScope = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("A-Scope设置")));
-	m_itemRTI = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("RTI设置")));
-	m_itemTextLight = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Text/Light设置")));
-
-	m_itemBar = new QTreeWidgetItem;
-	m_itemBar->setText(0, QString::fromLocal8Bit("Bar设置"));
-	ui.treeWidget_settings->addTopLevelItem(m_itemBar);
-
-	m_itemDial = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Dials设置")));
-	m_itemAttitude = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Attitude设置")));
-	m_itemTrackStatus = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Track Status设置")));
-	m_itemRangeDoppler = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Range Doppler设置")));
-
-	m_itemLimits = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("限制")));
-	m_itemPlotMarkers = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("标记")));
-	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
-	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
-
+	
 // 	m_itemGOG->setDisabled(true); 
 // 	m_itemScatterPlot->setDisabled(true);
 // 	m_itemAScope->setDisabled(true);
@@ -83,9 +48,6 @@ PlotManager::PlotManager(QWidget* parent)
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
 	
 	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
-	connect(ui.pushButton_axisColor, SIGNAL(clicked()), this, SLOT(onBtnAxisColorClicked()));
-	connect(ui.pushButton_gridColor, SIGNAL(clicked()), this, SLOT(onBtnGridColorClicked()));
-	connect(ui.pushButton_gridFill, SIGNAL(clicked()), this, SLOT(onBtnGridFillClicked()));
 
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
 	connect(ui.spinBox_left, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxLeftChanged);
@@ -98,21 +60,20 @@ PlotManager::PlotManager(QWidget* parent)
 		m_vertGrids = ui.lineEdit_vertGrids->text().toInt();
 		});
 
-	ui.pushButton_axisColor->setFixedSize(21, 21);
-	ui.pushButton_gridColor->setFixedSize(21, 21);
-	ui.pushButton_gridFill->setFixedSize(21, 21);
-// 	ui.textEdit->setFixedHeight(24);
-// 	ui.textEdit_2->setFixedHeight(24);
-	ui.pushButton_10->setFixedSize(21, 21);
-	ui.pushButton_21->setFixedSize(21, 21);
-	ui.pushButton_22->setFixedSize(21, 21);
-	ui.pushButton_23->setFixedSize(21, 21);
+// 	ui.pushButton_axisColor->setFixedSize(21, 21);
+// 	ui.pushButton_gridColor->setFixedSize(21, 21);
+// 	ui.pushButton_gridFill->setFixedSize(21, 21);
+// 	ui.pushButton_10->setFixedSize(21, 21);
+// 	ui.pushButton_21->setFixedSize(21, 21);
+// 	ui.pushButton_22->setFixedSize(21, 21);
+// 	ui.pushButton_23->setFixedSize(21, 21);
 
-	ui.radioButton_percent->setChecked(true);
-	m_radioPixelChecked = false;
-	connect(ui.radioButton_percent, &QRadioButton::clicked, this, &PlotManager::onRadioPercentClicked);
-	connect(ui.radioButton_pixel, &QRadioButton::clicked, this, &PlotManager::onRadioPixelClicked);
+	
 
+// 	QFontDatabase FontDb;
+// 	foreach(int size, FontDb.standardSizes()) {
+// 		ui.comboBox_AxisGrid_FontSize->addItem(QString::number(size));
+// 	}
 }
 
 PlotManager::~PlotManager()
@@ -123,9 +84,9 @@ PlotManager::~PlotManager()
 
 void PlotManager::init()
 {
-
+	initTreeWidgetSettings();
+	initGeneralUI();
 }
-
 
 void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
 {
@@ -154,6 +115,50 @@ void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
 
 	//数据层更新
 	m_plotManager[tabName].append(plotItem);
+}
+
+void PlotManager::initTreeWidgetSettings()
+{
+	ui.treeWidget_settings->setHeaderHidden(false);
+	ui.treeWidget_settings->setHeaderLabel(QString::fromLocal8Bit("设置"));
+	ui.treeWidget_settings->setIndentation(15);
+
+	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("总体设置")));
+	m_itemAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("坐标轴和网格设置")));
+	m_itemPlotData = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("数据设置")));
+	m_itemText = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("文本信息")));
+	m_itemGOG = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("GOG曲线")));
+	m_itemLinkedAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("相关的轴")));
+	m_itemScatterPlot = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Scatter设置")));
+	m_itemAScope = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("A-Scope设置")));
+	m_itemRTI = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("RTI设置")));
+	m_itemTextLight = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Text/Light设置")));
+
+	m_itemBar = new QTreeWidgetItem;
+	m_itemBar->setText(0, QString::fromLocal8Bit("Bar设置"));
+	ui.treeWidget_settings->addTopLevelItem(m_itemBar);
+
+	m_itemDial = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Dials设置")));
+	m_itemAttitude = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Attitude设置")));
+	m_itemTrackStatus = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Track Status设置")));
+	m_itemRangeDoppler = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Range Doppler设置")));
+
+	m_itemLimits = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("限制")));
+	m_itemPlotMarkers = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("标记")));
+	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
+	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
+}
+
+void PlotManager::initGeneralUI()
+{
+	ui.radioButton_percent->setChecked(true);
+	m_radioPixelChecked = false;
+	connect(ui.radioButton_percent, &QRadioButton::clicked, this, &PlotManager::onRadioPercentClicked);
+	connect(ui.radioButton_pixel, &QRadioButton::clicked, this, &PlotManager::onRadioPixelClicked);
+	connect(ui.lineEdit_plotPositionX, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
+	connect(ui.lineEdit_plotPositionY, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
+	connect(ui.lineEdit_plotWidth, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
+	connect(ui.lineEdit_plotHeight, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
 }
 
 void PlotManager::refreshGeneralUI(PlotItemBase * plot)
@@ -333,92 +338,92 @@ void PlotManager::spinboxRightChanged()
 }
 
 
-void PlotManager::onAddPlotPair(QString entityType, QString entityAttr)
-{
-	//界面更新
-	QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
-	addplotItem->setText(0, entityType + " " + entityAttr);
-	addplotItem->setText(1, "Time");
-
-	ui.treeWidget_4->addTopLevelItem(addplotItem);
-
-	//数据层更新 ->更新对应Item数据
-	// tmpCode
-	//获取当前plotBar控件
-	if (m_plotManager.isEmpty())
-		return;
-
-	auto it = m_plotManager.begin();
-	PlotItemBase* currItem = it.value().at(0);
-	if (currItem)
-	{
-		PlotBar* currBarItem = dynamic_cast<PlotBar*>(currItem);
-//		currBarItem->addPlotDataPair(entityType, entityAttr);
-	}
-}
-
-void PlotManager::onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn)
-{
-	//界面更新
-	QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
-	addplotItem->setText(0, xColumn);
-	addplotItem->setText(1, yColumn);
-	ui.treeWidget_4->addTopLevelItem(addplotItem);
-
-	//获取当前plotBar控件
-	if (m_plotManager[tabName].isEmpty())
-		return;
-
-	for (int i = 0; i < m_plotManager[tabName].size(); ++i)
-	{
-		PlotItemBase* currItem = m_plotManager[tabName].at(i);
-		QString name = currItem->metaObject()->className();
-		if (name.compare("PlotPlotScatter") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotAScope") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotRTI") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotText") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotLight") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotBar") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotDial") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotAttitude") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotPolar") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotTrack") == 0)
-		{
-			
-		}
-		else if (name.compare("PlotDoppler") == 0)
-		{
-			
-		}
-	}
-}
+// void PlotManager::onAddPlotPair(QString entityType, QString entityAttr)
+// {
+// 	//界面更新
+// 	QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
+// 	addplotItem->setText(0, entityType + " " + entityAttr);
+// 	addplotItem->setText(1, "Time");
+// 
+// 	ui.treeWidget_4->addTopLevelItem(addplotItem);
+// 
+// 	//数据层更新 ->更新对应Item数据
+// 	// tmpCode
+// 	//获取当前plotBar控件
+// 	if (m_plotManager.isEmpty())
+// 		return;
+// 
+// 	auto it = m_plotManager.begin();
+// 	PlotItemBase* currItem = it.value().at(0);
+// 	if (currItem)
+// 	{
+// 		PlotBar* currBarItem = dynamic_cast<PlotBar*>(currItem);
+// //		currBarItem->addPlotDataPair(entityType, entityAttr);
+// 	}
+// }
+// 
+// void PlotManager::onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn)
+// {
+// 	//界面更新
+// 	QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
+// 	addplotItem->setText(0, xColumn);
+// 	addplotItem->setText(1, yColumn);
+// 	ui.treeWidget_4->addTopLevelItem(addplotItem);
+// 
+// 	//获取当前plotBar控件
+// 	if (m_plotManager[tabName].isEmpty())
+// 		return;
+// 
+// 	for (int i = 0; i < m_plotManager[tabName].size(); ++i)
+// 	{
+// 		PlotItemBase* currItem = m_plotManager[tabName].at(i);
+// 		QString name = currItem->metaObject()->className();
+// 		if (name.compare("PlotPlotScatter") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotAScope") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotRTI") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotText") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotLight") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotBar") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotDial") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotAttitude") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotPolar") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotTrack") == 0)
+// 		{
+// 			
+// 		}
+// 		else if (name.compare("PlotDoppler") == 0)
+// 		{
+// 			
+// 		}
+// 	}
+// }
 
 void PlotManager::onRadioPixelClicked()
 {
@@ -493,39 +498,36 @@ void PlotManager::onGetTabWidgetRect(QRect rect)
 	m_tabWidgetRect = rect;
 }
 
-void PlotManager::onBtnAxisColorClicked()
+void PlotManager::onBtnCloseClicked()
 {
-
-	m_axisColor = QColorDialog::getColor(Qt::yellow, this);
-	if (!m_axisColor.isValid())
-	{
-	}
-	else
-	{
-		ui.pushButton_axisColor->setStyleSheet("background-color: " + m_axisColor.name() + ";");
-	}
+	close();
 }
 
-void PlotManager::onBtnGridColorClicked()
+void PlotManager::onPlotRectEditFinishing()
 {
+	if (ui.lineEdit_plotPositionX->text() == nullptr || ui.lineEdit_plotPositionY->text() == nullptr ||
+		ui.lineEdit_plotWidth->text() == nullptr || ui.lineEdit_plotHeight->text() == nullptr)
+	{
+		return;
+	}
 
-	m_gridColor = QColorDialog::getColor(Qt::yellow, this);
-	if (!m_gridColor.isValid())
+	bool bX, bY, bW, bH;
+	int x, y, w, h;
+	if (m_radioPixelChecked)
 	{
+		x = ui.lineEdit_plotPositionX->text().toInt(&bX);
+		y = ui.lineEdit_plotPositionY->text().toInt(&bY);
+		w = ui.lineEdit_plotWidth->text().toInt(&bW);
+		h = ui.lineEdit_plotHeight->text().toInt(&bH);
 	}
 	else
 	{
-		ui.pushButton_gridColor->setStyleSheet("background-color: " + m_gridColor.name() + ";");
+		x = (int)(ui.lineEdit_plotPositionX->text().toFloat(&bX) * m_tabWidgetRect.width());
+		y = (int)(ui.lineEdit_plotPositionY->text().toFloat(&bY) * m_tabWidgetRect.height());
+		w = (int)(ui.lineEdit_plotWidth->text().toFloat(&bW) * m_tabWidgetRect.width());
+		h = (int)(ui.lineEdit_plotHeight->text().toFloat(&bH) * m_tabWidgetRect.height());
 	}
-}
-void PlotManager::onBtnGridFillClicked()
-{
-	m_girdFill = QColorDialog::getColor(Qt::yellow, this);
-	if (!m_girdFill.isValid())
-	{
-	}
-	else
-	{
-		ui.pushButton_gridFill->setStyleSheet("background-color: " + m_girdFill.name() + ";");
-	}
+
+	if (bX && bY && bW && bH)
+		emit sigRectChanged(QRect(x, y, w, h));
 }

@@ -305,6 +305,7 @@ void PlotXYDemo::onRenameTabPage()
 		int currTabIndex = ui.tabWidget->currentIndex();
 		ui.tabWidget->setTabText(currTabIndex, renameDlg->getNewTabName());
 	}
+	renameDlg->deleteLater();
 }
 
 void PlotXYDemo::onAddBarPlot()
@@ -508,6 +509,7 @@ void PlotXYDemo::onAddScatterPlot()
 
     plotItem->setTabName(currTabText);
     connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotScatter::onGetCurrentSeconds);
+//	connect(m_plotManager, &PlotManager::sigRectChanged, plotItem, &PlotScatter::slot_updateRect);
 
     initWidget(plotItem);
 
@@ -559,6 +561,7 @@ void PlotXYDemo::onAddPolarPlot()
     PlotPolar *plotItem = new PlotPolar(ui.tabWidget->currentWidget());
     plotItem->setTabName(currTabText);
     connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotPolar::slot_getCurrentSeconds);
+//	connect(m_plotManager, &PlotManager::sigRectChanged, plotItem, &PlotScatter::slot_updateRect);
 
     initWidget(plotItem);
     // 控制其自由移动和缩放

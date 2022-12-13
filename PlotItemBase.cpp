@@ -52,6 +52,16 @@ void PlotItemBase::setHeight(int height)
 	update();
 }
 
+void PlotItemBase::setRect(QRect rect)
+{
+	m_position.setX(rect.x());
+	m_position.setY(rect.y());
+	m_width = rect.width();
+	m_height = rect.height();
+	this->setGeometry(rect);
+	update();
+}
+
 QPoint PlotItemBase::currPosition()
 {
 	m_position = this->pos();
@@ -68,6 +78,11 @@ int PlotItemBase::currHeight()
 {
 	m_height = this->height();
     return m_height;
+}
+
+QRect PlotItemBase::currRect()
+{
+	return this->rect();
 }
 
 void PlotItemBase::setName(const QString& name)
@@ -94,6 +109,8 @@ QString PlotItemBase::currTabName()
 void PlotItemBase::addPlotPairData(QPair<QString, QString> pair)
 {
 	m_plotPairData.append(pair);
+	DataPair* data = new DataPair(pair);
+	m_dataPair.append(data);
 }
 
 void PlotItemBase::delPlotPairData(QPair<QString, QString> pair)
@@ -103,9 +120,18 @@ void PlotItemBase::delPlotPairData(QPair<QString, QString> pair)
 
 	for (auto &i : m_plotPairData)
 	{
-		if (i == pair)
+		if (QPair<QString, QString>(i) == pair)
 		{
 			m_plotPairData.removeOne(i);
+			break;
+		}
+	}
+
+	for (int i = 0; i < m_dataPair.size(); ++i)
+	{
+		if (m_dataPair.at(i)->getDataPair() == pair)
+		{
+			m_dataPair.remove(i);
 			break;
 		}
 	}
@@ -124,11 +150,25 @@ void PlotItemBase::updatePlotPairData(QPair<QString, QString> oldPair, QPair<QSt
 			break;
 		}
 	}
+
+	for (int i = 0; i < m_dataPair.size(); ++i)
+	{
+		if (m_dataPair.at(i)->getDataPair() == oldPair)
+		{
+			m_dataPair.at(i)->setDataPair(newPair);
+			break;
+		}
+	}
 }
 
 QList<QPair<QString, QString>> PlotItemBase::getPlotPairData()
 {
 	return m_plotPairData;
+}
+
+void PlotItemBase::slot_updateRect(QRect rect)
+{
+	setRect(rect);
 }
 
 //void PlotItemBase::setVisible(bool bVisible)

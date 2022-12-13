@@ -3,7 +3,8 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_PlotManager.h"
-#include "PlotItemBase.h"
+
+class PlotItemBase;
 
 class PlotManager : public QWidget
 {
@@ -27,29 +28,32 @@ public:
 	int m_hrozGrids;
 	int m_vertGrids;
 private:
+	void initTreeWidgetSettings();
+	void initGeneralUI();
 	void refreshGeneralUI(PlotItemBase* plot);
 public slots:
     void onTWSclicked(QTreeWidgetItem* item, int i);
     void onTWSPclicked(QTreeWidgetItem* item, int i);
     void onAddNewClicked();
 
-	void onBtnAxisColorClicked();
-	void onBtnGridColorClicked();
-	void onBtnGridFillClicked();
 	void spinboxBetweenChanged();
 	void spinboxLeftChanged();
 	void spinboxRightChanged();
 
-	void onAddPlotPair(QString,QString);
-	void onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn);
+// 	void onAddPlotPair(QString,QString);
+// 	void onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn);
 
 	void onRadioPixelClicked();
 	void onRadioPercentClicked();
 
 	void onGetTabWidgetRect(QRect);
+	void onBtnCloseClicked();
+
+	void onPlotRectEditFinishing();
 
 signals:
 	void sigAddPlotPair();
+	void sigRectChanged(QRect);
 
 private:
     Ui::PlotManager ui;
