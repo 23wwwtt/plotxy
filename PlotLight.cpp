@@ -43,9 +43,9 @@ PlotLight::~PlotLight()
 
 void PlotLight::paintEvent(QPaintEvent* event)
 {
-
 	//以下为绘制表头
 	QPainter painter(this);
+	painter.setRenderHint(QPainter::Antialiasing, true);
 	QPen pen;
 	QFont font;
 	QRect rect;
@@ -75,189 +75,186 @@ void PlotLight::paintEvent(QPaintEvent* event)
 		painter.drawRect(rect);
 
 	}
+	painter.setBrush(QBrush(Qt::gray));
 	for (int i = 0; i < dataList.size(); i++)
-	{
+	{	
+		painter.setBrush(QBrush(Qt::gray));
 		yset.insert(dataList.at(i).first);
 		m_verGridNum = dataList.size();
 		verGridWidth = 0.85*height() / m_verGridNum;
 		horGridWidth = (0.85*width() - 0.1*height()) / m_horiGridNum;//整个宽减去框框宽，减去圆圈占宽
 		rect.setRect(0.1*width() + 0.1*height(), 0.1*height() + i*verGridWidth, horGridWidth, verGridWidth);
 		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, dataList.at(i).first);
-		path.addEllipse(0.1*width(), 0.1*height() + (i + 0.5)*verGridWidth - 0.05*height(), 0.1*height(), 0.1*height());
-
-		//if (m_brush.isEmpty())
-		//	painter.fillPath(path, Qt::gray);
-		//else
-			painter.fillPath(path, m_temBrush);
-		//if (m_userLightData.isEmpty())
-		//	painter.fillPath(path, m_brushColor.at(0));
-		//else
-		//	painter.fillPath(path, m_brushColor.at(m_userLightData.size()-1));
-		painter.drawEllipse(0.1*width(), 0.1*height() + (i + 0.5)*verGridWidth - 0.05*height(), 0.1*height(), 0.1*height());
+		judgeLight();	
 	}
-	//drawLight();
-
+	drawLight(painter, verGridWidth);
+	if (!m_brush.isEmpty())
+		m_brush.clear();
 }
 
-void PlotLight::drawLight()
+void PlotLight::drawLight(QPainter &painter,double &verGridWidth)
 {
+	for (int i = 0; i < getPlotPairData().size(); i++)
+	{
+		painter.setBrush(QBrush(Qt::gray));
+		if (m_brush.isEmpty())
+			painter.setBrush(QBrush(Qt::gray));
+		else if ((m_brush.at(i).color() == QColor(0,0,0,255)))
+			painter.setBrush(QBrush(Qt::gray));
+		else
+			painter.setBrush(QBrush(m_brush.at(i).color()));
+
+		painter.drawEllipse(0.1*width(), 0.1*height() + (i + 0.5)*verGridWidth - 0.05*height(), 0.1*height(), 0.1*height());
+		painter.setBrush(QBrush(Qt::gray));
+	}
+}
+
+
+void PlotLight::judgeLight()
+{
+	if (m_lightMap.isEmpty())
+		return;
+	QBrush iBrush;
 	QString entityAndAtrr;
 	QString judge;
 	QString threshold;
 	QString redOrGreen;
 	QList<QString> partUserLightData;
 	QStringList docEntityAndAttr;
-	//for (int i = 0; i < getPlotPairData().size(); i++)
-	//{
-	//	docEntityAndAttr.push_back(getPlotPairData().at(i).first);
-	//}
+	QString temEntityAndAtrr = " ";
+	for (int i = 0; i < getPlotPairData().size(); i++)
+	{
+		docEntityAndAttr.push_back(getPlotPairData().at(i).first);
+	}
 	int isize = 0;
 	int icount = 0;
 
-	for (int i = 0; i < m_userLightData.size(); i++)
+	if (m_userLightData.size() > 1)
 	{
-		QBrush iBrush;
-		partUserLightData = m_userLightData.at(i);
-		QString temEntity = partUserLightData.at(icount++);
-		entityAndAtrr = temEntity + "+" + partUserLightData.at(icount++);
-		judge = partUserLightData.at(icount++);
-		threshold = partUserLightData.at(icount++);
-		redOrGreen = partUserLightData.at(icount++);
-
-		QList <long double> lightThreshold = m_lightMap.value(entityAndAtrr);
-
-		if (judge == ">")
+		for (int j = 0; j < getPlotPairData().size(); j++)
 		{
-			if (lightThreshold.back() > threshold.toDouble())
+			iBrush.setColor(Qt::gray);
+			for (int i = 0; i < m_userLightData.size(); i++)
 			{
-				if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
-					m_temBrush.setColor(Qt::green);
-				else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
-					m_temBrush.setColor(Qt::red);
-				else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
-					m_temBrush.setColor(Qt::yellow);
+				
+				icount = i * 5;
+				partUserLightData = m_userLightData.at(i);
+				QString temEntity = partUserLightData.at(icount++);
+				entityAndAtrr = temEntity + "+" + partUserLightData.at(icount++);
+				judge = partUserLightData.at(icount++);
+				threshold = partUserLightData.at(icount++);
+	 			redOrGreen = partUserLightData.at(icount++);
+				//iBrush.setColor(Qt::gray);
+
+				if (QString::compare(redOrGreen, "G/R/Y") == 0)
+					continue;
+				QList <long double> lightThreshold = m_lightMap.value(entityAndAtrr);
+				if (!lightThreshold.size() == 0)
+				{
+					if (entityAndAtrr == docEntityAndAttr.at(j))
+					{
+						if (QString::compare(judge, ">") == 0)
+						{
+							if (lightThreshold.back() > threshold.toDouble())
+							{
+								if (QString::compare(redOrGreen, "G") == 0)
+									iBrush.setColor(Qt::green);
+								else if (QString::compare(redOrGreen, "R") == 0)
+									iBrush.setColor(Qt::red);
+								else if (QString::compare(redOrGreen, "Y") == 0)
+									iBrush.setColor(Qt::yellow);
+							}
+						}
+						else if (QString::compare(judge, "<") == 0)
+						{
+							if (lightThreshold.back() < threshold.toDouble())
+							{
+								if (QString::compare(redOrGreen, "G") == 0)
+									iBrush.setColor(Qt::green);
+								else if (QString::compare(redOrGreen, "R") == 0)
+									iBrush.setColor(Qt::red);
+								else if (QString::compare(redOrGreen, "Y") == 0)
+									iBrush.setColor(Qt::yellow);
+							}
+						}
+					}
+				}	
 			}
+				m_brush.push_back(iBrush);
+
 		}
-		else if (judge == "<")
-		{
-			if (lightThreshold.back() < threshold.toDouble())
-			{
-				if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
-					m_temBrush.setColor(Qt::green);
-				else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
-					m_temBrush.setColor(Qt::red);
-				else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
-					m_temBrush.setColor(Qt::yellow);
-			}
-		}
-		update();
 	}
-	//	for (int j = 0; j < getPlotPairData().size(); j++)
-	//	{
-	//		if (entityAndAtrr == docEntityAndAttr.at(j))
-	//		{
-	//			if (judge == ">")
-	//			{
-	//				if (lightThreshold.back() > threshold.toDouble())
-	//				{
-	//					if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
-	//						m_temColor.green();
-	//					else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
-	//						m_temColor.red();
-	//					else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
-	//						m_temColor.yellow();
-	//				}
-	//			}
-	//			else if (judge == "<")
-	//			{
-	//				if (lightThreshold.back() < threshold.toDouble())
-	//				{
-	//					if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
-	//						m_temColor.green();
-	//					else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
-	//						m_temColor.red();
-	//					else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
-	//						m_temColor.yellow();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-
-	//for (int i = 0; i < m_userLightData.size(); i++)
-	//{
-	//	//用户输入的数据
-	//	QBrush iBrush;
-	//	partUserLightData = m_userLightData.at(i);
-	//	QString temEntity = partUserLightData.at(icount++);
-	//	entityAndAtrr = temEntity + "+" + partUserLightData.at(icount++);
-	//	judge = partUserLightData.at(icount++);
-	//	threshold = partUserLightData.at(icount++);
-	//	redOrGreen = partUserLightData.at(icount++);
-	//	m_brush.push_back(iBrush);
-
-	//	//文档拿来的数据
-
-	//	QList <long double> lightThreshold = m_lightMap.value(entityAndAtrr);
-	//	//判断颜色
-	//	for (int i = 0; i < m_userLightData.size(); i++)
-	//	{
-	//		for (int j = 0; j < getPlotPairData().size(); j++)
-	//		{
-	//			if (entityAndAtrr == docEntityAndAttr.at(j))
-	//			{
-	//				if (judge == ">")
-	//				{
-	//					if (lightThreshold.back() > threshold.toDouble())
-	//					{
-	//						iBrush = m_brush.at(j);
-	//						if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
-	//							iBrush.setColor(Qt::green);
-	//						else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
-	//							iBrush.setColor(Qt::red);
-	//						else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
-	//							iBrush.setColor(Qt::yellow);
-	//					}
-	//				}
-	//				else if (judge == "<")
-	//				{
-	//					if (lightThreshold.back() < threshold.toDouble())
-	//					{
-	//						if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
-	//							iBrush.setColor(Qt::green);
-	//						else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
-	//							iBrush.setColor(Qt::red);
-	//						else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
-	//							iBrush.setColor(Qt::yellow);
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-
-
-		/*
-		if (m_entityAndAttr.isEmpty())
-			m_brush.push_back(iBrush);
-		for (int i = 0; i < m_entityAndAttr.size(); i++)
-		{
-			if (entityAndAtrr == m_entityAndAttr.at(i))
-				isize++;
-		}
-		if (isize == 0)
-			m_brush.push_back(iBrush);
-		isize = 0;*/
+	update();
 }
+
+
+//for (int i = 0; i < m_userLightData.size(); i++)
+//{
+//	//用户输入的数据
+//	QBrush iBrush;
+//	partUserLightData = m_userLightData.at(i);
+//	QString temEntity = partUserLightData.at(icount++);
+//	entityAndAtrr = temEntity + "+" + partUserLightData.at(icount++);
+//	judge = partUserLightData.at(icount++);
+//	threshold = partUserLightData.at(icount++);
+//	redOrGreen = partUserLightData.at(icount++);
+//	m_brush.push_back(iBrush);
+
+//	//文档拿来的数据
+
+//	QList <long double> lightThreshold = m_lightMap.value(entityAndAtrr);
+//	//判断颜色
+//	for (int i = 0; i < m_userLightData.size(); i++)
+//	{
+//		for (int j = 0; j < getPlotPairData().size(); j++)
+//		{
+//			if (entityAndAtrr == docEntityAndAttr.at(j))
+//			{
+//				if (judge == ">")
+//				{
+//					if (lightThreshold.back() > threshold.toDouble())
+//					{
+//						iBrush = m_brush.at(j);
+//						if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
+//							iBrush.setColor(Qt::green);
+//						else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
+//							iBrush.setColor(Qt::red);
+//						else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
+//							iBrush.setColor(Qt::yellow);
+//					}
+//				}
+//				else if (judge == "<")
+//				{
+//					if (lightThreshold.back() < threshold.toDouble())
+//					{
+//						if (redOrGreen == QString::fromLocal8Bit("绿") || redOrGreen == QString::fromLocal8Bit("绿色"))
+//							iBrush.setColor(Qt::green);
+//						else if (redOrGreen == QString::fromLocal8Bit("红") || redOrGreen == QString::fromLocal8Bit("红色"))
+//							iBrush.setColor(Qt::red);
+//						else if (redOrGreen == QString::fromLocal8Bit("黄") || redOrGreen == QString::fromLocal8Bit("黄色"))
+//							iBrush.setColor(Qt::yellow);
+//					}
+//				}
+//			}
+//		}
+//	}
+
+
 
 
 void PlotLight::slot_getLightData(QList<QList<QString>> userLightData)
 {
 	if (userLightData.size() > 1)
 	{
+		
 		m_userLightData = userLightData;
 		update();
 	}
+}
+void PlotLight::slot_onAddButtonClicked()
+{
+
+	update();
 }
 
 void PlotLight::slot_getCurrentSeconds(double secs)

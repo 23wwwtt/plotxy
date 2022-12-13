@@ -1939,7 +1939,7 @@
             </item>
             <item row="0" column="2">
              <property name="text">
-              <string>&gt;或&lt;</string>
+              <string>&gt;/&lt;</string>
              </property>
             </item>
             <item row="0" column="3">
@@ -1949,7 +1949,7 @@
             </item>
             <item row="0" column="4">
              <property name="text">
-              <string>红或绿或黄</string>
+              <string>G/R/Y</string>
              </property>
             </item>
            </widget>

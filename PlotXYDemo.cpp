@@ -49,6 +49,13 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
     m_curBaseInfo.Base_PlotName = nullptr;
     qRegisterMetaType<BaseInfo>("BaseInfo");
 
+	//QPalette palette(ui.tabWidget->palette());
+	//palette.setColor(QPalette::Background, Qt::darkGray);
+	//ui.tabWidget->setPalette(palette);
+
+	/*ui.tabWidget->setStyleSheet("QTabWidget#tabWidget{backgroungd-color:darkgray}");*/
+	
+
     setMinimumSize(1600, 900);
     showMaximized();
 
@@ -370,13 +377,10 @@ void PlotXYDemo::onAddLightPlot()
 
     PlotLight *plotItem = new PlotLight(ui.tabWidget->currentWidget());
     plotItem->setTabName(currTabText);
-    //bool res = connect(ui.actionStop,SIGNAL(triggered(bool)), plotItem, SLOT(onSwitch(bool)));
-    //connect(ui.actionStop, &QAction::triggered, plotItem, &PlotText::onSwitch);
-    //connect(m_AdvancedDataManager, &AdvancedDataManager::updateColorThresholdMap,
-    //  plotItem, &PlotText::onUpdateColorThresholdMap);
-//	connect(m_addPlotPair, &AddPlotPair::sgn_addPlotPair, plotItem, &PlotLight::slot_getCurrentSeconds);
+
 	connect(this, &PlotXYDemo::sgn_sendCurrentSeconds, plotItem, &PlotLight::slot_getCurrentSeconds);
 	connect(m_addPlotPair, &AddPlotPair::sgn_getLightData, plotItem, &PlotLight::slot_getLightData);
+	connect(m_addPlotPair,&AddPlotPair::sgn_updatePlotPair,plotItem,&PlotLight::slot_onAddButtonClicked);
 
     initWidget(plotItem);
 
