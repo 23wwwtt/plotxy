@@ -11,6 +11,7 @@
 #include <QStyleFactory>
 #include "DataManager.h"
 #include "PlotLight.h"
+#include "PlotManagerData.h"
 AddPlotPair* AddPlotPair::thispoint = nullptr;
 AddPlotPair* AddPlotPair::m_getInstance()
 {
@@ -38,6 +39,8 @@ AddPlotPair::AddPlotPair(QWidget *parent) :
 	initStackedWidget_pageAScope();
 
 	initTreePlot();
+
+	connect(PlotManagerData::getInstance(), SIGNAL(sgnUpdatePlotManager()), this, SLOT(updatePlotTrees()));
 
 	connect(ui.pushButton_add, SIGNAL(clicked()), this, SLOT(onBtnAddClicked()));
 	connect(ui.pushButton_close, SIGNAL(clicked()), this, SLOT(onBtnCloseClicked()));
@@ -280,6 +283,7 @@ void AddPlotPair::setPlotBaseInfo(BaseInfo info)
 
 void AddPlotPair::updatePlotTrees()
 {
+	m_plotManager = PlotManagerData::getInstance()->getPlotManagerData();
 	if (m_plotManager.isEmpty())
 		return;
 

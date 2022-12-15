@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1281</width>
+    <width>1259</width>
     <height>764</height>
    </rect>
   </property>
@@ -499,6 +499,9 @@ color: rgb(255, 255, 255);</string>
               <string>限制</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="spacing">
+               <number>5</number>
+              </property>
               <property name="leftMargin">
                <number>7</number>
               </property>
@@ -558,7 +561,17 @@ color: rgb(255, 255, 255);</string>
                  <widget class="QLineEdit" name="lineEdit_limitEndX"/>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QLineEdit" name="lineEdit_limitBgnX"/>
+                 <widget class="QLineEdit" name="lineEdit_limitBgnX">
+                  <property name="autoFillBackground">
+                   <bool>false</bool>
+                  </property>
+                  <property name="dragEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="clearButtonEnabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="0" column="2">
                  <widget class="QLabel" name="label_11">
@@ -611,6 +624,9 @@ color: rgb(255, 255, 255);</string>
                <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1">
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <property name="spacing">
+                   <number>5</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBox_4">
                     <property name="text">
@@ -674,7 +690,7 @@ color: rgb(255, 255, 255);</string>
                 <item>
                  <widget class="QTableWidget" name="tableWidget">
                   <attribute name="horizontalHeaderDefaultSectionSize">
-                   <number>150</number>
+                   <number>200</number>
                   </attribute>
                   <column>
                    <property name="text">
@@ -699,6 +715,9 @@ color: rgb(255, 255, 255);</string>
                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,1">
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_5">
+                  <property name="spacing">
+                   <number>5</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBox_5">
                     <property name="text">
@@ -762,7 +781,7 @@ color: rgb(255, 255, 255);</string>
                 <item>
                  <widget class="QTableWidget" name="tableWidget_2">
                   <attribute name="horizontalHeaderDefaultSectionSize">
-                   <number>150</number>
+                   <number>200</number>
                   </attribute>
                   <column>
                    <property name="text">
@@ -993,7 +1012,7 @@ color: rgb(255, 255, 255);</string>
            <item>
             <widget class="QGroupBox" name="groupBox_8">
              <property name="title">
-              <string>Static Grid</string>
+              <string>静态网格</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <property name="leftMargin">
@@ -1150,7 +1169,7 @@ color: rgb(255, 255, 255);</string>
               </sizepolicy>
              </property>
              <property name="title">
-              <string>Formats</string>
+              <string>格式</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <property name="leftMargin">

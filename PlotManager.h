@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_PlotManager.h"
+#include "constdef.h"
 
 class PlotItemBase;
 
@@ -30,11 +31,28 @@ public:
 private:
 	void initTreeWidgetSettings();
 	void initGeneralUI();
+	void initAxisGridUI();
+	void refreshTreeWidgetSettingEnabled(PlotItemBase* plot);
 	void refreshGeneralUI(PlotItemBase* plot);
+	void refreshPlotDataUI(PlotItemBase* plot);
+
+	void enableItem_Scatter();
+	void enableItem_AScope();
+	void enableItem_RTI();
+	void enableItem_Text_Light();
+	void enableItem_Bar();
+	void enableItem_Dial();
+	void enableItem_Attitude();
+	void enableItem_Polar();
+	void enableItem_Track();
+	void enableItem_Doppler();
+
 public slots:
     void onTWSclicked(QTreeWidgetItem* item, int i);
     void onTWSPclicked(QTreeWidgetItem* item, int i);
     void onAddNewClicked();
+
+	void onUpdatePlotManager();
 
 	void spinboxBetweenChanged();
 	void spinboxLeftChanged();
@@ -50,10 +68,19 @@ public slots:
 	void onBtnCloseClicked();
 
 	void onPlotRectEditFinishing();
+	void onLineEditPlotNameEditingFinishing();
+	void onCheckBox_drawStateChanged();
+
+	void onCheckBox_4StateChanged();
+	void onCheckBox_5StateChanged();
+
 
 signals:
 	void sigAddPlotPair();
 	void sigRectChanged(QRect);
+	void sigGetTabRect();
+	void sigSetPlotVisible(bool);
+	void sigChangePlotName();
 
 private:
     Ui::PlotManager ui;
@@ -81,6 +108,7 @@ private:
     QMap<QString/*int*/, QList<PlotItemBase*>> m_plotManager;	//tabName
 	bool m_radioPixelChecked;
 	QRect m_tabWidgetRect;
+	PlotItemBase* m_curSelectPlot = nullptr;;
 };
 
 #endif // ! 

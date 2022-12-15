@@ -22,6 +22,7 @@
 #include "PlotScatter.h"
 #include "PlotDial.h"
 #include "renameTab.h"
+#include "PlotManagerData.h"
 
 PlotXYDemo::PlotXYDemo(QWidget *parent)
     : QMainWindow(parent)
@@ -66,6 +67,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
 
     connect(m_plotManager, SIGNAL(sigAddPlotPair()), this, SLOT(onAddPlotPair()));
 	connect(this, &PlotXYDemo::sgn_sendTabWidgetRect, m_plotManager, &PlotManager::onGetTabWidgetRect);
+	connect(m_plotManager, &PlotManager::sigGetTabRect, this, &PlotXYDemo::onSendTabRect);
 	QRect tabRect = ui.tabWidget->rect();
 	emit sgn_sendTabWidgetRect(tabRect);
 
@@ -309,6 +311,12 @@ void PlotXYDemo::onRenameTabPage()
 	renameDlg->deleteLater();
 }
 
+void PlotXYDemo::onSendTabRect()
+{
+	QRect tabRect = ui.tabWidget->rect();
+	emit sgn_sendTabWidgetRect(tabRect);
+}
+
 void PlotXYDemo::onAddBarPlot()
 {
     int currTabIndex = ui.tabWidget->currentIndex();
@@ -333,9 +341,10 @@ void PlotXYDemo::onAddBarPlot()
     plotItem->show();
 
     m_lastSelectedType = PlotType::Type_PlotBar;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 void PlotXYDemo::onAddTextPlot()
 {
@@ -369,8 +378,9 @@ void PlotXYDemo::onAddTextPlot()
 
 
     m_lastSelectedType = PlotType::Type_PlotText;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddLightPlot()
@@ -397,9 +407,10 @@ void PlotXYDemo::onAddLightPlot()
     plotItem->show();
 
     m_lastSelectedType = PlotType::Type_PlotLight;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddTrackPlot()
@@ -424,9 +435,10 @@ void PlotXYDemo::onAddTrackPlot()
     plotItem->update();
 
     m_lastSelectedType = PlotType::Type_PlotTrack;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddAScopePlot()
@@ -447,9 +459,10 @@ void PlotXYDemo::onAddAScopePlot()
     plotItem->show();
 
     m_lastSelectedType = PlotType::Type_PlotAScope;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddRTIPlot()
@@ -470,9 +483,10 @@ void PlotXYDemo::onAddRTIPlot()
     plotItem->show();
 
     m_lastSelectedType = PlotType::Type_PlotRTI;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//     m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddDopplerPolt()
@@ -493,9 +507,10 @@ void PlotXYDemo::onAddDopplerPolt()
     plotItem->show();
 
     m_lastSelectedType = PlotType::Type_PlotDoppler;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//     m_addPlotPair->onAddPlot(currTabText, plotItem);
+//     m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddScatterPlot()
@@ -520,9 +535,10 @@ void PlotXYDemo::onAddScatterPlot()
 //    plotItem->update();
 
     m_lastSelectedType = PlotType::Type_PlotScatter;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+// 	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddDialPlot()
@@ -546,9 +562,10 @@ void PlotXYDemo::onAddDialPlot()
     plotItem->update();
 
     m_lastSelectedType = PlotType::Type_PlotDial;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+// 	m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onAddPolarPlot()
@@ -570,9 +587,10 @@ void PlotXYDemo::onAddPolarPlot()
     plotItem->show();
 
     m_lastSelectedType = PlotType::Type_PlotPolar;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//     m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::onFocusChanged(QWidget *oldWidget, QWidget *newWidget)
@@ -757,9 +775,10 @@ void PlotXYDemo::onAddAttitudePlot()
     plotItem->update();
 
     m_lastSelectedType = PlotType::Type_PlotAttitude;
-    m_plotManager->addPlot(currTabText, plotItem);
-    m_addPlotPair->onAddPlot(currTabText, plotItem);
-    m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+//    m_plotManager->addPlot(currTabText, plotItem);
+//    m_addPlotPair->onAddPlot(currTabText, plotItem);
+//     m_AdvancedDataManager->onAddPlot(currTabText, plotItem);
+	PlotManagerData::getInstance()->addPlotManagerData(currTabText, plotItem);
 }
 
 void PlotXYDemo::init()
@@ -918,7 +937,7 @@ PlotType PlotXYDemo::getCurrentFocusPlot()
         m_curBaseInfo.Base_TabName = ui.tabWidget->tabText(ui.tabWidget->currentIndex());
     }
 
-    if (name.compare("PlotPlotScatter") == 0) {
+    if (name.compare("PlotScatter") == 0) {
         m_lastSelectedType =  PlotType::Type_PlotScatter;
     } else if (name.compare("PlotAScope") == 0) {
         m_lastSelectedType = PlotType::Type_PlotAScope;

@@ -7,6 +7,7 @@
 #include <QString>
 #include <QStyleFactory>
 #include "PlotItemBase.h"
+#include "PlotManagerData.h"
 
 //#include "PlotBar.h"
 
@@ -18,33 +19,16 @@ PlotManager::PlotManager(QWidget* parent)
 	connect(ui.pushButton_close, &QPushButton::clicked, this, &PlotManager::onBtnCloseClicked);
 	this->setWindowTitle(QString::fromLocal8Bit("图表管理器"));
 	init();
+
+	connect(PlotManagerData::getInstance(), SIGNAL(sgnUpdatePlotManager()), this, SLOT(onUpdatePlotManager()));
+	connect(this, SIGNAL(sigChangePlotName()), PlotManagerData::getInstance(), SLOT(slotChangePlotName()));
+
 	ui.treeWidget_selectedPlots->setStyle(QStyleFactory::create("windows"));
 	ui.treeWidget_selectedPlots->setHeaderHidden(true);
 	ui.treeWidget_selectedPlots->expandAll();
 	
-// 	m_itemGOG->setDisabled(true); 
-// 	m_itemScatterPlot->setDisabled(true);
-// 	m_itemAScope->setDisabled(true);
-// 	m_itemRTI->setDisabled(true);
-// 	m_itemTextLight->setDisabled(true);
-// 	m_itemBar->setDisabled(true);
-// 	m_itemDial->setDisabled(true);
-// 	m_itemAttitude->setDisabled(true);
-// 	m_itemTrackStatus->setDisabled(true);
-// 	m_itemRangeDoppler->setDisabled(true);
-
 	ui.stackedWidget->setCurrentIndex(0);
-	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
-	m_itemScatterPlot->setExpanded(true);
 
-	/*ui.textEdit->setFixedHeight(24);
-	ui.textEdit_2->setFixedHeight(24);
-	ui.pushButton_10->setFixedSize(21, 21);
-	ui.pushButton_21->setFixedSize(21, 21);
-	ui.pushButton_22->setFixedSize(21, 21);
-	ui.pushButton_23->setFixedSize(21, 21);*/
-
-	connect(ui.treeWidget_settings, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSclicked(QTreeWidgetItem*, int)));
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
 	
 	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
@@ -59,16 +43,6 @@ PlotManager::PlotManager(QWidget* parent)
 	connect(ui.lineEdit_vertGrids, &QLineEdit::textChanged, this, [=]() {
 		m_vertGrids = ui.lineEdit_vertGrids->text().toInt();
 		});
-
-// 	ui.pushButton_axisColor->setFixedSize(21, 21);
-// 	ui.pushButton_gridColor->setFixedSize(21, 21);
-// 	ui.pushButton_gridFill->setFixedSize(21, 21);
-// 	ui.pushButton_10->setFixedSize(21, 21);
-// 	ui.pushButton_21->setFixedSize(21, 21);
-// 	ui.pushButton_22->setFixedSize(21, 21);
-// 	ui.pushButton_23->setFixedSize(21, 21);
-
-	
 
 // 	QFontDatabase FontDb;
 // 	foreach(int size, FontDb.standardSizes()) {
@@ -86,10 +60,13 @@ void PlotManager::init()
 {
 	initTreeWidgetSettings();
 	initGeneralUI();
+	initAxisGridUI();
 }
 
 void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
 {
+	m_plotManager = PlotManagerData::getInstance()->getPlotManagerData();
+
 	//显示层更新
 	if (m_plotManager.contains(tabName))
 	{
@@ -114,7 +91,7 @@ void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
 	}
 
 	//数据层更新
-	m_plotManager[tabName].append(plotItem);
+//	m_plotManager[tabName].append(plotItem);
 }
 
 void PlotManager::initTreeWidgetSettings()
@@ -122,6 +99,8 @@ void PlotManager::initTreeWidgetSettings()
 	ui.treeWidget_settings->setHeaderHidden(false);
 	ui.treeWidget_settings->setHeaderLabel(QString::fromLocal8Bit("设置"));
 	ui.treeWidget_settings->setIndentation(15);
+
+	connect(ui.treeWidget_settings, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSclicked(QTreeWidgetItem*, int)));
 
 	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("总体设置")));
 	m_itemAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("坐标轴和网格设置")));
@@ -133,11 +112,7 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemAScope = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("A-Scope设置")));
 	m_itemRTI = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("RTI设置")));
 	m_itemTextLight = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Text/Light设置")));
-
-	m_itemBar = new QTreeWidgetItem;
-	m_itemBar->setText(0, QString::fromLocal8Bit("Bar设置"));
-	ui.treeWidget_settings->addTopLevelItem(m_itemBar);
-
+	m_itemBar = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Bar设置")));
 	m_itemDial = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Dials设置")));
 	m_itemAttitude = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Attitude设置")));
 	m_itemTrackStatus = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Track Status设置")));
@@ -147,22 +122,88 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemPlotMarkers = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("标记")));
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
 	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
+
+	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
+	m_itemScatterPlot->setExpanded(true);
 }
 
 void PlotManager::initGeneralUI()
 {
-	ui.radioButton_percent->setChecked(true);
-	m_radioPixelChecked = false;
+	ui.radioButton_percent->setChecked(false);
+	ui.radioButton_pixel->setChecked(true);
+	m_radioPixelChecked = true;
 	connect(ui.radioButton_percent, &QRadioButton::clicked, this, &PlotManager::onRadioPercentClicked);
 	connect(ui.radioButton_pixel, &QRadioButton::clicked, this, &PlotManager::onRadioPixelClicked);
 	connect(ui.lineEdit_plotPositionX, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
 	connect(ui.lineEdit_plotPositionY, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
 	connect(ui.lineEdit_plotWidth, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
 	connect(ui.lineEdit_plotHeight, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinishing);
+	connect(ui.checkBox_draw, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_drawStateChanged);
+	connect(ui.lineEdit_plotName, &QLineEdit::editingFinished, this, &PlotManager::onLineEditPlotNameEditingFinishing);
+}
+
+void PlotManager::initAxisGridUI()
+{
+	ui.lineEdit_10->setEnabled(false);
+	ui.lineEdit_11->setEnabled(false);
+	ui.lineEdit_12->setEnabled(false);
+	ui.lineEdit_13->setEnabled(false);
+	ui.tableWidget->setEnabled(false);
+	ui.tableWidget_2->setEnabled(false);
+	connect(ui.checkBox_4, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_4StateChanged);
+	connect(ui.checkBox_5, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_5StateChanged);
+
+}
+
+void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
+{
+	QString name = plot->metaObject()->className();
+	if (name.compare("PlotScatter") == 0) 
+	{
+		enableItem_Scatter();
+	}
+	else if (name.compare("PlotAScope") == 0) 
+	{
+		enableItem_AScope();
+	}
+	else if (name.compare("PlotRTI") == 0) 
+	{
+		enableItem_RTI();
+	}
+	else if (name.compare("PlotText") == 0 || name.compare("PlotLight") == 0)
+	{
+		enableItem_Text_Light();
+	}
+	else if (name.compare("PlotBar") == 0) 
+	{
+		enableItem_Bar();
+	}
+	else if (name.compare("PlotDial") == 0) 
+	{
+		enableItem_Dial();
+	}
+	else if (name.compare("PlotAttitude") == 0) 
+	{
+		enableItem_Attitude();
+	}
+	else if (name.compare("PlotPolar") == 0) 
+	{
+		enableItem_Polar();
+	}
+	else if (name.compare("PlotTrack") == 0) 
+	{
+		enableItem_Track();
+	}
+	else if (name.compare("PlotDoppler") == 0) 
+	{
+		enableItem_Doppler();
+	}
 }
 
 void PlotManager::refreshGeneralUI(PlotItemBase * plot)
 {
+	emit sigGetTabRect();
+
 	ui.lineEdit_plotName->setText(plot->currName());
 	ui.comboBox_tabName->setCurrentText(plot->currTabName());
 	if (ui.radioButton_pixel->isChecked())
@@ -182,14 +223,179 @@ void PlotManager::refreshGeneralUI(PlotItemBase * plot)
 	}
 }
 
-void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int i)
+void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
+{
+	ui.treeWidget_4->clear();
+	QList<QPair<QString, QString>> plotPairData = plot->getPlotPairData();
+	for (int k = 0; k < plotPairData.size(); ++k)
+	{
+		//界面更新
+		QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
+		addplotItem->setText(0, plotPairData[k].first);
+		addplotItem->setText(1, plotPairData[k].second);
+
+		ui.treeWidget_4->addTopLevelItem(addplotItem);
+	}
+}
+
+void PlotManager::enableItem_Scatter()
+{
+	m_itemGOG->setDisabled(false);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(false);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_AScope()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(false);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_RTI()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(false);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Text_Light()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(false);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Bar()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(false);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Dial()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(false);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Attitude()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(false);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Polar()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Track()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(false);
+	m_itemRangeDoppler->setDisabled(true);
+}
+
+void PlotManager::enableItem_Doppler()
+{
+	m_itemGOG->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(true);
+	m_itemScatterPlot->setDisabled(true);
+	m_itemAScope->setDisabled(true);
+	m_itemRTI->setDisabled(true);
+	m_itemTextLight->setDisabled(true);
+	m_itemBar->setDisabled(true);
+	m_itemDial->setDisabled(true);
+	m_itemAttitude->setDisabled(true);
+	m_itemTrackStatus->setDisabled(true);
+	m_itemRangeDoppler->setDisabled(false);
+}
+
+void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 {
 	QTreeWidgetItem *parent = item->parent();
 	if (NULL == parent)
 		return;
 
 	QString parent_text = parent->text(0);
-	QString child_text = item->text(i);
+	QString child_text = item->text(column);
 
 	if (m_plotManager.contains(parent_text))
 	{
@@ -198,26 +404,23 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int i)
 			PlotItemBase *tempPlot = m_plotManager[parent_text].at(i);
 			if (child_text == tempPlot->currName())
 			{
+				m_curSelectPlot = tempPlot;
+				//刷新treeWidgetSetting的使能状态
+				refreshTreeWidgetSettingEnabled(m_curSelectPlot);
 				//general界面
-				refreshGeneralUI(tempPlot);
-
+				refreshGeneralUI(m_curSelectPlot);
 				//plotPair界面
-				ui.treeWidget_4->clear();
-				QList<QPair<QString, QString>> plotPairData = tempPlot->getPlotPairData();
-				for (int k = 0; k < plotPairData.size(); ++k)
-				{
-					//界面更新
-					QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
-					addplotItem->setText(0, plotPairData[k].first);
-					addplotItem->setText(1, plotPairData[k].second);
+				refreshPlotDataUI(m_curSelectPlot);
 
-					ui.treeWidget_4->addTopLevelItem(addplotItem);
-				}
-
+				//
+			//	tempPlot->deleteLater();
 				break;
 			}
+			m_curSelectPlot = nullptr;
 		}
 	}
+	else
+		m_curSelectPlot = nullptr;
 
 	/*if (child_text == "Bar")
 	{
@@ -233,11 +436,37 @@ void PlotManager::onAddNewClicked()
 	emit sigAddPlotPair();
 }
 
+void PlotManager::onUpdatePlotManager()
+{
+	m_plotManager = PlotManagerData::getInstance()->getPlotManagerData();
+	if (m_plotManager.isEmpty())
+	{
+		return;
+	}
 
-void PlotManager::onTWSclicked(QTreeWidgetItem* item, int i)
+	ui.treeWidget_selectedPlots->clear();
+
+	for (int i = 0; i < m_plotManager.size(); ++i)
+	{
+		QString tabName = m_plotManager.keys().at(i);
+		QTreeWidgetItem* itemselPlotH = new QTreeWidgetItem(QStringList() << tabName);
+		ui.treeWidget_selectedPlots->addTopLevelItem(itemselPlotH);
+		ui.treeWidget_selectedPlots->expandAll();
+		for (int k = 0; k < m_plotManager[tabName].size(); ++k)
+		{
+			QTreeWidgetItem* itemselPlotI = new QTreeWidgetItem(QStringList() << m_plotManager[tabName].at(k)->currName());
+			itemselPlotH->addChild(itemselPlotI);
+		}
+
+		//comboBox_tabName
+		ui.comboBox_tabName->addItem(tabName);
+	}
+}
+
+void PlotManager::onTWSclicked(QTreeWidgetItem* item, int column)
 {
 	QString compare;
-	compare = item->text(i);
+	compare = item->text(column);
 
 	if (item->isDisabled() == true)
 	{
@@ -528,6 +757,50 @@ void PlotManager::onPlotRectEditFinishing()
 		h = (int)(ui.lineEdit_plotHeight->text().toFloat(&bH) * m_tabWidgetRect.height());
 	}
 
-	if (bX && bY && bW && bH)
+	if (bX && bY && bW && bH && (m_curSelectPlot != nullptr))
+	{
+		//m_curSelectPlot->setRect(QRect(x, y, w, h));
+		connect(this, SIGNAL(sigRectChanged(QRect)), m_curSelectPlot, SLOT(slot_updateRect(QRect)));
 		emit sigRectChanged(QRect(x, y, w, h));
+		disconnect(this, SIGNAL(sigRectChanged(QRect)), m_curSelectPlot, SLOT(slot_updateRect(QRect)));
+	}
+		
+}
+
+void PlotManager::onLineEditPlotNameEditingFinishing()
+{
+	if (m_curSelectPlot != nullptr)
+	{
+		QString oldName = m_curSelectPlot->currName();
+		QString newName = ui.lineEdit_plotName->text();
+		if (newName.compare(oldName) != 0)
+		{
+			m_curSelectPlot->setName(newName);
+			emit sigChangePlotName();
+		}
+	}
+}
+
+void PlotManager::onCheckBox_drawStateChanged()
+{
+	if (m_curSelectPlot != nullptr)
+	{
+		connect(this, SIGNAL(sigSetPlotVisible(bool)), m_curSelectPlot, SLOT(slot_setVisible(bool)));
+		emit sigSetPlotVisible(ui.checkBox_draw->isChecked());
+		disconnect(this, SIGNAL(sigSetPlotVisible(bool)), m_curSelectPlot, SLOT(slot_setVisible(bool)));
+	}
+}
+
+void PlotManager::onCheckBox_4StateChanged()
+{
+	ui.lineEdit_10->setEnabled(ui.checkBox_4->isChecked());
+	ui.lineEdit_11->setEnabled(ui.checkBox_4->isChecked());
+	ui.tableWidget->setEnabled(ui.checkBox_4->isChecked());
+}
+
+void PlotManager::onCheckBox_5StateChanged()
+{
+	ui.lineEdit_12->setEnabled(ui.checkBox_5->isChecked());
+	ui.lineEdit_13->setEnabled(ui.checkBox_5->isChecked());
+	ui.tableWidget_2->setEnabled(ui.checkBox_5->isChecked());
 }

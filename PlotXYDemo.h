@@ -39,6 +39,7 @@ public slots:
     void onAddTabPage();
     void onRemoveTabPage();
     void onRenameTabPage();
+	void onSendTabRect();
 
     void onAddBarPlot();
     void onAddAttitudePlot();

@@ -53,6 +53,7 @@ protected:
 
 public slots:
 	void slot_updateRect(QRect);
+	void slot_setVisible(bool);
 
 private:
     QPoint  m_position;

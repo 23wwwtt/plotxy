@@ -12,9 +12,6 @@ PlotItemBase::PlotItemBase(QWidget* parent)
 {
     ui.setupUi(this);
     
-    QWidget* centerWindow = new QWidget;
-    //this->setCentralWidget(centerWindow);
-
     m_position = QPoint(0,0);
     m_width = 0;
     m_height = 0;
@@ -164,6 +161,12 @@ void PlotItemBase::updatePlotPairData(QPair<QString, QString> oldPair, QPair<QSt
 QList<QPair<QString, QString>> PlotItemBase::getPlotPairData()
 {
 	return m_plotPairData;
+}
+
+void PlotItemBase::slot_setVisible(bool on)
+{
+	m_bVisible = on;
+	this->setVisible(on);
 }
 
 void PlotItemBase::slot_updateRect(QRect rect)

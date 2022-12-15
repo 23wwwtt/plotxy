@@ -77,14 +77,6 @@ void PlotScatter::getDataInfo(double secs)
 	}
 
 	m_customPlot->clearGraphs();
-//     int itemCnt = m_plotPairData.size();
-//     for (int i = 0; i < itemCnt; i++) 
-// 	{
-// 		QColor color = m_graphColorMap[m_plotPairData.at(i)];
-// 		QString xcolumn = m_plotPairData.at(i).first;
-// 		QString ycolumn = m_plotPairData.at(i).second;
-// 		updateData(xcolumn, ycolumn, secs, i, color);
-//     }
 
 	int itemCnt = m_dataPair.size();
 	for (int i = 0; i < itemCnt; ++i)
