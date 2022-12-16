@@ -16,6 +16,17 @@ PlotItemBase::PlotItemBase(QWidget* parent)
     m_width = 0;
     m_height = 0;
     m_bVisible = true; 
+	m_coordBgn_x = 0;
+	m_coordEnd_x = 100;
+	m_coordBgn_y = 0;
+	m_coordEnd_y = 100;
+
+	m_horzGrids = 4;
+	m_vertGrids = 4;
+	m_axisWidth = 1;
+	m_gridWidth = 1;
+	m_axisColor = Qt::white;
+	m_gridColor = QColor(200, 200, 200);
 }
    
 PlotItemBase::~PlotItemBase()
@@ -101,6 +112,52 @@ QString PlotItemBase::currName()
 QString PlotItemBase::currTabName()
 {
     return m_tabName;
+}
+
+void PlotItemBase::setCoordRangeX(double lower, double upper)
+{
+	m_coordBgn_x = lower;
+	m_coordEnd_x = upper;
+}
+
+void PlotItemBase::setCoordRangeY(double lower, double upper)
+{
+	m_coordBgn_y = lower;
+	m_coordEnd_y = upper;
+}
+
+void PlotItemBase::getCoordRangeX(double & lower, double & upper)
+{
+	lower = m_coordBgn_x;
+	upper = m_coordEnd_x;
+}
+
+void PlotItemBase::getCoordRangeY(double & lower, double & upper)
+{
+	lower = m_coordBgn_y;
+	upper = m_coordEnd_y;
+}
+
+void PlotItemBase::setHorzGrids(uint count)
+{
+	m_horzGrids = count;
+}
+
+void PlotItemBase::setVertGrids(uint count)
+{
+	m_vertGrids = count;
+}
+
+void PlotItemBase::setAxisColorWidth(QColor color, uint width)
+{
+	m_axisColor = color;
+	m_axisWidth = width;
+}
+
+void PlotItemBase::setGridColorWidth(QColor color, uint width)
+{
+	m_gridColor = color;
+	m_gridWidth = width;
 }
 
 void PlotItemBase::addPlotPairData(QPair<QString, QString> pair)

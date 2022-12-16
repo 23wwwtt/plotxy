@@ -38,8 +38,11 @@ public:
 
 	void setAxisVisible(bool on, AxisType type);
 	void setAxisTickLabelShow(bool on, AxisType type);
-	void setRange_xAxis(double lower, double upper);
-	void setRange_yAxis(double lower, double upper);
+
+	void setCoordRangeX(double lower, double upper);
+	void setCoordRangeY(double lower, double upper);
+	void getCoordRangeX(double& lower, double& upper);
+	void getCoordRangeY(double& lower, double& upper);
 
 public:
 	static int m_instanceCount;			//实体个数

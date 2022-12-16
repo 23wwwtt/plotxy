@@ -36,6 +36,18 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_topPadding = 10;
 	m_bottomPadding = 20;
 
+	m_coordBgn_x = 0;
+	m_coordEnd_x = 2000;
+	m_coordBgn_y = 0;
+	m_coordEnd_y = 2000;
+
+	m_horzGrids = 5;
+	m_vertGrids = 5;
+	m_axisWidth = 1;
+	m_gridWidth = 1;
+	m_axisColor = Qt::white;
+	m_gridColor = QColor(200, 200, 200);
+
 	initPlot();
 }
 
@@ -48,25 +60,35 @@ void PlotScatter::initPlot()
 {
 	m_customPlot = new QCustomPlot(this);
 	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-	connect(m_customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), m_customPlot->xAxis2, SLOT(setRange(QCPRange)));
-	connect(m_customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), m_customPlot->yAxis2, SLOT(setRange(QCPRange)));
+ 	m_customPlot->axisRect()->setupFullAxesBox(true);
 
+	m_customPlot->xAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+	m_customPlot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+	m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
+	m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
-	m_customPlot->xAxis->setRange(0, 2000);
-	m_customPlot->yAxis->setRange(0, 2000);
+	m_customPlot->xAxis->setRange(m_coordBgn_x, m_coordEnd_x);
+	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
+
 //  	m_customPlot->xAxis->setNumberPrecision(3);
 //  	m_customPlot->yAxis->setNumberPrecision(3);
 
 	m_customPlot->setBackground(m_backgroundBrush);
-	m_customPlot->xAxis->setBasePen(QPen(m_axisColor));
-	m_customPlot->yAxis->setBasePen(QPen(m_axisColor));
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->xAxis->setLabelFont(m_axisFont);
 	m_customPlot->yAxis->setLabelFont(m_axisFont);
 	m_customPlot->xAxis->setTickLabelColor(QColor(255, 255, 255));
 	m_customPlot->yAxis->setTickLabelColor(QColor(255, 255, 255));
+
+	m_customPlot->replot();
 }
 
 void PlotScatter::getDataInfo(double secs)
@@ -190,7 +212,7 @@ void PlotScatter::setyAxisLabel(QString & str)
 {
 	m_yAxisLabel = str;
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
-	//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotScatter::setAxisColor(QColor & color)
@@ -198,7 +220,7 @@ void PlotScatter::setAxisColor(QColor & color)
 	m_axisLabelColor = color;
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
-	//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotScatter::setAxisFont(QFont & font)
@@ -206,7 +228,7 @@ void PlotScatter::setAxisFont(QFont & font)
 	m_axisFont = font;
 	m_customPlot->xAxis->setLabelFont(m_axisFont);
 	m_customPlot->yAxis->setLabelFont(m_axisFont);
-	//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotScatter::setAxisVisible(bool on, AxisType type)
@@ -228,7 +250,7 @@ void PlotScatter::setAxisVisible(bool on, AxisType type)
 	default:
 		break;
 	}
-	//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotScatter::setAxisTickLabelShow(bool on, AxisType type)
@@ -250,19 +272,7 @@ void PlotScatter::setAxisTickLabelShow(bool on, AxisType type)
 	default:
 		break;
 	}
-	//	m_customPlot->replot();
-}
-
-void PlotScatter::setRange_xAxis(double lower, double upper)
-{
-	m_customPlot->xAxis->setRange(lower, upper);
-	//	m_customPlot->replot();
-}
-
-void PlotScatter::setRange_yAxis(double lower, double upper)
-{
-	m_customPlot->yAxis->setRange(lower, upper);
-	//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotScatter::rescale_xAxis(bool on)
@@ -281,4 +291,130 @@ void PlotScatter::rescaleAxis(bool on)
 {
 	m_customPlot->rescaleAxes(on);
 	m_customPlot->replot(QCustomPlot::rpQueuedRefresh);
+}
+
+void PlotScatter::setCoordRangeX(double lower, double upper)
+{
+	if (m_coordBgn_x == lower && m_coordEnd_x == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_x = lower;
+	m_coordEnd_x = upper;
+	m_customPlot->xAxis->setRange(m_coordBgn_x, m_coordEnd_x);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setCoordRangeY(double lower, double upper)
+{
+	if (m_coordBgn_y == lower && m_coordEnd_y == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_y = lower;
+	m_coordEnd_y = upper;
+	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
+	m_customPlot->replot();
+}
+
+void PlotScatter::getCoordRangeX(double & lower, double & upper)
+{
+	lower = m_coordBgn_x;
+	upper = m_coordEnd_x;
+}
+
+void PlotScatter::getCoordRangeY(double & lower, double & upper)
+{
+	lower = m_coordBgn_y;
+	upper = m_coordEnd_y;
+}
+
+void PlotScatter::setHorzGrids(uint count)
+{
+	if (m_horzGrids == count || count < 0)
+	{
+		return;
+	}
+	m_horzGrids = count;
+	if (count == 0)
+	{
+		m_customPlot->yAxis->grid()->setVisible(false);
+	}
+	else
+	{
+		m_customPlot->yAxis->grid()->setVisible(true);
+		m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	}
+	m_customPlot->replot();
+}
+
+void PlotScatter::setVertGrids(uint count)
+{
+	if (m_vertGrids == count || count < 0)
+	{
+		return;
+	}
+	m_vertGrids = count;
+	if (count == 0)
+	{
+		m_customPlot->xAxis->grid()->setVisible(false);
+	}
+	else
+	{
+		m_customPlot->xAxis->grid()->setVisible(true);
+		m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
+	}
+	m_customPlot->replot();
+}
+
+uint PlotScatter::getHorzGrids()
+{
+	return m_horzGrids;
+}
+
+uint PlotScatter::getVertGrids()
+{
+	return m_vertGrids;
+}
+
+void PlotScatter::setAxisColorWidth(QColor color, uint width)
+{
+	m_axisColor = color;
+	m_axisWidth = width;
+	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->replot();
+}
+
+void PlotScatter::setGridColorWidth(QColor color, uint width)
+{
+	m_gridColor = color;
+	m_gridWidth = width;
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->replot();
+}
+
+uint PlotScatter::getAxisWidth()
+{
+	return m_axisWidth;
+}
+
+uint PlotScatter::getGridWidth()
+{
+	return m_gridWidth;
+}
+
+QColor PlotScatter::getAxisColor()
+{
+	return m_axisColor;
+}
+
+QColor PlotScatter::getGridColor()
+{
+	return m_gridColor;
 }

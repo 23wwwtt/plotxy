@@ -64,6 +64,7 @@ void ColorButton::setColor(const QColor& value)
 {
     m_color = value;
     update();
+	emit clicked();
 }
 
 void ColorButton::paintColoredSquare(QPainter* painter, const QRect& rect, const QColor& color, bool showAlpha)

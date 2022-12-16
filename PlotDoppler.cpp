@@ -25,6 +25,11 @@ PlotDoppler::PlotDoppler(QWidget* parent)
 	m_topPadding = 0;
 	m_bottomPadding = 10;
 
+	m_coordBgn_x = 0;
+	m_coordEnd_x = 100;
+	m_coordBgn_y = 0;
+	m_coordEnd_y = 100;
+
 	initPlot();
 }
 
@@ -90,8 +95,8 @@ void PlotDoppler::initPlot()
 	m_vertical_AScope->setAxisTickLabelShow(false, PlotAScope::xAxis);
 	m_vertical_AScope->setMinimumMargins(QMargins(15, 15, 3, 15));
 
-	setRange_xAxis(0, 100);
-	setRange_yAxis(0, 100);
+	setCoordRangeX(m_coordBgn_x, m_coordEnd_x);
+	setCoordRangeY(m_coordBgn_y, m_coordEnd_y);
 }
 
 void PlotDoppler::paintEvent(QPaintEvent * event)
@@ -246,20 +251,46 @@ void PlotDoppler::setAxisTickLabelShow(bool on, AxisType type)
 	m_customPlot->replot();
 }
 
-void PlotDoppler::setRange_xAxis(double lower, double upper)
+void PlotDoppler::setCoordRangeX(double lower, double upper)
 {
+	if (m_coordBgn_x == lower && m_coordEnd_x == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_x = lower;
+	m_coordEnd_x = upper;
 	m_customPlot->xAxis->setRange(lower, upper);
-	m_horizon_AScope->setRange_xAxis(lower, upper);
+	m_horizon_AScope->setCoordRangeX(lower, upper);
 
 	m_customPlot->rescaleAxes();
  	m_customPlot->replot();
 }
 
-void PlotDoppler::setRange_yAxis(double lower, double upper)
+void PlotDoppler::setCoordRangeY(double lower, double upper)
 {
+	if (m_coordBgn_y == lower && m_coordEnd_y == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_y = lower;
+	m_coordEnd_y = upper;
 	m_customPlot->yAxis->setRange(lower, upper);
-	m_vertical_AScope->setRange_yAxis(lower, upper);
+	m_vertical_AScope->setCoordRangeY(lower, upper);
 
 	m_customPlot->rescaleAxes();
 	m_customPlot->replot();
+}
+
+void PlotDoppler::getCoordRangeX(double & lower, double & upper)
+{
+	lower = m_coordBgn_x;
+	upper = m_coordEnd_x;
+}
+
+void PlotDoppler::getCoordRangeY(double & lower, double & upper)
+{
+	lower = m_coordBgn_y;
+	upper = m_coordEnd_y;
 }

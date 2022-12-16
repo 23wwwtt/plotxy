@@ -213,6 +213,12 @@ color: rgb(255, 255, 255);</string>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
            <item>
             <widget class="QGroupBox" name="groupBox_3">
              <property name="title">
@@ -587,7 +593,7 @@ color: rgb(255, 255, 255);</string>
                 <item>
                  <widget class="QCheckBox" name="checkBox_oneToOneScale">
                   <property name="text">
-                   <string>Always  one-to-ont scale</string>
+                   <string>Always one-to-one scale</string>
                   </property>
                  </widget>
                 </item>
@@ -830,7 +836,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_30">
                     <property name="text">
-                     <string>水平网格:</string>
+                     <string>水平网格个数:</string>
                     </property>
                    </widget>
                   </item>
@@ -840,7 +846,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="0" column="2">
                    <widget class="QLabel" name="label_31">
                     <property name="text">
-                     <string>轴宽</string>
+                     <string>坐标轴宽：</string>
                     </property>
                    </widget>
                   </item>
@@ -850,7 +856,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_32">
                     <property name="text">
-                     <string>垂直网格:</string>
+                     <string>垂直网格个数:</string>
                     </property>
                    </widget>
                   </item>
@@ -860,7 +866,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="1" column="2">
                    <widget class="QLabel" name="label_33">
                     <property name="text">
-                     <string>网格宽度</string>
+                     <string>网格宽度：</string>
                     </property>
                    </widget>
                   </item>
@@ -928,7 +934,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_34">
                     <property name="text">
-                     <string>Axis Color:</string>
+                     <string>坐标轴颜色:</string>
                     </property>
                    </widget>
                   </item>
@@ -948,7 +954,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_35">
                     <property name="text">
-                     <string>Grid Color:</string>
+                     <string>网格颜色:</string>
                     </property>
                    </widget>
                   </item>

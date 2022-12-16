@@ -46,12 +46,25 @@ public:
 
 	void setAxisVisible(bool on, AxisType type);
 	void setAxisTickLabelShow(bool on, AxisType type);
-	void setRange_xAxis(double lower, double upper);
-	void setRange_yAxis(double lower, double upper);
 
 	void rescale_xAxis(bool);
 	void rescale_yAxis(bool);
 	void rescaleAxis(bool);
+
+	virtual void setCoordRangeX(double lower, double upper);
+	virtual void setCoordRangeY(double lower, double upper);
+	virtual void getCoordRangeX(double& lower, double& upper);
+	virtual void getCoordRangeY(double& lower, double& upper);
+	virtual void setHorzGrids(uint);
+	virtual void setVertGrids(uint);
+	virtual uint getHorzGrids();
+	virtual uint getVertGrids();
+	virtual void setAxisColorWidth(QColor, uint);
+	virtual void setGridColorWidth(QColor, uint);
+	virtual uint getAxisWidth();
+	virtual uint getGridWidth();
+	virtual QColor getAxisColor();
+	virtual QColor getGridColor();
 
 public slots:
     void onGetCurrentSeconds(double secs);
@@ -66,7 +79,6 @@ private:
 
 private:
     double m_curSeconds;
-    QColor m_axisColor{Qt::lightGray};
 	QBrush m_backgroundBrush;			//背景刷
 	double m_topPadding;				//绘图间隔-top
 	double m_bottomPadding;				//绘图间隔-bottom

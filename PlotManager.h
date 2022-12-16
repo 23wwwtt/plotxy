@@ -34,6 +34,7 @@ private:
 	void initAxisGridUI();
 	void refreshTreeWidgetSettingEnabled(PlotItemBase* plot);
 	void refreshGeneralUI(PlotItemBase* plot);
+	void refreshAxisGridUI(PlotItemBase* plot);
 	void refreshPlotDataUI(PlotItemBase* plot);
 
 	void enableItem_Scatter();
@@ -53,6 +54,7 @@ public slots:
     void onAddNewClicked();
 
 	void onUpdatePlotManager();
+	void onBtnCloseClicked();
 
 	void spinboxBetweenChanged();
 	void spinboxLeftChanged();
@@ -61,18 +63,25 @@ public slots:
 // 	void onAddPlotPair(QString,QString);
 // 	void onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn);
 
+	//General
 	void onRadioPixelClicked();
 	void onRadioPercentClicked();
-
 	void onGetTabWidgetRect(QRect);
-	void onBtnCloseClicked();
-
-	void onPlotRectEditFinishing();
-	void onLineEditPlotNameEditingFinishing();
+	void onPlotRectEditFinished();
+	void onLineEditPlotNameEditingFinished();
 	void onCheckBox_drawStateChanged();
 
+	//Axis and Grid
 	void onCheckBox_4StateChanged();
 	void onCheckBox_5StateChanged();
+	void onLineEdit_limitXEditingFinished();
+	void onLineEdit_limitYEditingFinished();
+	void onPushButton_flipXValuesClicked();
+	void onPushButton_flipYValuesClicked();
+	void onLineEdit_horzGridsEditingFinished();
+	void onLineEdit_vertGridsEditingFinished();
+	void onSetAxisColorWidth();
+	void onSetGridColorWidth();
 
 
 signals:
