@@ -2220,6 +2220,7 @@ public:
   QCPLineEnding lowerEnding() const;
   QCPLineEnding upperEnding() const;
   QCPGrid *grid() const { return mGrid; }
+  bool getAxisFormatShow() { return m_formatShow; }
   
   // setters:
   Q_SLOT void setScaleType(QCPAxis::ScaleType type);
@@ -2268,6 +2269,7 @@ public:
   void setUpperEnding(const QCPLineEnding &ending);
   
   void setAxisFormat(QString format);
+  void setAxisFormatShow(bool show);
   // reimplemented virtual methods:
   virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=nullptr) const Q_DECL_OVERRIDE;
   
@@ -2381,6 +2383,7 @@ private:
   friend class QCPAxisRect;
 
   QString m_format;
+  bool m_formatShow;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QCPAxis::SelectableParts)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QCPAxis::AxisTypes)
@@ -7061,6 +7064,7 @@ public:
   QPen selectedBasePen() const { return mSelectedBasePen; }
   QPen selectedTickPen() const { return mSelectedTickPen; }
   QPen selectedSubTickPen() const { return mSelectedSubTickPen; }
+  bool getFormatShow() const { return m_formatShow; }
   
   // setters:
   void setRangeDrag(bool enabled);
@@ -7124,6 +7128,7 @@ public:
   double radiusToCoord(double radius) const;
   SelectablePart getPartAt(const QPointF &pos) const;
   void setFormat(QString format);
+  void setFormatShow(bool show);
   
 signals:
   void rangeChanged(const QCPRange &newRange);
@@ -7170,6 +7175,7 @@ protected:
   bool mRangeReversed;
   ScaleType mScaleType;
   QString m_format;
+  bool m_formatShow;
   
   // non-property members:
   QPointF mCenter;
@@ -7397,6 +7403,7 @@ public:
   QPointF center() const { return mCenter; }
   double radius() const { return mRadius; }
   void setFormat(QString format);
+  void setFormatShow(bool show);
   
 signals:
   void rangeChanged(const QCPRange &newRange);
@@ -7463,6 +7470,7 @@ protected:
   QCP::AntialiasedElements mAADragBackup, mNotAADragBackup;
   QCPLabelPainterPrivate mLabelPainter;
   QString m_format;
+  bool m_formatShow;
   
   // reimplemented virtual methods:
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const Q_DECL_OVERRIDE;

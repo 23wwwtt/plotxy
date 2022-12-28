@@ -9,6 +9,7 @@ PlotAttitude::PlotAttitude(QWidget* parent)
 	: PlotItemBase(parent)
 {
 	m_titleColor = Qt::white;
+	m_titleFillColor = Qt::red;
 	m_border_ColorStart = Qt::white;
 	m_border_ColorEnd = Qt::white;
 	m_bgColor = Qt::black;
@@ -23,18 +24,21 @@ PlotAttitude::PlotAttitude(QWidget* parent)
 	m_pitchValue = 0.0;
 	m_rollValue = 0.0;
 
-	m_startAngle_pitch = 0.0;
-	m_endAngle_pitch = 360.0;
-	m_startAngle_roll = 0.0;
-	m_endAngle_roll = 360.0;
-	m_coordNum_roll = 4;
-	m_coordNum_pitch = 3;
+	m_coordBgn_y = 0.0;
+	m_coordEnd_y = 180;
+	m_coordBgn_x = 0;
+	m_coordEnd_x = 360;
+	m_horzGrids = 4;
+	m_vertGrids = 5;
 
-	m_unit_roll = QString::fromLocal8Bit("°");
-	m_unit_pitch = QString::fromLocal8Bit("°");
+	m_units_x = QString::fromLocal8Bit("°");
+	m_units_y = QString::fromLocal8Bit("°");
+	m_showUnits_x = true;
+	m_showUnits_y = true;
 	m_decision_roll = 0;
 	m_decision_pitch = 0;
 	m_title = "Attitude";
+	m_titleVisible = true;
 
 	m_leftPadding = 40;
 	m_rightPadding = 40;
@@ -75,13 +79,13 @@ void PlotAttitude::paintEvent(QPaintEvent* event)
 
 	//绘制标题
 	drawTitle(&painter, side / 2);
-	//绘制外边框
-	drawBorder(&painter, side / 2);
 	//绘制背景
 	drawBg(&painter, side / 2);
 	//绘制刻度尺
 	drawScale_roll(&painter, side / 2);
 	drawScale_pitch(&painter, side / 2);
+	//绘制外边框
+	drawBorder(&painter, side / 2);
 	//绘制线条
 	drawLine_roll(&painter, side / 2);
 	drawLine_pitch(&painter, side / 2);
@@ -97,12 +101,19 @@ void PlotAttitude::drawTitle(QPainter * painter, int radius)
 	painter->save();
 	QFontMetricsF fm(m_titleFont);
 	double w = fm.size(Qt::TextSingleLine, m_title).width();
+	double h0 = fm.size(Qt::TextSingleLine, m_title).height();
+	double as = fm.ascent();
 	QFontMetricsF fm1(m_scaleFont);
 	double h = fm1.size(Qt::TextSingleLine, m_title).height();
 	
 	painter->setFont(m_titleFont);
 	painter->setPen(m_titleColor);
-	painter->drawText(QPoint(-w / 2, -radius - h), m_title);
+	if (m_titleVisible)
+	{
+		painter->fillRect(-w / 2, -radius - h - h0, w, h0, m_titleFillColor);
+		painter->drawText(QPoint(-w / 2, -radius - h*1.5), m_title);
+	}
+		
 
 	painter->restore();
 }
@@ -110,12 +121,13 @@ void PlotAttitude::drawTitle(QPainter * painter, int radius)
 void PlotAttitude::drawBorder(QPainter *painter, int radius)
 {
 	painter->save();
-	painter->setPen(Qt::SolidLine);
-	QLinearGradient borderGradient(0, -radius, 0, radius);
-	borderGradient.setColorAt(0, m_border_ColorStart);
-	borderGradient.setColorAt(1, m_border_ColorEnd);
-	painter->setBrush(borderGradient);
+	painter->setPen(QPen(m_axisColor, m_axisWidth, Qt::SolidLine));
+// 	QLinearGradient borderGradient(0, -radius, 0, radius);
+// 	borderGradient.setColorAt(0, m_border_ColorStart);
+// 	borderGradient.setColorAt(1, m_border_ColorEnd);
+// 	painter->setBrush(borderGradient);
 	painter->drawEllipse(-radius, -radius, radius * 2, radius * 2);
+	painter->drawLine(0, -radius, 0, radius);
 	painter->restore();
 }
 
@@ -141,27 +153,32 @@ void PlotAttitude::drawScale_roll(QPainter *painter, int radius)
 
 	painter->save();
 	painter->setFont(m_scaleFont);
-	painter->setPen(QPen(m_scaleColor_roll, 1));
-	double eachMajor_roll = (m_endAngle_roll - m_startAngle_roll) / (double)m_coordNum_roll;
+//	painter->setPen(QPen(m_scaleColor_roll, m_gridWidth));
+	double eachMajor_roll = (m_coordEnd_x - m_coordBgn_x) / (double)m_horzGrids;
 	double x, y, w, h;
 	QString str,strNum;
 
-	for (int i = 0; i < m_coordNum_roll; ++i)
+	for (int i = 0; i < m_horzGrids; ++i)
 	{
-		strNum = QString::number(eachMajor_roll * i + m_startAngle_roll, 'f', m_decision_roll);
-		str = QString("%1%2").arg(strNum).arg(m_unit_roll);
+		strNum = QString::number(eachMajor_roll * i + m_coordBgn_x, 'f', m_decision_roll);
+		if (m_showUnits_x)
+			str = QString("%1%2").arg(strNum).arg(m_units_x);
+		else
+			str = QString("%1").arg(strNum);
 		w = fm.size(Qt::TextSingleLine, strNum).width() + 5;
 		h = fm.size(Qt::TextSingleLine, strNum).height();
-		double rad = qDegreesToRadians(eachMajor_roll * i);
+		double rad = qDegreesToRadians(360.0 / (double)m_horzGrids * i);
 		x = radius * sin(rad);
 		y = radius * cos(rad) * (-1);
 
+		painter->setPen(QPen(m_gridColor, m_gridWidth));
 		painter->drawLine(0, 0, x, y);
 
 		int R = radius + sqrt(pow(w/2,2)+pow(h/2,2));
 		int x_R = R * sin(rad) - w/2;
 		int y_R = R * cos(rad) * (-1) + h / 4;
-			
+		
+		painter->setPen(QPen(m_scaleColor_roll));
 		painter->drawText(x_R, y_R, str);
 	}
 	painter->restore();
@@ -173,24 +190,27 @@ void PlotAttitude::drawScale_pitch(QPainter *painter, int radius)
 
 	painter->save();
 	painter->setFont(m_scaleFont);
-	painter->setPen(QPen(m_scaleColor_pitch, 1));
+	painter->setPen(QPen(m_scaleColor_pitch));
 	double x, y, w, h;
 	QString str, strNum;
-	double eachMajor_pitch = (m_endAngle_pitch - m_startAngle_pitch) / (double)(m_coordNum_pitch - 1);
-	for (int i = 0; i < m_coordNum_pitch; ++i)
+	double eachMajor_pitch = (m_coordEnd_y - m_coordBgn_y) / (double)(m_vertGrids - 1);
+	for (int i = 0; i < m_vertGrids; ++i)
 	{
-		strNum = QString::number(eachMajor_pitch * i + m_startAngle_pitch, 'f', m_decision_pitch);
-		str = QString("%1%2").arg(strNum).arg(m_unit_pitch);
+		strNum = QString::number(eachMajor_pitch * i + m_coordBgn_y, 'f', m_decision_pitch);
+		if(m_showUnits_y)
+			str = QString("%1%2").arg(strNum).arg(m_units_y);
+		else
+			str = QString("%1").arg(strNum);
 		w = fm.size(Qt::TextSingleLine, str).width() + 10;
 		h = fm.size(Qt::TextSingleLine, str).height();
-		double rad = qDegreesToRadians(eachMajor_pitch * i);
+//		double rad = qDegreesToRadians(eachMajor_pitch * i);
 		x = - w;
 		if (i == 0)
-			y = radius - 2 * radius / (m_coordNum_pitch - 1) * i - h / 4;
-		else if(i == (m_coordNum_pitch - 1))
-			y = radius - 2 * radius / (m_coordNum_pitch - 1) * i + h;
+			y = radius - 2 * radius / (m_vertGrids - 1) * i - h / 4;
+		else if(i == (m_vertGrids - 1))
+			y = radius - 2 * radius / (m_vertGrids - 1) * i + h;
 		else
-			y = radius - 2 * radius / (m_coordNum_pitch - 1) * i + h / 4;
+			y = radius - 2 * radius / (m_vertGrids - 1) * i + h / 4;
 
 		painter->drawText(x, y, str);
 	}
@@ -202,7 +222,8 @@ void PlotAttitude::drawLine_roll(QPainter *painter, int radius)
 {
 	painter->save();
 	painter->setPen(QPen(m_lineColor_roll, 4));
-	painter->rotate(fmodf(m_rollValue, 360) - m_startAngle_roll);
+	double range = abs(m_coordEnd_x - m_coordBgn_x);
+	painter->rotate((fmodf(m_rollValue, range) - m_coordBgn_x) * 360.0 / range);
 	painter->drawLine(QPoint(-radius / 2, 0), QPoint(radius / 2, 0));
 	painter->drawLine(QPoint(0, 0), QPoint(0, -radius / 2));
 
@@ -213,12 +234,13 @@ void PlotAttitude::drawLine_pitch(QPainter *painter, int radius)
 {
 	painter->save();
 	painter->setPen(QPen(m_lineColor_pitch, 4));
-	if (fmodf(m_pitchValue,360) > m_startAngle_pitch && fmodf(m_pitchValue, 360) < m_endAngle_pitch)
-	{ 
-		double translate_y = (m_endAngle_pitch - fmodf(m_pitchValue, 360)) / (m_endAngle_pitch - m_startAngle_pitch) * 2 * radius - radius;
-		painter->translate(0, translate_y);
-		painter->drawLine(QPoint(-radius / 2, 0), QPoint(radius / 2, 0));
-	}
+	double range = abs(m_coordEnd_y - m_coordBgn_y);
+//	if (fmodf(m_pitchValue, range) > m_coordBgn_y && fmodf(m_pitchValue, range) < m_coordEnd_y)
+//	{ 
+	double translate_y = radius - (fmodf(m_pitchValue, range) - m_coordBgn_y) / range * 2 * radius;
+	painter->translate(0, translate_y);
+	painter->drawLine(QPoint(-radius / 2, 0), QPoint(radius / 2, 0));
+//	}
 	
 	painter->restore();
 }
@@ -237,7 +259,7 @@ void PlotAttitude::drawText_roll(QPainter * painter, int radius)
 	
 	painter->drawText(QPoint(radius - 30, radius - 30), str);
 	double h = fm.size(Qt::TextSingleLine, str).height();
-	str = QString("%1%2").arg(strNum).arg(m_unit_roll);
+	str = QString("%1%2").arg(strNum).arg(m_units_x);
 	painter->drawText(QPoint(radius - 30, radius - 30 + h), str);
 
 	painter->restore();
@@ -256,7 +278,7 @@ void PlotAttitude::drawText_pitch(QPainter * painter, int radius)
 	
 	painter->drawText(QPoint(-radius, radius - 30), str);
 	double h = fm.size(Qt::TextSingleLine, str).height();
-	str = QString("%1%2").arg(strNum).arg(m_unit_pitch);
+	str = QString("%1%2").arg(strNum).arg(m_units_y);
 	painter->drawText(QPoint(-radius, radius - 30 + h), str);
 
 	painter->restore();
@@ -325,6 +347,100 @@ QSize PlotAttitude::sizeHint() const
 QSize PlotAttitude::minimumSizeHint() const
 {
 	return QSize();
+}
+
+void PlotAttitude::setCoordRangeX(double lower, double upper)
+{
+	if (m_coordBgn_x == lower && m_coordEnd_x == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_x = lower;
+	m_coordEnd_x = upper;
+	update();
+}
+
+void PlotAttitude::setCoordRangeY(double lower, double upper)
+{
+	if (m_coordBgn_y == lower && m_coordEnd_y == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_y = lower;
+	m_coordEnd_y = upper;
+	update();
+}
+
+void PlotAttitude::getCoordRangeX(double & lower, double & upper)
+{
+	lower = m_coordBgn_x;
+	upper = m_coordEnd_x;
+}
+
+void PlotAttitude::getCoordRangeY(double & lower, double & upper)
+{
+	lower = m_coordBgn_y;
+	upper = m_coordEnd_y;
+}
+
+void PlotAttitude::setHorzGrids(uint count)
+{
+	if (m_horzGrids == count || count <= 0)
+	{
+		return;
+	}
+	m_horzGrids = count;
+	update();
+}
+
+void PlotAttitude::setVertGrids(uint count)
+{
+	if (m_vertGrids == count || count <= 0)
+	{
+		return;
+	}
+	m_vertGrids = count;
+	update();
+}
+
+void PlotAttitude::setAxisColorWidth(QColor color, uint width)
+{
+	m_axisColor = color;
+	m_axisWidth = width;
+	update();
+}
+
+void PlotAttitude::setGridColorWidth(QColor color, uint width)
+{
+	m_gridColor = color;
+	m_gridWidth = width;
+	update();
+}
+
+void PlotAttitude::setUnitsShowX(bool on)
+{
+	m_showUnits_x = on;
+	update();
+}
+
+void PlotAttitude::setUnitsShowY(bool on)
+{
+	m_showUnits_y = on;
+	update();
+}
+
+void PlotAttitude::setUnitsX(const QString & units)
+{
+	m_units_x = units;
+	update();
+}
+
+void PlotAttitude::setUnitsY(const QString & units)
+{
+	m_units_y = units;
+	update();
 }
 
 void PlotAttitude::updateItems()
@@ -412,13 +528,19 @@ void PlotAttitude::slot_setTextColor_pitch(const QColor &textColor)
 	update();
 }
 
-void PlotAttitude::slot_setTitleColor(const QColor & titleColor)
+void PlotAttitude::setTitleColor(QColor & titleColor)
 {
 	m_titleColor = titleColor;
 	update();
 }
 
-void PlotAttitude::slot_setTitleFont(const QFont & font)
+void PlotAttitude::setTitleFillColor(QColor & color)
+{
+	m_titleFillColor = color;
+	update();
+}
+
+void PlotAttitude::setTitleFont(QFont & font)
 {
 	m_titleFont = font;
 	update();
@@ -436,9 +558,15 @@ void PlotAttitude::slot_setTextFont(const QFont & font)
 	update();
 }
 
-void PlotAttitude::slot_setTitle(QString title)
+void PlotAttitude::setTitle(QString& title)
 {
 	m_title = title;
+	update();
+}
+
+void PlotAttitude::setTitleVisible(bool show)
+{
+	m_titleVisible = show;
 	update();
 }
 

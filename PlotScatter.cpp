@@ -14,16 +14,17 @@ PlotScatter::PlotScatter(QWidget *parent)
     this->setName(name);
     m_instanceCount += 1;
 
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-    for (int i = 0; i < 20; i++) {
-        m_clrList << QColor::fromRgb(qrand() % 255, qrand() % 255, qrand() % 255);
-    }
+//     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+//     for (int i = 0; i < 20; i++) {
+//         m_clrList << QColor::fromRgb(qrand() % 255, qrand() % 255, qrand() % 255);
+//     }
 	m_backgroundBrush = QBrush(QColor(0,0,0));
 	m_title = "Scatter Plot";
 	m_titleColor = Qt::white;
+	m_titleFillColor = Qt::black;
 	m_titleFont.setFamily("Microsoft YaHei");
 	m_titleFont.setPointSizeF(16.0);
-	m_titleShow = true;
+	m_titleVisible = true;
 
 	m_axisLabelColor = Qt::white;
 	m_axisFont.setFamily("Microsoft YaHei");
@@ -47,6 +48,9 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
 	m_gridColor = QColor(200, 200, 200);
+
+	m_showUnits_x = false;
+	m_showUnits_y = false;
 
 	initPlot();
 }
@@ -129,7 +133,6 @@ void PlotScatter::updateData(QString xEntityType, QString yEntityType, double se
 	m_customPlot->graph(index)->addData(x, y);
 }
 
-
 void PlotScatter::onGetCurrentSeconds(double secs)
 {
     m_curSeconds = secs;
@@ -150,10 +153,11 @@ void PlotScatter::paintEvent(QPaintEvent *event)
 	double h = fm.size(Qt::TextSingleLine, m_title).height();
 	double as = fm.ascent();
 	//绘制标题
-	if (m_titleShow)
+	if (m_titleVisible)
 	{
 		painter.setFont(m_titleFont);
 		painter.setPen(m_titleColor);
+		painter.fillRect((width - w + m_leftPadding - m_rightPadding) / 2, m_topPadding, w, h, m_titleFillColor);
 		painter.drawText(QPoint((width - w + m_leftPadding - m_rightPadding) / 2, as + m_topPadding), m_title);
 	}
 
@@ -190,15 +194,21 @@ void PlotScatter::setTitleColor(QColor & color)
 	update();
 }
 
+void PlotScatter::setTitleFillColor(QColor & color)
+{
+	m_titleFillColor = color;
+	update();
+}
+
 void PlotScatter::setTitleFont(QFont & font)
 {
 	m_titleFont = font;
 	update();
 }
 
-void PlotScatter::setTitleShow(bool show)
+void PlotScatter::setTitleVisible(bool show)
 {
-	m_titleShow = show;
+	m_titleVisible = show;
 	update();
 }
 
@@ -417,4 +427,32 @@ QColor PlotScatter::getAxisColor()
 QColor PlotScatter::getGridColor()
 {
 	return m_gridColor;
+}
+
+void PlotScatter::setUnitsShowX(bool on)
+{
+	m_showUnits_x = on;
+	m_customPlot->xAxis->setAxisFormatShow(on);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setUnitsShowY(bool on)
+{
+	m_showUnits_y = on;
+	m_customPlot->yAxis->setAxisFormatShow(on);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setUnitsX(const QString & units)
+{
+	m_units_x = units;
+	m_customPlot->xAxis->setAxisFormat(units);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setUnitsY(const QString & units)
+{
+	m_units_y = units;
+	m_customPlot->yAxis->setAxisFormat(units);
+	m_customPlot->replot();
 }

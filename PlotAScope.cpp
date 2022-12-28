@@ -10,11 +10,11 @@ PlotAScope::PlotAScope(QWidget* parent)
 
 	m_title = "A-Scope";
 	m_titleColor = Qt::white;
+	m_titleFillColor = Qt::black;
 	m_titleFont.setFamily("Microsoft YaHei");
 	m_titleFont.setPointSizeF(16.0);
-	m_titleShow = true;
+	m_titleVisible = true;
 
-	m_axisColor = Qt::white;
 	m_axisFont.setFamily("Microsoft YaHei");
 	m_axisFont.setPointSizeF(10.0);
 	m_xAxisLabel = "Range(m)";
@@ -30,6 +30,16 @@ PlotAScope::PlotAScope(QWidget* parent)
 	m_coordBgn_y = 0;
 	m_coordEnd_y = 100;
 
+	m_horzGrids = 5;
+	m_vertGrids = 5;
+	m_axisWidth = 1;
+	m_gridWidth = 1;
+	m_axisColor = Qt::white;
+	m_gridColor = QColor(200, 200, 200);
+
+	m_showUnits_x = false;
+	m_showUnits_y = false;
+
 	initPlot();
 
 	parent->installEventFilter(this);
@@ -44,8 +54,18 @@ void PlotAScope::initPlot()
 {
 	m_customPlot = new QCustomPlot(this);
 	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-	connect(m_customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), m_customPlot->xAxis2, SLOT(setRange(QCPRange)));
-	connect(m_customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), m_customPlot->yAxis2, SLOT(setRange(QCPRange)));
+	m_customPlot->axisRect()->setupFullAxesBox(true);
+
+	m_customPlot->xAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+	m_customPlot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+	m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
+	m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
 
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
@@ -53,14 +73,14 @@ void PlotAScope::initPlot()
 	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
 
 	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
-	m_customPlot->xAxis->setBasePen(QPen(QColor(255, 255, 255)));
-	m_customPlot->yAxis->setBasePen(QPen(QColor(255, 255, 255)));
 	m_customPlot->xAxis->setLabelColor(m_axisColor);
 	m_customPlot->yAxis->setLabelColor(m_axisColor);
 	m_customPlot->xAxis->setLabelFont(m_axisFont);
 	m_customPlot->yAxis->setLabelFont(m_axisFont);
 	m_customPlot->xAxis->setTickLabelColor(QColor(255, 255, 255));
 	m_customPlot->yAxis->setTickLabelColor(QColor(255, 255, 255));
+
+	m_customPlot->replot();
 }
 
 void PlotAScope::slot_getCurrentSeconds(double secs)
@@ -75,7 +95,6 @@ void PlotAScope::slot_getCurrentSeconds(double secs)
 		QString xcolumn = getPlotPairData().at(i).first;
 		QString ycolumn = getPlotPairData().at(i).second;
 	}
-	
 }
 
 void PlotAScope::paintEvent(QPaintEvent * event)
@@ -91,16 +110,11 @@ void PlotAScope::paintEvent(QPaintEvent * event)
 	double h = fm.size(Qt::TextSingleLine, m_title).height();
 	double as = fm.ascent();
 
-	if (!m_titleShow)
-	{
-		w = 0.0;
-		h = 0.0;
-		as = 0.0;
-	}
-	else
+	if (m_titleVisible)
 	{
 		painter.setFont(m_titleFont);
 		painter.setPen(m_titleColor);
+		painter.fillRect((width - w + m_leftPadding - m_rightPadding) / 2, m_topPadding, w, h, m_titleFillColor);
 		painter.drawText(QPoint((width + m_leftPadding - m_rightPadding - w) / 2, as + m_topPadding), m_title);
 	}
 	
@@ -131,6 +145,34 @@ void PlotAScope::setPaddings(double top, double bottom, double left, double righ
 	update();
 }
 
+void PlotAScope::setUnitsShowX(bool on)
+{
+	m_showUnits_x = on;
+	m_customPlot->xAxis->setAxisFormatShow(on);
+	m_customPlot->replot();
+}
+
+void PlotAScope::setUnitsShowY(bool on)
+{
+	m_showUnits_y = on;
+	m_customPlot->yAxis->setAxisFormatShow(on);
+	m_customPlot->replot();
+}
+
+void PlotAScope::setUnitsX(const QString & units)
+{
+	m_units_x = units;
+	m_customPlot->xAxis->setAxisFormat(units);
+	m_customPlot->replot();
+}
+
+void PlotAScope::setUnitsY(const QString & units)
+{
+	m_units_y = units;
+	m_customPlot->yAxis->setAxisFormat(units);
+	m_customPlot->replot();
+}
+
 void PlotAScope::setTitle(QString & str)
 {
 	m_title = str;
@@ -149,9 +191,15 @@ void PlotAScope::setTitleFont(QFont & font)
 	update();
 }
 
-void PlotAScope::setTitleShow(bool show)
+void PlotAScope::setTitleVisible(bool show)
 {
-	m_titleShow = show;
+	m_titleVisible = show;
+	update();
+}
+
+void PlotAScope::setTitleFillColor(QColor & color)
+{
+	m_titleFillColor = color;
 	update();
 }
 
@@ -159,14 +207,14 @@ void PlotAScope::setxAxisLabel(QString & str)
 {
 	m_xAxisLabel = str;
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
-//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotAScope::setyAxisLabel(QString & str)
 {
 	m_yAxisLabel = str;
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
-//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotAScope::setAxisColor(QColor & color)
@@ -174,7 +222,7 @@ void PlotAScope::setAxisColor(QColor & color)
 	m_axisColor = color;
 	m_customPlot->xAxis->setLabelColor(m_axisColor);
 	m_customPlot->yAxis->setLabelColor(m_axisColor);
-//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotAScope::setAxisFont(QFont & font)
@@ -182,7 +230,7 @@ void PlotAScope::setAxisFont(QFont & font)
 	m_axisFont = font;
 	m_customPlot->xAxis->setLabelFont(m_axisFont);
 	m_customPlot->yAxis->setLabelFont(m_axisFont);
-//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotAScope::setAxisVisible(bool on, AxisType type)
@@ -204,7 +252,7 @@ void PlotAScope::setAxisVisible(bool on, AxisType type)
 	default:
 		break;
 	}
-//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotAScope::setAxisTickLabelShow(bool on, AxisType type)
@@ -226,7 +274,7 @@ void PlotAScope::setAxisTickLabelShow(bool on, AxisType type)
 	default:
 		break;
 	}
-//	m_customPlot->replot();
+	m_customPlot->replot();
 }
 
 void PlotAScope::setCoordRangeX(double lower, double upper)
@@ -239,6 +287,7 @@ void PlotAScope::setCoordRangeX(double lower, double upper)
 	m_coordBgn_x = lower;
 	m_coordEnd_x = upper;
 	m_customPlot->xAxis->setRange(lower, upper);
+	m_customPlot->replot();
 }
 
 void PlotAScope::setCoordRangeY(double lower, double upper)
@@ -251,6 +300,7 @@ void PlotAScope::setCoordRangeY(double lower, double upper)
 	m_coordBgn_y = lower;
 	m_coordEnd_y = upper;
 	m_customPlot->yAxis->setRange(lower, upper);
+	m_customPlot->replot();
 }
 
 void PlotAScope::getCoordRangeX(double & lower, double & upper)
@@ -263,6 +313,64 @@ void PlotAScope::getCoordRangeY(double & lower, double & upper)
 {
 	lower = m_coordBgn_y;
 	upper = m_coordEnd_y;
+}
+
+void PlotAScope::setHorzGrids(uint count)
+{
+	if (m_horzGrids == count || count < 0)
+	{
+		return;
+	}
+	m_horzGrids = count;
+	if (count == 0)
+	{
+		m_customPlot->yAxis->grid()->setVisible(false);
+	}
+	else
+	{
+		m_customPlot->yAxis->grid()->setVisible(true);
+		m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	}
+	m_customPlot->replot();
+}
+
+void PlotAScope::setVertGrids(uint count)
+{
+	if (m_vertGrids == count || count < 0)
+	{
+		return;
+	}
+	m_vertGrids = count;
+	if (count == 0)
+	{
+		m_customPlot->xAxis->grid()->setVisible(false);
+	}
+	else
+	{
+		m_customPlot->xAxis->grid()->setVisible(true);
+		m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
+	}
+	m_customPlot->replot();
+}
+
+void PlotAScope::setAxisColorWidth(QColor color, uint width)
+{
+	m_axisColor = color;
+	m_axisWidth = width;
+	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->replot();
+}
+
+void PlotAScope::setGridColorWidth(QColor color, uint width)
+{
+	m_gridColor = color;
+	m_gridWidth = width;
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->replot();
 }
 
 void PlotAScope::setMinimumMargins(const QMargins & margins)

@@ -28,7 +28,6 @@ public:
 	void drawText_roll(QPainter *painter, int radius);
 	void drawText_pitch(QPainter *painter, int radius);
 private:
-	QColor m_titleColor;				//标题颜色
 	QColor m_border_ColorStart;			//边框渐变开始颜色
 	QColor m_border_ColorEnd;			//边框渐变结束颜色
 	QColor m_bgColor;					//背景颜色
@@ -39,24 +38,20 @@ private:
 	QColor m_textColor_roll;			//文字颜色roll
 	QColor m_textColor_pitch;			//文字颜色pitch
 
-	QFont m_titleFont;					//标题字体
 	QFont m_scaleFont;					//刻度字体
 	QFont m_textFont;					//文本字体
 
-	QString m_title;					//标题
 	double m_pitchValue;				//旋转角度
 	double m_rollValue;					//滚动值
-	int    m_coordNum_roll;				//roll坐标个数
-	double m_startAngle_roll;			//roll起始角度
-	double m_endAngle_roll;				//roll结束角度
-	QString m_unit_roll;				//roll单位
-	int		m_decision_roll;			//roll小数点精度
+	int    m_horzGrids;					//roll坐标个数
+	double m_coordBgn_x;				//roll起始角度
+	double m_coordEnd_x;				//roll结束角度
+	int	   m_decision_roll;				//roll小数点精度
 
-	int    m_coordNum_pitch;			//pitch坐标个数
-	double m_startAngle_pitch;			//pitch起始角度
-	double m_endAngle_pitch;			//pitch结束角度
-	QString m_unit_pitch;				//pitch单位
-	int		m_decision_pitch;			//pitch小数点精度
+	int    m_vertGrids;					//pitch坐标个数
+	double m_coordBgn_y;				//pitch起始角度
+	double m_coordEnd_y;				//pitch结束角度
+	int	   m_decision_pitch;			//pitch小数点精度
 
 	double m_topPadding;				//绘图间隔-top
 	double m_bottomPadding;				//绘图间隔-bottom
@@ -85,6 +80,41 @@ public:
 	QSize sizeHint()                const;
 	QSize minimumSizeHint()         const;
 
+	virtual void setCoordRangeX(double lower, double upper);
+	virtual void setCoordRangeY(double lower, double upper);
+	virtual void getCoordRangeX(double& lower, double& upper);
+	virtual void getCoordRangeY(double& lower, double& upper);
+	virtual void setHorzGrids(uint count);
+	virtual void setVertGrids(uint count);
+	virtual void setAxisColorWidth(QColor color, uint width);
+	virtual void setGridColorWidth(QColor color, uint width);
+
+	virtual uint getHorzGrids() { return m_horzGrids; }
+	virtual uint getVertGrids() { return m_vertGrids; }
+	virtual uint getAxisWidth() { return m_axisWidth; }
+	virtual uint getGridWidth() { return m_gridWidth; }
+	virtual QColor getAxisColor() { return m_axisColor; }
+	virtual QColor getGridColor() { return m_gridColor; }
+
+	virtual void setUnitsShowX(bool on);
+	virtual void setUnitsShowY(bool on);
+	virtual void setUnitsX(const QString& units);
+	virtual void setUnitsY(const QString& units);
+	virtual void setTitle(QString& title);
+	virtual void setTitleVisible(bool show);
+	virtual void setTitleColor(QColor &titleColor);
+	virtual void setTitleFillColor(QColor& color);
+	virtual void setTitleFont(QFont &font);
+	virtual bool unitsShowX() { return m_showUnits_x; }
+	virtual bool unitsShowY() { return m_showUnits_y; }
+	virtual QString getUnitsX() { return m_units_x; }
+	virtual QString getUnitsY() { return m_units_y; }
+	virtual bool getTitleVisible() { return m_titleVisible; }
+	virtual QString getTitle() { return m_title; }
+	virtual QColor getTitleColor() { return m_titleColor; }
+	virtual QColor getTitleFillColor() { return m_titleFillColor; }
+	virtual QFont getTitleFont() { return m_titleFont; }
+
 	void updateItems();
 
 public slots:
@@ -107,20 +137,11 @@ public slots:
 	void slot_setTextColor_roll(const QColor &textColor);
 	void slot_setTextColor_pitch(const QColor &textColor);
 
-	//设置标题颜色
-	void slot_setTitleColor(const QColor &titleColor);
-
-	//设置标题字体
-	void slot_setTitleFont(const QFont &font);
-
 	//设置刻度字体
 	void slot_setScaleFont(const QFont &font);
 
 	//设置文本字体
 	void slot_setTextFont(const QFont &font);
-
-	//设置标题
-	void slot_setTitle(QString title);
 
 	//设置旋转角度值
 	void slot_setPitchValue(double pitchValue);

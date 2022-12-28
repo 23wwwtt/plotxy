@@ -24,21 +24,13 @@ public:
     static int m_instanceCount;         //Plot实体个数
 
 	QBrush getBackground() const { return m_backgroundBrush; }
-	QString getTitle() const { return m_title; }
-	QColor getTitleColor() const { return m_titleColor; }
-	QFont getTitleFont() const { return m_titleFont; }
-	bool getTitleShow() const { return m_titleShow; }
 	QString getxAxisLabel() const { return m_xAxisLabel; }
 	QString getyAxisLabel() const { return m_yAxisLabel; }
-	QColor getAxisColor() const { return m_axisColor; }
 	QFont getAxisFont() const { return m_axisFont; }
 
 	void setBackground(QBrush brush);
 	void setPaddings(double top, double bottom, double left, double right);
-	void setTitle(QString& str);
-	void setTitleColor(QColor& color);
-	void setTitleFont(QFont& font);
-	void setTitleShow(bool show);
+	
 	void setxAxisLabel(QString& str);
 	void setyAxisLabel(QString& str);
 	void setAxisColor(QColor& color);
@@ -66,6 +58,25 @@ public:
 	virtual QColor getAxisColor();
 	virtual QColor getGridColor();
 
+	virtual void setUnitsShowX(bool on);
+	virtual void setUnitsShowY(bool on);
+	virtual void setUnitsX(const QString& units);
+	virtual void setUnitsY(const QString& units);
+	virtual void setTitle(QString& str);
+	virtual void setTitleColor(QColor& color);
+	virtual void setTitleFillColor(QColor& color);
+	virtual void setTitleFont(QFont& font);
+	virtual void setTitleVisible(bool show);
+	virtual bool unitsShowX() { return m_showUnits_x; }
+	virtual bool unitsShowY() { return m_showUnits_y; }
+	virtual QString getUnitsX() { return m_units_x; }
+	virtual QString getUnitsY() { return m_units_y; }
+	virtual bool getTitleVisible() { return m_titleVisible; }
+	virtual QString getTitle() { return m_title; }
+	virtual QColor getTitleColor() { return m_titleColor; }
+	virtual QColor getTitleFillColor() { return m_titleFillColor; }
+	virtual QFont getTitleFont() { return m_titleFont; }
+
 public slots:
     void onGetCurrentSeconds(double secs);
 
@@ -87,17 +98,12 @@ private:
 
 	QCustomPlot *m_customPlot;
 
-	QString m_title;
-	QColor	m_titleColor;				//标题颜色
-	QFont	m_titleFont;				//标题字体
-	bool	m_titleShow;				//标题是否显示
-
 	QColor	m_axisLabelColor;			//坐标标题颜色
 	QFont	m_axisFont;					//坐标标题字体
 	QString m_xAxisLabel;
 	QString m_yAxisLabel;
 
-    QList<QColor> m_clrList;
+//    QList<QColor> m_clrList;
 };
 
 #endif // PLOTSCATTER_H

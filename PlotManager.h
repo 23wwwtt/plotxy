@@ -26,16 +26,19 @@ public:
 	int m_spinBoxLeft;
 	int m_spinBoxRight;
 
-	int m_hrozGrids;
-	int m_vertGrids;
+// 	int m_hrozGrids;
+// 	int m_vertGrids;
 private:
 	void initTreeWidgetSettings();
 	void initGeneralUI();
 	void initAxisGridUI();
+	void initPlotDataUI();
+	void initTextEditUI();
 	void refreshTreeWidgetSettingEnabled(PlotItemBase* plot);
 	void refreshGeneralUI(PlotItemBase* plot);
 	void refreshAxisGridUI(PlotItemBase* plot);
 	void refreshPlotDataUI(PlotItemBase* plot);
+	void refreshTextEditUI(PlotItemBase* plot);
 
 	void enableItem_Scatter();
 	void enableItem_AScope();
@@ -83,6 +86,15 @@ public slots:
 	void onSetAxisColorWidth();
 	void onSetGridColorWidth();
 
+	//Text Edit
+	void onCheckBox_12StateChanged();
+	void onCheckBox_13StateChanged();
+	void onCheckBox_14StateChanged();
+	void onLineEdit_26EditingFinished();
+	void onPushButton_22Clicked();
+	void onPushButton_23Clicked();
+	void onfontComboBox_2CurrentFontChanged(const QFont& font);
+	void onComboBox_Text_fontSizeCurrentTextChanged(const QString& text);
 
 signals:
 	void sigAddPlotPair();

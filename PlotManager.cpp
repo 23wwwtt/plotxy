@@ -31,18 +31,9 @@ PlotManager::PlotManager(QWidget* parent)
 
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
 	
-	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
-
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
 	connect(ui.spinBox_left, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxLeftChanged);
 	connect(ui.spinBox_right, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxRightChanged);
-
-	connect(ui.lineEdit_hrozGrids, &QLineEdit::textChanged, this, [=]() {
-		m_hrozGrids = ui.lineEdit_hrozGrids->text().toInt();
-		});
-	connect(ui.lineEdit_vertGrids, &QLineEdit::textChanged, this, [=]() {
-		m_vertGrids = ui.lineEdit_vertGrids->text().toInt();
-		});
 
 // 	QFontDatabase FontDb;
 // 	foreach(int size, FontDb.standardSizes()) {
@@ -61,6 +52,8 @@ void PlotManager::init()
 	initTreeWidgetSettings();
 	initGeneralUI();
 	initAxisGridUI();
+	initPlotDataUI();
+	initTextEditUI();
 }
 
 void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
@@ -171,6 +164,27 @@ void PlotManager::initAxisGridUI()
 	connect(ui.pushButton_gridColor, &QPushButton::clicked, this, &PlotManager::onSetGridColorWidth);
 }
 
+void PlotManager::initPlotDataUI()
+{
+	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
+}
+
+void PlotManager::initTextEditUI()
+{
+	connect(ui.checkBox_12, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_12StateChanged);
+	connect(ui.checkBox_13, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_13StateChanged);
+	connect(ui.checkBox_14, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_14StateChanged);
+	connect(ui.lineEdit_26, &QLineEdit::editingFinished, this, &PlotManager::onLineEdit_26EditingFinished);
+	connect(ui.pushButton_22, &QPushButton::clicked, this, &PlotManager::onPushButton_22Clicked);
+	connect(ui.pushButton_23, &QPushButton::clicked, this, &PlotManager::onPushButton_23Clicked);
+	QFontDatabase FontDb;
+	foreach(int size, FontDb.standardSizes()) {
+		ui.comboBox_Text_fontSize->addItem(QString::number(size));
+	}
+	connect(ui.fontComboBox_2, &QFontComboBox::currentFontChanged, this, &PlotManager::onfontComboBox_2CurrentFontChanged);
+	connect(ui.comboBox_Text_fontSize, &QComboBox::currentTextChanged, this, &PlotManager::onComboBox_Text_fontSizeCurrentTextChanged);
+}
+
 void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 {
 	QString name = plot->metaObject()->className();
@@ -254,7 +268,6 @@ void PlotManager::refreshAxisGridUI(PlotItemBase * plot)
 	ui.lineEdit_23->setText(QString("%1").arg(plot->getGridWidth()));
 	ui.pushButton_axisColor->setColor(plot->getAxisColor());
 	ui.pushButton_gridColor->setColor(plot->getGridColor());
-
 }
 
 void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
@@ -270,6 +283,18 @@ void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
 
 		ui.treeWidget_4->addTopLevelItem(addplotItem);
 	}
+}
+
+void PlotManager::refreshTextEditUI(PlotItemBase * plot)
+{
+	ui.checkBox_12->setChecked(plot->unitsShowX());
+	ui.checkBox_13->setChecked(plot->unitsShowY());
+	ui.checkBox_14->setChecked(plot->getTitleVisible());
+	ui.lineEdit_26->setText(plot->getTitle());
+	ui.pushButton_22->setColor(plot->getTitleColor());
+	ui.pushButton_23->setColor(plot->getTitleFillColor());
+	ui.fontComboBox_2->setCurrentFont(plot->getTitleFont());
+	ui.comboBox_Text_fontSize->setCurrentText(QString("%1").arg(plot->getTitleFont().pointSize()));
 }
 
 void PlotManager::enableItem_Scatter()
@@ -447,7 +472,8 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 				refreshAxisGridUI(m_curSelectPlot);
 				//plotPair½çÃæ
 				refreshPlotDataUI(m_curSelectPlot);
-
+				//Text Edit
+				refreshTextEditUI(m_curSelectPlot);
 				//
 			//	tempPlot->deleteLater();
 				break;
@@ -843,6 +869,11 @@ void PlotManager::onLineEdit_vertGridsEditingFinished()
 
 void PlotManager::onSetAxisColorWidth()
 {
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
 	bool on;
 	uint width = ui.lineEdit_21->text().toInt(&on);
 	QColor color = ui.pushButton_axisColor->color();
@@ -852,9 +883,100 @@ void PlotManager::onSetAxisColorWidth()
 
 void PlotManager::onSetGridColorWidth()
 {
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
 	bool on;
 	uint width = ui.lineEdit_23->text().toInt(&on);
 	QColor color = ui.pushButton_gridColor->color();
 	if (on)
 		m_curSelectPlot->setGridColorWidth(color, width);
 }
+
+void PlotManager::onCheckBox_12StateChanged()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setUnitsShowX(ui.checkBox_12->isChecked());
+}
+
+void PlotManager::onCheckBox_13StateChanged()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setUnitsShowY(ui.checkBox_13->isChecked());
+}
+
+void PlotManager::onCheckBox_14StateChanged()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTitleVisible(ui.checkBox_14->isChecked());
+}
+
+void PlotManager::onLineEdit_26EditingFinished()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTitle(ui.lineEdit_26->text());
+}
+
+void PlotManager::onPushButton_22Clicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTitleColor(ui.pushButton_22->color());
+}
+
+void PlotManager::onPushButton_23Clicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTitleFillColor(ui.pushButton_23->color());
+}
+
+void PlotManager::onfontComboBox_2CurrentFontChanged(const QFont & font)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+	float fontSize = ui.comboBox_Text_fontSize->currentText().toFloat();
+	QFont newFont;
+	newFont.setFamily(font.family());
+	newFont.setPointSizeF(fontSize);
+	m_curSelectPlot->setTitleFont(newFont);
+}
+
+void PlotManager::onComboBox_Text_fontSizeCurrentTextChanged(const QString & text)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	QFont font = ui.fontComboBox_2->currentFont();
+	font.setPointSizeF(text.toFloat());
+	m_curSelectPlot->setTitleFont(font);
+}
+
