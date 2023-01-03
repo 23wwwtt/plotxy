@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1281</width>
+    <width>1259</width>
     <height>764</height>
    </rect>
   </property>
@@ -96,7 +96,7 @@
         <number>1</number>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>12</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QVBoxLayout" name="verticalLayout_64" stretch="0,1,0,0,0,1">
@@ -213,6 +213,12 @@ color: rgb(255, 255, 255);</string>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
            <item>
             <widget class="QGroupBox" name="groupBox_3">
              <property name="title">
@@ -499,6 +505,9 @@ color: rgb(255, 255, 255);</string>
               <string>限制</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="spacing">
+               <number>5</number>
+              </property>
               <property name="leftMargin">
                <number>7</number>
               </property>
@@ -558,7 +567,17 @@ color: rgb(255, 255, 255);</string>
                  <widget class="QLineEdit" name="lineEdit_limitEndX"/>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QLineEdit" name="lineEdit_limitBgnX"/>
+                 <widget class="QLineEdit" name="lineEdit_limitBgnX">
+                  <property name="autoFillBackground">
+                   <bool>false</bool>
+                  </property>
+                  <property name="dragEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="clearButtonEnabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="0" column="2">
                  <widget class="QLabel" name="label_11">
@@ -574,7 +593,7 @@ color: rgb(255, 255, 255);</string>
                 <item>
                  <widget class="QCheckBox" name="checkBox_oneToOneScale">
                   <property name="text">
-                   <string>Always  one-to-ont scale</string>
+                   <string>Always one-to-one scale</string>
                   </property>
                  </widget>
                 </item>
@@ -611,6 +630,9 @@ color: rgb(255, 255, 255);</string>
                <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1">
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <property name="spacing">
+                   <number>5</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBox_4">
                     <property name="text">
@@ -674,7 +696,7 @@ color: rgb(255, 255, 255);</string>
                 <item>
                  <widget class="QTableWidget" name="tableWidget">
                   <attribute name="horizontalHeaderDefaultSectionSize">
-                   <number>150</number>
+                   <number>200</number>
                   </attribute>
                   <column>
                    <property name="text">
@@ -699,6 +721,9 @@ color: rgb(255, 255, 255);</string>
                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,1">
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_5">
+                  <property name="spacing">
+                   <number>5</number>
+                  </property>
                   <item>
                    <widget class="QCheckBox" name="checkBox_5">
                     <property name="text">
@@ -762,7 +787,7 @@ color: rgb(255, 255, 255);</string>
                 <item>
                  <widget class="QTableWidget" name="tableWidget_2">
                   <attribute name="horizontalHeaderDefaultSectionSize">
-                   <number>150</number>
+                   <number>200</number>
                   </attribute>
                   <column>
                    <property name="text">
@@ -811,7 +836,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_30">
                     <property name="text">
-                     <string>水平网格:</string>
+                     <string>水平网格个数:</string>
                     </property>
                    </widget>
                   </item>
@@ -821,7 +846,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="0" column="2">
                    <widget class="QLabel" name="label_31">
                     <property name="text">
-                     <string>轴宽</string>
+                     <string>坐标轴宽：</string>
                     </property>
                    </widget>
                   </item>
@@ -831,7 +856,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_32">
                     <property name="text">
-                     <string>垂直网格:</string>
+                     <string>垂直网格个数:</string>
                     </property>
                    </widget>
                   </item>
@@ -841,7 +866,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="1" column="2">
                    <widget class="QLabel" name="label_33">
                     <property name="text">
-                     <string>网格宽度</string>
+                     <string>网格宽度：</string>
                     </property>
                    </widget>
                   </item>
@@ -909,7 +934,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_34">
                     <property name="text">
-                     <string>Axis Color:</string>
+                     <string>坐标轴颜色:</string>
                     </property>
                    </widget>
                   </item>
@@ -929,7 +954,7 @@ color: rgb(255, 255, 255);</string>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_35">
                     <property name="text">
-                     <string>Grid Color:</string>
+                     <string>网格颜色:</string>
                     </property>
                    </widget>
                   </item>
@@ -993,7 +1018,7 @@ color: rgb(255, 255, 255);</string>
            <item>
             <widget class="QGroupBox" name="groupBox_8">
              <property name="title">
-              <string>Static Grid</string>
+              <string>静态网格</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <property name="leftMargin">
@@ -1150,7 +1175,7 @@ color: rgb(255, 255, 255);</string>
               </sizepolicy>
              </property>
              <property name="title">
-              <string>Formats</string>
+              <string>格式</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <property name="leftMargin">
@@ -4534,17 +4559,35 @@ background-color: rgb(127, 127, 127);</string>
               </widget>
              </item>
              <item>
-              <widget class="QListWidget" name="listWidget_textLightPlots">
-               <item>
-                <property name="text">
-                 <string>有自定义数据</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>有来自文件的数据</string>
-                </property>
-               </item>
+              <widget class="QStackedWidget" name="stackedWidget_LightTextDataSort">
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <widget class="QWidget" name="page_TextDataSort">
+                <layout class="QVBoxLayout" name="verticalLayout_75">
+                 <item>
+                  <widget class="QTableWidget" name="tableWidget_TextDataSort">
+                   <column>
+                    <property name="text">
+                     <string>Entity</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Attri</string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="page_LightDataSort">
+                <layout class="QVBoxLayout" name="verticalLayout_76">
+                 <item>
+                  <widget class="QTableWidget" name="tableWidget_LightDataSort"/>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </item>
             </layout>
@@ -4554,14 +4597,14 @@ background-color: rgb(127, 127, 127);</string>
              <item>
               <widget class="QPushButton" name="pushButton_66">
                <property name="text">
-                <string>Move Up</string>
+                <string>Move Up/Left</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_67">
                <property name="text">
-                <string>Move Down</string>
+                <string>Move Down/Right</string>
                </property>
               </widget>
              </item>

@@ -25,6 +25,11 @@ PlotRTI::PlotRTI(QWidget* parent)
 	m_topPadding = 20;
 	m_bottomPadding = 10;
 
+	m_coordBgn_x = 0;
+	m_coordEnd_x = 100;
+	m_coordBgn_y = 0;
+	m_coordEnd_y = 100;
+
 	initPlot();
 }
 
@@ -42,8 +47,8 @@ void PlotRTI::initPlot()
 
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
-	m_customPlot->xAxis->setRange(-1, 1);
-	m_customPlot->yAxis->setRange(0, 1);
+	m_customPlot->xAxis->setRange(m_coordBgn_x, m_coordEnd_x);
+	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
 
 	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
 	m_customPlot->xAxis->setBasePen(QPen(QColor(255, 255, 255)));
@@ -206,14 +211,40 @@ void PlotRTI::setAxisTickLabelShow(bool on, AxisType type)
 	m_customPlot->replot();
 }
 
-void PlotRTI::setRange_xAxis(double lower, double upper)
+void PlotRTI::setCoordRangeX(double lower, double upper)
 {
+	if (m_coordBgn_x == lower && m_coordEnd_x == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_x = lower;
+	m_coordEnd_x = upper;
 	m_customPlot->xAxis->setRange(lower, upper);
-	m_customPlot->replot();
+//	m_customPlot->replot();
 }
 
-void PlotRTI::setRange_yAxis(double lower, double upper)
+void PlotRTI::setCoordRangeY(double lower, double upper)
 {
+	if (m_coordBgn_y == lower && m_coordEnd_y == upper)
+	{
+		return;
+	}
+
+	m_coordBgn_y = lower;
+	m_coordEnd_y = upper;
 	m_customPlot->yAxis->setRange(lower, upper);
-	m_customPlot->replot();
+//	m_customPlot->replot();
+}
+
+void PlotRTI::getCoordRangeX(double & lower, double & upper)
+{
+	lower = m_coordBgn_x;
+	upper = m_coordEnd_x;
+}
+
+void PlotRTI::getCoordRangeY(double & lower, double & upper)
+{
+	lower = m_coordBgn_y;
+	upper = m_coordEnd_y;
 }

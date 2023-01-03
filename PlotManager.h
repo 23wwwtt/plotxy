@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_PlotManager.h"
+#include "constdef.h"
 
 class PlotItemBase;
 
@@ -30,11 +31,32 @@ public:
 private:
 	void initTreeWidgetSettings();
 	void initGeneralUI();
+	void initAxisGridUI();
+	void initTextLightUI();
+	void refreshTreeWidgetSettingEnabled(PlotItemBase* plot);
 	void refreshGeneralUI(PlotItemBase* plot);
+	void refreshAxisGridUI(PlotItemBase* plot);
+	void refreshPlotDataUI(PlotItemBase* plot);
+	void refreshLightTextUI(PlotItemBase* plot);
+
+	void enableItem_Scatter();
+	void enableItem_AScope();
+	void enableItem_RTI();
+	void enableItem_Text_Light();
+	void enableItem_Bar();
+	void enableItem_Dial();
+	void enableItem_Attitude();
+	void enableItem_Polar();
+	void enableItem_Track();
+	void enableItem_Doppler();
+
 public slots:
     void onTWSclicked(QTreeWidgetItem* item, int i);
     void onTWSPclicked(QTreeWidgetItem* item, int i);
     void onAddNewClicked();
+
+	void onUpdatePlotManager();
+	void onBtnCloseClicked();
 
 	void spinboxBetweenChanged();
 	void spinboxLeftChanged();
@@ -43,17 +65,36 @@ public slots:
 // 	void onAddPlotPair(QString,QString);
 // 	void onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn);
 
+	//General
 	void onRadioPixelClicked();
 	void onRadioPercentClicked();
-
 	void onGetTabWidgetRect(QRect);
-	void onBtnCloseClicked();
+	void onPlotRectEditFinished();
+	void onLineEditPlotNameEditingFinished();
+	void onCheckBox_drawStateChanged();
 
-	void onPlotRectEditFinishing();
+	//Axis and Grid
+	void onCheckBox_4StateChanged();
+	void onCheckBox_5StateChanged();
+	void onLineEdit_limitXEditingFinished();
+	void onLineEdit_limitYEditingFinished();
+	void onPushButton_flipXValuesClicked();
+	void onPushButton_flipYValuesClicked();
+	void onLineEdit_horzGridsEditingFinished();
+	void onLineEdit_vertGridsEditingFinished();
+	void onSetAxisColorWidth();
+	void onSetGridColorWidth();
+
+	//Light/Text
+	void onPushButton_71Clicked();
 
 signals:
 	void sigAddPlotPair();
 	void sigRectChanged(QRect);
+	void sigGetTabRect();
+	void sigSetPlotVisible(bool);
+	void sigChangePlotName();
+	void sigOnTextGridColorChanged();
 
 private:
     Ui::PlotManager ui;
@@ -81,6 +122,7 @@ private:
     QMap<QString/*int*/, QList<PlotItemBase*>> m_plotManager;	//tabName
 	bool m_radioPixelChecked;
 	QRect m_tabWidgetRect;
+	PlotItemBase* m_curSelectPlot = nullptr;;
 };
 
 #endif // ! 

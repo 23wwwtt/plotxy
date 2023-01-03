@@ -1,5 +1,6 @@
 #include "AdvancedDataManager.h"
 #include "SubSettingWidgetContainer.h"
+#include "PlotManagerData.h"
 
 #include <QColorDialog>
 #include <QColor>
@@ -21,6 +22,7 @@ AdvancedDataManager::AdvancedDataManager(QWidget *parent) :
 	connect(subSettingWidgetContainer->m_colorRanges, SIGNAL(sigBtnColorRangesMoreclicked()), this, SLOT(onBtnColorMore()));
 	connect(subSettingWidgetContainer->m_eventSetting, SIGNAL(sgn_BtnMoreClicked()), this, SLOT(onEventBtnMoreClicked()));
 
+	connect(PlotManagerData::getInstance(), SIGNAL(sgnUpdatePlotManager()), this, SLOT(onUpdatePlotPair()));
 	//connect(ui.treeWidget_xy,SIGNAL(currentItemChanged(QTreeWidgetItem * , QTreeWidgetItem * )),
 	//		this,SLOT(onCurrentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 }
@@ -103,6 +105,8 @@ void AdvancedDataManager::onAddPlot(const QString &tabName, PlotItemBase *plotIt
 
 void AdvancedDataManager::onUpdatePlotPair()
 {
+	m_plotManager = PlotManagerData::getInstance()->getPlotManagerData();
+
 	if (m_plotManager.isEmpty())
 		return;
 
