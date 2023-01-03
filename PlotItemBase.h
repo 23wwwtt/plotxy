@@ -10,6 +10,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_PlotItemBase.h"
 #include "DataPair.h"
+#include "constdef.h"
 
 class PlotItemBase : public QWidget
 {
@@ -54,6 +55,18 @@ public:
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
+	virtual void setGridVisible(bool enable);
+	virtual void setTickLabelColor(QColor& color);
+	virtual void setTickLabelFont(QFont& font);
+	virtual void setTickLabelFontSize(int size);
+	virtual void setGridStyle(GridStyle style);
+	virtual void setGridDensity(GridDensity density);
+	virtual bool getGridVisible() { return m_gridVisible; }
+	virtual QColor getTickLabelColor() { return m_tickLabelColor; }
+	virtual QFont getTickLabelFont() { return m_tickLabelFont; }
+	virtual int getTickLabelFontSize() { return m_tickLabelFontSize; }
+	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
+	virtual GridDensity getGridDensity() { return m_gridDensity; }
 
 	virtual void setUnitsShowX(bool on);
 	virtual void setUnitsShowY(bool on);
@@ -64,6 +77,7 @@ public:
 	virtual void setTitleColor(QColor& color);
 	virtual void setTitleFillColor(QColor& color);
 	virtual void setTitleFont(QFont& font);
+	virtual void setTitleFontSize(int size);
 	virtual bool unitsShowX() { return m_showUnits_x; }
 	virtual bool unitsShowY() { return m_showUnits_y; }
 	virtual QString getUnitsX() { return m_units_x; }
@@ -73,6 +87,7 @@ public:
 	virtual QColor getTitleColor() { return m_titleColor; }
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
+	virtual int getTitleFontSize() { return m_titleFontSize; }
 
 	virtual void addPlotPairData(QPair<QString, QString>);
 	virtual void delPlotPairData(QPair<QString, QString>);
@@ -96,6 +111,12 @@ protected:
 	uint	m_gridWidth;
 	QColor	m_axisColor;
 	QColor	m_gridColor;
+	bool	m_gridVisible;
+	QColor	m_tickLabelColor;
+	QFont	m_tickLabelFont;
+	int		m_tickLabelFontSize;
+	Qt::PenStyle m_gridStyle;
+	GridDensity m_gridDensity;
 
 	//Text
 	QString m_units_x;
@@ -106,6 +127,7 @@ protected:
 	bool	m_titleVisible;
 	QColor	m_titleColor;
 	QFont	m_titleFont;
+	int		m_titleFontSize;
 	QColor	m_titleFillColor;
 
 public slots:

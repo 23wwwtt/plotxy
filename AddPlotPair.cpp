@@ -424,7 +424,7 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 		}
 		else if (ui.radioButton_3->isChecked())
 		{
-			if (ui.tableWidget_Entity_3->currentItem() == NULL || ui.tableWidget_nameUnits_3->item(ui.tableWidget_nameUnits_2->currentRow(), 0) == NULL)
+			if (ui.tableWidget_Entity_3->currentItem() == NULL || ui.tableWidget_nameUnits_3->item(ui.tableWidget_nameUnits_3->currentRow(), 0) == NULL)
 				return false;
 
 			strEntity2 = ui.tableWidget_Entity_3->currentItem()->text();
@@ -719,7 +719,7 @@ void AddPlotPair::onUpdateData()
 		ui.tableWidget_Entity_2->setItem(index, 0, new QTableWidgetItem(*item));
 		ui.tableWidget_Entity_3->setItem(index, 0, new QTableWidgetItem(*item));
 		ui.tableWidget_Entity_4->setItem(index, 0, new QTableWidgetItem(*item));
-		ui.tableWidget_Entity_5->setItem(index, 0, item);
+		ui.tableWidget_Entity_5->setItem(index, 0, new QTableWidgetItem(*item));
 		ui.tableWidget_lightEntity->setItem(index, 0, new QTableWidgetItem(*item));
 		ui.tableWidget_Entity_6->setItem(index, 0, new QTableWidgetItem(*item));
 		ui.tableWidget_Entity_7->setItem(index, 0, new QTableWidgetItem(*item));

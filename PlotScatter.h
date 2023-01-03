@@ -26,15 +26,16 @@ public:
 	QBrush getBackground() const { return m_backgroundBrush; }
 	QString getxAxisLabel() const { return m_xAxisLabel; }
 	QString getyAxisLabel() const { return m_yAxisLabel; }
-	QFont getAxisFont() const { return m_axisFont; }
+	QColor getAxisLabelColor() const { return m_axisLabelColor; }
+	QFont getAxisLabelFont() const { return m_axisLabelFont; }
 
 	void setBackground(QBrush brush);
 	void setPaddings(double top, double bottom, double left, double right);
 	
 	void setxAxisLabel(QString& str);
 	void setyAxisLabel(QString& str);
-	void setAxisColor(QColor& color);
-	void setAxisFont(QFont& font);
+	void setAxisLabelColor(QColor& color);
+	void setAxisLabelFont(QFont& font);
 
 	void setAxisVisible(bool on, AxisType type);
 	void setAxisTickLabelShow(bool on, AxisType type);
@@ -57,6 +58,18 @@ public:
 	virtual uint getGridWidth();
 	virtual QColor getAxisColor();
 	virtual QColor getGridColor();
+	virtual void setGridVisible(bool enable);
+	virtual void setTickLabelColor(QColor& color);
+	virtual void setTickLabelFont(QFont& font);
+	virtual void setTickLabelFontSize(int size);
+	virtual void setGridStyle(GridStyle style);
+	virtual void setGridDensity(GridDensity density);
+	virtual bool getGridVisible() { return m_gridVisible; }
+	virtual QColor getTickLabelColor() { return m_tickLabelColor; }
+	virtual QFont getTickLabelFont() { return m_tickLabelFont; }
+	virtual int getTickLabelFontSize() { return m_tickLabelFontSize; }
+	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
+	virtual GridDensity getGridDensity() { return m_gridDensity; }
 
 	virtual void setUnitsShowX(bool on);
 	virtual void setUnitsShowY(bool on);
@@ -66,6 +79,7 @@ public:
 	virtual void setTitleColor(QColor& color);
 	virtual void setTitleFillColor(QColor& color);
 	virtual void setTitleFont(QFont& font);
+	virtual void setTitleFontSize(int size);
 	virtual void setTitleVisible(bool show);
 	virtual bool unitsShowX() { return m_showUnits_x; }
 	virtual bool unitsShowY() { return m_showUnits_y; }
@@ -76,6 +90,7 @@ public:
 	virtual QColor getTitleColor() { return m_titleColor; }
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
+	virtual int getTitleFontSize() { return m_titleFontSize; }
 
 public slots:
     void onGetCurrentSeconds(double secs);
@@ -99,7 +114,7 @@ private:
 	QCustomPlot *m_customPlot;
 
 	QColor	m_axisLabelColor;			//坐标标题颜色
-	QFont	m_axisFont;					//坐标标题字体
+	QFont	m_axisLabelFont;			//坐标标题字体
 	QString m_xAxisLabel;
 	QString m_yAxisLabel;
 

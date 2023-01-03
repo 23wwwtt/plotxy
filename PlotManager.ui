@@ -96,7 +96,7 @@
         <number>1</number>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QVBoxLayout" name="verticalLayout_64" stretch="0,1,0,0,0,1">
@@ -1118,7 +1118,11 @@ color: rgb(255, 255, 255);</string>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QFontComboBox" name="fontComboBox_3"/>
+                 <widget class="QFontComboBox" name="fontComboBox_3">
+                  <property name="editable">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="1" colspan="2">
                  <widget class="QComboBox" name="comboBox_3">
@@ -1146,17 +1150,22 @@ color: rgb(255, 255, 255);</string>
                  <widget class="QComboBox" name="comboBox_2">
                   <item>
                    <property name="text">
-                    <string>Line</string>
+                    <string>SolidLine</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Stipple</string>
+                    <string>DashLine</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Ticks</string>
+                    <string>DotLine</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>DashDotLine</string>
                    </property>
                   </item>
                  </widget>
@@ -1831,7 +1840,11 @@ color: rgb(255, 255, 255);</string>
                  </widget>
                 </item>
                 <item row="4" column="1" colspan="2">
-                 <widget class="QFontComboBox" name="fontComboBox_2"/>
+                 <widget class="QFontComboBox" name="fontComboBox_2">
+                  <property name="editable">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_42">

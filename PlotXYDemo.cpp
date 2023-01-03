@@ -103,6 +103,7 @@ void PlotXYDemo::onPlotManager()
     if (!m_plotManager) {
         return;
     }
+	m_plotManager->onSelectedPlot(m_curBaseInfo.Base_TabName, m_curBaseInfo.Base_PlotName);
     m_plotManager->show();
 }
 

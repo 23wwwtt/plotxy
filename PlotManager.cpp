@@ -116,8 +116,10 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
 	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
 
-	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
+//	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
 	m_itemScatterPlot->setExpanded(true);
+
+	ui.treeWidget_settings->setEnabled(false);
 }
 
 void PlotManager::initGeneralUI()
@@ -162,6 +164,16 @@ void PlotManager::initAxisGridUI()
 	connect(ui.lineEdit_23, &QLineEdit::editingFinished, this, &PlotManager::onSetGridColorWidth);
 	connect(ui.pushButton_axisColor, &QPushButton::clicked, this, &PlotManager::onSetAxisColorWidth);
 	connect(ui.pushButton_gridColor, &QPushButton::clicked, this, &PlotManager::onSetGridColorWidth);
+	connect(ui.checkBox_6, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_6StateChanged);
+	connect(ui.pushButton_10, &QPushButton::clicked, this, &PlotManager::onPushButton_10Clicked);
+	connect(ui.fontComboBox_3, &QFontComboBox::currentFontChanged, this, &PlotManager::onfontComboBox_3CurrentFontChanged);
+	connect(ui.comboBox_AxisGrid_FontSize, &QComboBox::currentTextChanged, this, &PlotManager::onComboBox_AxisGrid_FontSizeCurrentTextChanged);
+	connect(ui.comboBox_2, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBox_2CurrentIndexChanged(int)));
+	connect(ui.comboBox_3, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBox_3CurrentIndexChanged(int)));
+	QFontDatabase FontDb;
+	foreach(int size, FontDb.standardSizes()) {
+		ui.comboBox_AxisGrid_FontSize->addItem(QString::number(size));
+	}
 }
 
 void PlotManager::initPlotDataUI()
@@ -187,6 +199,7 @@ void PlotManager::initTextEditUI()
 
 void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 {
+	ui.treeWidget_settings->setEnabled(true);
 	QString name = plot->metaObject()->className();
 	if (name.compare("PlotScatter") == 0) 
 	{
@@ -268,6 +281,23 @@ void PlotManager::refreshAxisGridUI(PlotItemBase * plot)
 	ui.lineEdit_23->setText(QString("%1").arg(plot->getGridWidth()));
 	ui.pushButton_axisColor->setColor(plot->getAxisColor());
 	ui.pushButton_gridColor->setColor(plot->getGridColor());
+	ui.checkBox_6->setChecked(plot->getGridVisible());
+	ui.pushButton_10->setColor(plot->getTickLabelColor());
+	ui.fontComboBox_3->setCurrentFont(plot->getTickLabelFont());
+	ui.comboBox_AxisGrid_FontSize->setCurrentText(QString("%1").arg(plot->getTickLabelFontSize()));
+	ui.comboBox_2->setCurrentIndex(int(plot->getGridStyle()) - 1);
+	switch (plot->getGridDensity())
+	{
+	case GridDensity::LESS:
+		ui.comboBox_3->setCurrentIndex(0);
+		break;
+	case GridDensity::NORMAL:
+		ui.comboBox_3->setCurrentIndex(1);
+		break;
+	case GridDensity::MORE:
+		ui.comboBox_3->setCurrentIndex(2);
+		break;
+	}
 }
 
 void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
@@ -294,7 +324,7 @@ void PlotManager::refreshTextEditUI(PlotItemBase * plot)
 	ui.pushButton_22->setColor(plot->getTitleColor());
 	ui.pushButton_23->setColor(plot->getTitleFillColor());
 	ui.fontComboBox_2->setCurrentFont(plot->getTitleFont());
-	ui.comboBox_Text_fontSize->setCurrentText(QString("%1").arg(plot->getTitleFont().pointSize()));
+	ui.comboBox_Text_fontSize->setCurrentText(QString("%1").arg(plot->getTitleFontSize()));
 }
 
 void PlotManager::enableItem_Scatter()
@@ -496,6 +526,26 @@ void PlotManager::onAddNewClicked()
 	addPlotPair->show();*/
 
 	emit sigAddPlotPair();
+}
+
+void PlotManager::onSelectedPlot(QString tabName, QString plotName)
+{
+	if (tabName == nullptr || plotName == nullptr)
+		return;
+
+	QList<QTreeWidgetItem*> items = ui.treeWidget_selectedPlots->findItems(plotName, Qt::MatchExactly | Qt::MatchRecursive);
+	if (items.size() != 0)
+	{
+		for each (QTreeWidgetItem* item in items)
+		{
+			if (item->parent() != NULL && item->parent()->text(0) == tabName)
+			{
+				ui.treeWidget_selectedPlots->itemClicked(item, 0);
+				item->setSelected(true);
+				break;
+			}
+		}
+	}
 }
 
 void PlotManager::onUpdatePlotManager()
@@ -895,6 +945,82 @@ void PlotManager::onSetGridColorWidth()
 		m_curSelectPlot->setGridColorWidth(color, width);
 }
 
+void PlotManager::onCheckBox_6StateChanged()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setGridVisible(ui.checkBox_6->isChecked());
+}
+
+void PlotManager::onPushButton_10Clicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTickLabelColor(ui.pushButton_10->color());
+}
+
+void PlotManager::onfontComboBox_3CurrentFontChanged(const QFont & font)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+	int fontSize = ui.comboBox_AxisGrid_FontSize->currentText().toInt();
+	QFont newFont;
+	newFont.setFamily(font.family());
+	newFont.setPointSize(fontSize);
+	m_curSelectPlot->setTickLabelFont(newFont);
+}
+
+void PlotManager::onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString & text)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTickLabelFontSize(text.toInt());
+}
+
+void PlotManager::onComboBox_2CurrentIndexChanged(int index)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setGridStyle(GridStyle(index));
+}
+
+void PlotManager::onComboBox_3CurrentIndexChanged(int index)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	GridDensity density;
+	switch (index)
+	{
+	case 0:
+		density = GridDensity::LESS;
+		break;
+	case 1:
+		density = GridDensity::NORMAL;
+		break;
+	case 2:
+		density = GridDensity::MORE;
+		break;
+	}
+	m_curSelectPlot->setGridDensity(density);
+}
+
 void PlotManager::onCheckBox_12StateChanged()
 {
 	if (m_curSelectPlot == nullptr)
@@ -975,8 +1101,9 @@ void PlotManager::onComboBox_Text_fontSizeCurrentTextChanged(const QString & tex
 		return;
 	}
 
-	QFont font = ui.fontComboBox_2->currentFont();
-	font.setPointSizeF(text.toFloat());
-	m_curSelectPlot->setTitleFont(font);
+// 	QFont font = ui.fontComboBox_2->currentFont();
+// 	font.setPointSizeF(text.toFloat());
+// 	m_curSelectPlot->setTitleFont(font);
+	m_curSelectPlot->setTitleFontSize(text.toInt());
 }
 

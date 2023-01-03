@@ -11,12 +11,13 @@ PlotAScope::PlotAScope(QWidget* parent)
 	m_title = "A-Scope";
 	m_titleColor = Qt::white;
 	m_titleFillColor = Qt::black;
+	m_titleFontSize = 16;
 	m_titleFont.setFamily("Microsoft YaHei");
-	m_titleFont.setPointSizeF(16.0);
+	m_titleFont.setPointSizeF(m_titleFontSize);
 	m_titleVisible = true;
 
-	m_axisFont.setFamily("Microsoft YaHei");
-	m_axisFont.setPointSizeF(10.0);
+	m_axisLabelFont.setFamily("Microsoft YaHei");
+	m_axisLabelFont.setPointSizeF(10.0);
 	m_xAxisLabel = "Range(m)";
 	m_yAxisLabel = "Voltage(V)";
 
@@ -36,6 +37,13 @@ PlotAScope::PlotAScope(QWidget* parent)
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
 	m_gridColor = QColor(200, 200, 200);
+	m_gridVisible = true;
+	m_tickLabelColor = Qt::white;
+	m_tickLabelFontSize = 8;
+	m_tickLabelFont.setFamily("Microsoft YaHei");
+	m_tickLabelFont.setPointSizeF(m_tickLabelFontSize);
+	m_gridStyle = Qt::DotLine;
+	m_gridDensity = GridDensity::LESS;
 
 	m_showUnits_x = false;
 	m_showUnits_y = false;
@@ -60,12 +68,16 @@ void PlotAScope::initPlot()
 	m_customPlot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
 	m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
 	m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	m_customPlot->xAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->yAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->xAxis->setTickLabelFont(m_tickLabelFont);
+	m_customPlot->yAxis->setTickLabelFont(m_tickLabelFont);
 	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
-	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
-	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
 
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
@@ -73,12 +85,10 @@ void PlotAScope::initPlot()
 	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
 
 	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
-	m_customPlot->xAxis->setLabelColor(m_axisColor);
-	m_customPlot->yAxis->setLabelColor(m_axisColor);
-	m_customPlot->xAxis->setLabelFont(m_axisFont);
-	m_customPlot->yAxis->setLabelFont(m_axisFont);
-	m_customPlot->xAxis->setTickLabelColor(QColor(255, 255, 255));
-	m_customPlot->yAxis->setTickLabelColor(QColor(255, 255, 255));
+	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
+	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
+	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
+	m_customPlot->yAxis->setLabelFont(m_axisLabelFont);
 
 	m_customPlot->replot();
 }
@@ -197,6 +207,13 @@ void PlotAScope::setTitleVisible(bool show)
 	update();
 }
 
+void PlotAScope::setTitleFontSize(int size)
+{
+	m_titleFontSize = size;
+	m_titleFont.setPointSize(size);
+	update();
+}
+
 void PlotAScope::setTitleFillColor(QColor & color)
 {
 	m_titleFillColor = color;
@@ -217,19 +234,19 @@ void PlotAScope::setyAxisLabel(QString & str)
 	m_customPlot->replot();
 }
 
-void PlotAScope::setAxisColor(QColor & color)
+void PlotAScope::setAxisLabelColor(QColor & color)
 {
 	m_axisColor = color;
-	m_customPlot->xAxis->setLabelColor(m_axisColor);
-	m_customPlot->yAxis->setLabelColor(m_axisColor);
+	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
+	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->replot();
 }
 
-void PlotAScope::setAxisFont(QFont & font)
+void PlotAScope::setAxisLabelFont(QFont & font)
 {
-	m_axisFont = font;
-	m_customPlot->xAxis->setLabelFont(m_axisFont);
-	m_customPlot->yAxis->setLabelFont(m_axisFont);
+	m_axisLabelFont = font;
+	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
+	m_customPlot->yAxis->setLabelFont(m_axisLabelFont);
 	m_customPlot->replot();
 }
 
@@ -368,9 +385,69 @@ void PlotAScope::setGridColorWidth(QColor color, uint width)
 {
 	m_gridColor = color;
 	m_gridWidth = width;
-	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
-	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
 	m_customPlot->replot();
+}
+
+void PlotAScope::setGridVisible(bool enable)
+{
+	m_gridVisible = enable;
+	m_customPlot->xAxis->grid()->setVisible(enable);
+	m_customPlot->yAxis->grid()->setVisible(enable);
+	m_customPlot->replot();
+}
+
+void PlotAScope::setTickLabelColor(QColor & color)
+{
+	m_tickLabelColor = color;
+	m_customPlot->xAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->yAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->replot();
+}
+
+void PlotAScope::setTickLabelFont(QFont & font)
+{
+	m_tickLabelFont = font;
+	m_customPlot->xAxis->setTickLabelFont(m_tickLabelFont);
+	m_customPlot->yAxis->setTickLabelFont(m_tickLabelFont);
+	m_customPlot->replot();
+}
+
+void PlotAScope::setTickLabelFontSize(int size)
+{
+	m_tickLabelFontSize = size;
+	m_tickLabelFont.setPointSize(size);
+	setTickLabelFont(m_tickLabelFont);
+}
+
+void PlotAScope::setGridStyle(GridStyle style)
+{
+	switch (style)
+	{
+	case GridStyle::SOLIDLINE:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	case GridStyle::DASHLINE:
+		m_gridStyle = Qt::DashLine;
+		break;
+	case GridStyle::DOTLINE:
+		m_gridStyle = Qt::DotLine;
+		break;
+	case GridStyle::DASHDOTLINE:
+		m_gridStyle = Qt::DashDotLine;
+		break;
+	default:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	}
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->replot();
+}
+
+void PlotAScope::setGridDensity(GridDensity density)
+{
 }
 
 void PlotAScope::setMinimumMargins(const QMargins & margins)

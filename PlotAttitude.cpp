@@ -9,7 +9,7 @@ PlotAttitude::PlotAttitude(QWidget* parent)
 	: PlotItemBase(parent)
 {
 	m_titleColor = Qt::white;
-	m_titleFillColor = Qt::red;
+	m_titleFillColor = Qt::black;
 	m_border_ColorStart = Qt::white;
 	m_border_ColorEnd = Qt::white;
 	m_bgColor = Qt::black;
@@ -45,8 +45,9 @@ PlotAttitude::PlotAttitude(QWidget* parent)
 	m_topPadding = 50;
 	m_bottomPadding = 40;
 
+	m_titleFontSize = 16;
 	m_titleFont.setFamily("Microsoft YaHei");
-	m_titleFont.setPointSizeF(16.0);
+	m_titleFont.setPointSizeF(m_titleFontSize);
 
 	m_scaleFont.setFamily("Microsoft YaHei");
 	m_scaleFont.setPointSizeF(10.0);
@@ -110,7 +111,7 @@ void PlotAttitude::drawTitle(QPainter * painter, int radius)
 	painter->setPen(m_titleColor);
 	if (m_titleVisible)
 	{
-		painter->fillRect(-w / 2, -radius - h - h0, w, h0, m_titleFillColor);
+		painter->fillRect(-w / 2, -radius - 1.25*h - h0, w, h0+0.25*h, m_titleFillColor);
 		painter->drawText(QPoint(-w / 2, -radius - h*1.5), m_title);
 	}
 		
@@ -543,6 +544,13 @@ void PlotAttitude::setTitleFillColor(QColor & color)
 void PlotAttitude::setTitleFont(QFont & font)
 {
 	m_titleFont = font;
+	update();
+}
+
+void PlotAttitude::setTitleFontSize(int size)
+{
+	m_titleFontSize = size;
+	m_titleFont.setPointSize(size);
 	update();
 }
 

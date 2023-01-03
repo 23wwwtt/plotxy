@@ -55,6 +55,7 @@ public slots:
     void onTWSclicked(QTreeWidgetItem* item, int i);
     void onTWSPclicked(QTreeWidgetItem* item, int i);
     void onAddNewClicked();
+	void onSelectedPlot(QString tabName, QString plotName);	//用于默认点击的Item
 
 	void onUpdatePlotManager();
 	void onBtnCloseClicked();
@@ -85,6 +86,12 @@ public slots:
 	void onLineEdit_vertGridsEditingFinished();
 	void onSetAxisColorWidth();
 	void onSetGridColorWidth();
+	void onCheckBox_6StateChanged();
+	void onPushButton_10Clicked();
+	void onfontComboBox_3CurrentFontChanged(const QFont& font);
+	void onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString& text);
+	void onComboBox_2CurrentIndexChanged(int index);
+	void onComboBox_3CurrentIndexChanged(int index);
 
 	//Text Edit
 	void onCheckBox_12StateChanged();
