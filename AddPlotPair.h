@@ -63,6 +63,7 @@ signals:
 	void sgn_getLightData(QList<QList<QString>>);
 	void sgn_onTextLightBtnClicked();
 
+
 public slots:
 	void updatePlotTrees();
     void onBtnAddClicked();

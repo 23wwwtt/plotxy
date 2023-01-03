@@ -10,11 +10,11 @@ PlotRTI::PlotRTI(QWidget* parent)
 
 	m_title = "RTI Display";
 	m_titleColor = Qt::white;
+	m_titleFillColor = Qt::black;
 	m_titleFont.setFamily("Microsoft YaHei");
 	m_titleFont.setPointSizeF(16.0);
-	m_titleShow = true;
+	m_titleVisible = true;
 
-	m_axisColor = Qt::white;
 	m_axisFont.setFamily("Microsoft YaHei");
 	m_axisFont.setPointSizeF(10.0);
 	m_xAxisLabel = "Range(m)";
@@ -26,9 +26,25 @@ PlotRTI::PlotRTI(QWidget* parent)
 	m_bottomPadding = 10;
 
 	m_coordBgn_x = 0;
+
 	m_coordEnd_x = 100;
 	m_coordBgn_y = 0;
 	m_coordEnd_y = 100;
+
+	m_coordEnd_x = 5;
+	m_coordBgn_y = 0;
+	m_coordEnd_y = 5;
+
+	m_horzGrids = 5;
+	m_vertGrids = 5;
+	m_axisWidth = 1;
+	m_gridWidth = 1;
+	m_axisColor = Qt::white;
+	m_gridColor = QColor(200, 200, 200);
+
+	m_showUnits_x = false;
+	m_showUnits_y = false;
+
 
 	initPlot();
 }
@@ -42,8 +58,18 @@ void PlotRTI::initPlot()
 {
 	m_customPlot = new QCustomPlot(this);
 	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-	connect(m_customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), m_customPlot->xAxis2, SLOT(setRange(QCPRange)));
-	connect(m_customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), m_customPlot->yAxis2, SLOT(setRange(QCPRange)));
+	m_customPlot->axisRect()->setupFullAxesBox(true);
+
+	m_customPlot->xAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+	m_customPlot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
+	m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
+	m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
 
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
@@ -51,8 +77,6 @@ void PlotRTI::initPlot()
 	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
 
 	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
-	m_customPlot->xAxis->setBasePen(QPen(QColor(255, 255, 255)));
-	m_customPlot->yAxis->setBasePen(QPen(QColor(255, 255, 255)));
 	m_customPlot->xAxis->setLabelColor(m_axisColor);
 	m_customPlot->yAxis->setLabelColor(m_axisColor);
 	m_customPlot->xAxis->setLabelFont(m_axisFont);
@@ -74,7 +98,7 @@ void PlotRTI::initPlot()
 	m_customPlot->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, m_marginGroup);
 	m_colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, m_marginGroup);
 
-	m_customPlot->rescaleAxes();
+//	m_customPlot->rescaleAxes();
 }
 
 void PlotRTI::paintEvent(QPaintEvent * event)
@@ -91,16 +115,11 @@ void PlotRTI::paintEvent(QPaintEvent * event)
 	double as = fm.ascent();
 	QRectF rect = fm.boundingRect(m_title);
 
-	if (!m_titleShow)
-	{
-		w = 0.0;
-		h = 0.0;
-		as = 0.0;
-	}
-	else
+	if (m_titleVisible)
 	{
 		painter.setFont(m_titleFont);
 		painter.setPen(m_titleColor);
+		painter.fillRect((width - w + m_leftPadding - m_rightPadding) / 2, m_topPadding, w, h, m_titleFillColor);
 		painter.drawText(QPoint((width + m_leftPadding - m_rightPadding - w) / 2, as + m_topPadding), m_title);
 	}
 
@@ -111,6 +130,34 @@ void PlotRTI::paintEvent(QPaintEvent * event)
 void PlotRTI::slot_setMouseEventEnable(bool on)
 {
 	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, on);
+}
+
+void PlotRTI::setUnitsShowX(bool on)
+{
+	m_showUnits_x = on;
+	m_customPlot->xAxis->setAxisFormatShow(on);
+	m_customPlot->replot();
+}
+
+void PlotRTI::setUnitsShowY(bool on)
+{
+	m_showUnits_y = on;
+	m_customPlot->yAxis->setAxisFormatShow(on);
+	m_customPlot->replot();
+}
+
+void PlotRTI::setUnitsX(const QString & units)
+{
+	m_units_x = units;
+	m_customPlot->xAxis->setAxisFormat(units);
+	m_customPlot->replot();
+}
+
+void PlotRTI::setUnitsY(const QString & units)
+{
+	m_units_y = units;
+	m_customPlot->yAxis->setAxisFormat(units);
+	m_customPlot->replot();
 }
 
 void PlotRTI::setTitle(QString & str)
@@ -125,15 +172,21 @@ void PlotRTI::setTitleColor(QColor & color)
 	update();
 }
 
+void PlotRTI::setTitleFillColor(QColor & color)
+{
+	m_titleFillColor = color;
+	update();
+}
+
 void PlotRTI::setTitleFont(QFont & font)
 {
 	m_titleFont = font;
 	update();
 }
 
-void PlotRTI::setTitleShow(bool show)
+void PlotRTI::setTitleVisible(bool show)
 {
-	m_titleShow = show;
+	m_titleVisible = show;
 	update();
 }
 
@@ -247,4 +300,63 @@ void PlotRTI::getCoordRangeY(double & lower, double & upper)
 {
 	lower = m_coordBgn_y;
 	upper = m_coordEnd_y;
+}
+
+
+void PlotRTI::setHorzGrids(uint count)
+{
+	if (m_horzGrids == count || count < 0)
+	{
+		return;
+	}
+	m_horzGrids = count;
+	if (count == 0)
+	{
+		m_customPlot->yAxis->grid()->setVisible(false);
+	}
+	else
+	{
+		m_customPlot->yAxis->grid()->setVisible(true);
+		m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	}
+	m_customPlot->replot();
+}
+
+void PlotRTI::setVertGrids(uint count)
+{
+	if (m_vertGrids == count || count < 0)
+	{
+		return;
+	}
+	m_vertGrids = count;
+	if (count == 0)
+	{
+		m_customPlot->xAxis->grid()->setVisible(false);
+	}
+	else
+	{
+		m_customPlot->xAxis->grid()->setVisible(true);
+		m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
+	}
+	m_customPlot->replot();
+}
+
+void PlotRTI::setAxisColorWidth(QColor color, uint width)
+{
+	m_axisColor = color;
+	m_axisWidth = width;
+	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
+	m_customPlot->replot();
+}
+
+void PlotRTI::setGridColorWidth(QColor color, uint width)
+{
+	m_gridColor = color;
+	m_gridWidth = width;
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->replot();
 }

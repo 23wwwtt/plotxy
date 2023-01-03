@@ -27,6 +27,18 @@ PlotItemBase::PlotItemBase(QWidget* parent)
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
 	m_gridColor = QColor(200, 200, 200);
+
+
+	m_units_x = nullptr;
+	m_units_y = nullptr;
+	m_showUnits_x = true;
+	m_showUnits_y = true;
+	m_title = nullptr;
+	m_titleVisible = true;
+	m_titleColor = Qt::white;
+	m_titleFillColor = Qt::black;
+	m_titleFont.setFamily("Microsoft YaHei");
+	m_titleFont.setPointSizeF(16.0);
 }
    
 PlotItemBase::~PlotItemBase()
@@ -158,6 +170,51 @@ void PlotItemBase::setGridColorWidth(QColor color, uint width)
 {
 	m_gridColor = color;
 	m_gridWidth = width;
+}
+
+void PlotItemBase::setUnitsShowX(bool on)
+{
+	m_showUnits_x = on;
+}
+
+void PlotItemBase::setUnitsShowY(bool on)
+{
+	m_showUnits_y = on;
+}
+
+void PlotItemBase::setUnitsX(const QString & units)
+{
+	m_units_x = units;
+}
+
+void PlotItemBase::setUnitsY(const QString & units)
+{
+	m_units_y = units;
+}
+
+void PlotItemBase::setTitleVisible(bool on)
+{
+	m_titleVisible = on;
+}
+
+void PlotItemBase::setTitle(QString & title)
+{
+	m_title = title;
+}
+
+void PlotItemBase::setTitleColor(QColor& color)
+{
+	m_titleColor = color;
+}
+
+void PlotItemBase::setTitleFillColor(QColor& color)
+{
+	m_titleFillColor = color;
+}
+
+void PlotItemBase::setTitleFont(QFont& font)
+{
+	m_titleFont = font;
 }
 
 void PlotItemBase::addPlotPairData(QPair<QString, QString> pair)

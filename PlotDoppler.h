@@ -19,19 +19,11 @@ public:
 	};
 
 	void initPlot();
-	QString getTitle() const { return m_title; }
-	QColor getTitleColor() const { return m_titleColor; }
-	QFont getTitleFont() const { return m_titleFont; }
-	bool getTitleShow() const { return m_titleShow; }
+
 	QString getxAxisLabel() const { return m_xAxisLabel; }
 	QString getyAxisLabel() const { return m_yAxisLabel; }
-	QColor getAxisColor() const { return m_axisColor; }
 	QFont getAxisFont() const { return m_axisFont; }
 
-	void setTitle(QString& str);
-	void setTitleColor(QColor& color);
-	void setTitleFont(QFont& font);
-	void setTitleShow(bool show);
 	void setxAxisLabel(QString& str);
 	void setyAxisLabel(QString& str);
 	void setAxisColor(QColor& color);
@@ -44,6 +36,37 @@ public:
 	void setCoordRangeY(double lower, double upper);
 	void getCoordRangeX(double& lower, double& upper);
 	void getCoordRangeY(double& lower, double& upper);
+	
+	virtual void setHorzGrids(uint count);
+	virtual void setVertGrids(uint count);
+	virtual void setAxisColorWidth(QColor color, uint width);
+	virtual void setGridColorWidth(QColor color, uint width);
+	virtual uint getHorzGrids() { return m_horzGrids; }
+	virtual uint getVertGrids() { return m_vertGrids; }
+	virtual uint getAxisWidth() { return m_axisWidth; }
+	virtual uint getGridWidth() { return m_gridWidth; }
+	virtual QColor getAxisColor() { return m_axisColor; }
+	virtual QColor getGridColor() { return m_gridColor; }
+
+	virtual void setUnitsShowX(bool on);
+	virtual void setUnitsShowY(bool on);
+	virtual void setUnitsX(const QString& units);
+	virtual void setUnitsY(const QString& units);
+	virtual void setTitle(QString& str);
+	virtual void setTitleColor(QColor& color);
+	virtual void setTitleFillColor(QColor& color);
+	virtual void setTitleFont(QFont& font);
+	virtual void setTitleVisible(bool show);
+	virtual bool unitsShowX() { return m_showUnits_x; }
+	virtual bool unitsShowY() { return m_showUnits_y; }
+	virtual QString getUnitsX() { return m_units_x; }
+	virtual QString getUnitsY() { return m_units_y; }
+	virtual bool getTitleVisible() { return m_titleVisible; }
+	virtual QString getTitle() { return m_title; }
+	virtual QColor getTitleColor() { return m_titleColor; }
+	virtual QColor getTitleFillColor() { return m_titleFillColor; }
+	virtual QFont getTitleFont() { return m_titleFont; }
+
 
 public:
 	static int m_instanceCount;			//实体个数
@@ -57,16 +80,11 @@ private:
 	PlotAScope* m_horizon_AScope;
 	PlotAScope* m_vertical_AScope;
 
-	QString m_title;
-	QColor	m_titleColor;				//标题颜色
-	QFont	m_titleFont;				//标题字体
-	bool	m_titleShow;				//标题是否显示
 	double m_topPadding;				//绘图间隔-top
 	double m_bottomPadding;				//绘图间隔-bottom
 	double m_leftPadding;				//绘图间隔-left
 	double m_rightPadding;				//绘图间隔-right
 
-	QColor	m_axisColor;				//坐标标题颜色
 	QFont	m_axisFont;					//坐标标题字体
 	QString m_xAxisLabel;
 	QString m_yAxisLabel;

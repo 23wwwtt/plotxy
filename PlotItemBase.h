@@ -44,16 +44,46 @@ public:
 	virtual void setCoordRangeY(double lower, double upper);
 	virtual void getCoordRangeX(double& lower, double& upper);
 	virtual void getCoordRangeY(double& lower, double& upper);
-	virtual void setHorzGrids(uint);
-	virtual void setVertGrids(uint);
+
+	//virtual void setHorzGrids(uint);
+	//virtual void setVertGrids(uint);
+	//virtual uint getHorzGrids() { return m_horzGrids; }
+	//virtual uint getVertGrids() { return m_vertGrids; }
+	//virtual void setAxisColorWidth(QColor, uint);
+	//virtual void setGridColorWidth(QColor, uint);
+
+	virtual void setHorzGrids(uint count);
+	virtual void setVertGrids(uint count);
 	virtual uint getHorzGrids() { return m_horzGrids; }
 	virtual uint getVertGrids() { return m_vertGrids; }
-	virtual void setAxisColorWidth(QColor, uint);
-	virtual void setGridColorWidth(QColor, uint);
+	virtual void setAxisColorWidth(QColor color, uint width);
+	virtual void setGridColorWidth(QColor color, uint width);
+
 	virtual uint getAxisWidth() { return m_axisWidth; }
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
+
+
+	virtual void setUnitsShowX(bool on);
+	virtual void setUnitsShowY(bool on);
+	virtual void setUnitsX(const QString& units);
+	virtual void setUnitsY(const QString& units);
+	virtual void setTitleVisible(bool on);
+	virtual void setTitle(QString& title);
+	virtual void setTitleColor(QColor& color);
+	virtual void setTitleFillColor(QColor& color);
+	virtual void setTitleFont(QFont& font);
+	virtual bool unitsShowX() { return m_showUnits_x; }
+	virtual bool unitsShowY() { return m_showUnits_y; }
+	virtual QString getUnitsX() { return m_units_x; }
+	virtual QString getUnitsY() { return m_units_y; }
+	virtual bool getTitleVisible() { return m_titleVisible; }
+	virtual QString getTitle() { return m_title; }
+	virtual QColor getTitleColor() { return m_titleColor; }
+	virtual QColor getTitleFillColor() { return m_titleFillColor; }
+	virtual QFont getTitleFont() { return m_titleFont; }
+
 
 	virtual void addPlotPairData(QPair<QString, QString>);
 	virtual void delPlotPairData(QPair<QString, QString>);
@@ -66,6 +96,18 @@ protected:
     //virtual void paintEvent(QPaintEvent* event);
 	QList<QPair<QString, QString>> m_plotPairData;
 	QVector<DataPair*> m_dataPair;
+	//double  m_coordBgn_x;	//x坐标起始值
+	//double  m_coordEnd_x;	//x坐标结束值
+	//double  m_coordBgn_y;	//y坐标起始值
+	//double  m_coordEnd_y;	//y坐标结束值
+	//uint	m_horzGrids;
+	//uint	m_vertGrids;
+	//uint	m_axisWidth;
+	//uint	m_gridWidth;
+	//QColor	m_axisColor;
+	//QColor	m_gridColor;
+
+	//Axis and Grid
 	double  m_coordBgn_x;	//x坐标起始值
 	double  m_coordEnd_x;	//x坐标结束值
 	double  m_coordBgn_y;	//y坐标起始值
@@ -76,6 +118,17 @@ protected:
 	uint	m_gridWidth;
 	QColor	m_axisColor;
 	QColor	m_gridColor;
+
+	//Text
+	QString m_units_x;
+	QString m_units_y;
+	bool	m_showUnits_x;
+	bool	m_showUnits_y;
+	QString m_title;
+	bool	m_titleVisible;
+	QColor	m_titleColor;
+	QFont	m_titleFont;
+	QColor	m_titleFillColor;
 
 public slots:
 	void slot_updateRect(QRect);
