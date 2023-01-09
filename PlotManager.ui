@@ -1118,7 +1118,11 @@ color: rgb(255, 255, 255);</string>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QFontComboBox" name="fontComboBox_3"/>
+                 <widget class="QFontComboBox" name="fontComboBox_3">
+                  <property name="editable">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="1" colspan="2">
                  <widget class="QComboBox" name="comboBox_3">
@@ -1146,17 +1150,22 @@ color: rgb(255, 255, 255);</string>
                  <widget class="QComboBox" name="comboBox_2">
                   <item>
                    <property name="text">
-                    <string>Line</string>
+                    <string>SolidLine</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Stipple</string>
+                    <string>DashLine</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Ticks</string>
+                    <string>DotLine</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>DashDotLine</string>
                    </property>
                   </item>
                  </widget>
@@ -1831,7 +1840,11 @@ color: rgb(255, 255, 255);</string>
                  </widget>
                 </item>
                 <item row="4" column="1" colspan="2">
-                 <widget class="QFontComboBox" name="fontComboBox_2"/>
+                 <widget class="QFontComboBox" name="fontComboBox_2">
+                  <property name="editable">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_42">
@@ -4680,35 +4693,9 @@ background-color: rgb(127, 127, 127);</string>
               <string>General Table Options</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_44">
-              <property name="leftMargin">
-               <number>5</number>
-              </property>
-              <property name="rightMargin">
-               <number>5</number>
-              </property>
               <item>
-               <layout class="QGridLayout" name="gridLayout_26">
-                <property name="spacing">
-                 <number>2</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_173">
-                  <property name="text">
-                   <string>Vertical Scroll:</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="checkBox_29">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_48">
+                <item>
                  <widget class="QLabel" name="label_171">
                   <property name="text">
                    <string>Row Grids:</string>
@@ -4718,7 +4705,7 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="1">
+                <item>
                  <widget class="QCheckBox" name="checkBox_30">
                   <property name="text">
                    <string/>
@@ -4728,7 +4715,7 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="2">
+                <item>
                  <widget class="QLabel" name="label_172">
                   <property name="text">
                    <string>Cols Grids:</string>
@@ -4738,14 +4725,18 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="3">
+                <item>
                  <widget class="QCheckBox" name="checkBox_31">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="0">
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_49">
+                <item>
                  <widget class="QLabel" name="label_105">
                   <property name="text">
                    <string>Grid Width:</string>
@@ -4755,10 +4746,10 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="1">
+                <item>
                  <widget class="QSpinBox" name="spinBox_10"/>
                 </item>
-                <item row="2" column="2">
+                <item>
                  <widget class="QLabel" name="label_107">
                   <property name="text">
                    <string>Grid Color:</string>
@@ -4768,7 +4759,7 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="3">
+                <item>
                  <widget class="ColorButton" name="pushButton_71">
                   <property name="maximumSize">
                    <size>
@@ -4781,7 +4772,11 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0">
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_50">
+                <item>
                  <widget class="QLabel" name="label_106">
                   <property name="text">
                    <string>Outline Width:</string>
@@ -4791,10 +4786,10 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
+                <item>
                  <widget class="QSpinBox" name="spinBox_11"/>
                 </item>
-                <item row="3" column="2">
+                <item>
                  <widget class="QLabel" name="label_108">
                   <property name="text">
                    <string>Outline Color:</string>
@@ -4804,7 +4799,7 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="3">
+                <item>
                  <widget class="ColorButton" name="pushButton_72">
                   <property name="maximumSize">
                    <size>
@@ -4817,7 +4812,11 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="2">
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_51">
+                <item>
                  <widget class="QLabel" name="label_109">
                   <property name="text">
                    <string>Fill Color:</string>
@@ -4827,7 +4826,7 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="3">
+                <item>
                  <widget class="ColorButton" name="pushButton_73">
                   <property name="maximumSize">
                    <size>
@@ -4840,7 +4839,11 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="0">
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_52">
+                <item>
                  <widget class="QLabel" name="label_110">
                   <property name="text">
                    <string>Left Pad:</string>
@@ -4850,10 +4853,10 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="1">
+                <item>
                  <widget class="QSpinBox" name="spinBox_12"/>
                 </item>
-                <item row="5" column="2">
+                <item>
                  <widget class="QLabel" name="label_111">
                   <property name="text">
                    <string>Right Pad:</string>
@@ -4863,7 +4866,7 @@ background-color: rgb(127, 127, 127);</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="3">
+                <item>
                  <widget class="QSpinBox" name="spinBox_13"/>
                 </item>
                </layout>

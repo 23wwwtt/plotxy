@@ -21,14 +21,14 @@ public:
 	
 	QString getxAxisLabel() const { return m_xAxisLabel; }
 	QString getyAxisLabel() const { return m_yAxisLabel; }
-	QColor getAxisColor() const { return m_axisColor; }
-	QFont getAxisFont() const { return m_axisFont; }
+	QColor getAxisLabelColor() const { return m_axisLabelColor; }
+	QFont getAxisLabelFont() const { return m_axisLabelFont; }
 
 	void setPaddings(double top, double bottom, double left, double right);
 	void setxAxisLabel(QString& str);
 	void setyAxisLabel(QString& str);
-	void setAxisColor(QColor& color);
-	void setAxisFont(QFont& font);
+	void setAxisLabelColor(QColor& color);
+	void setAxisLabelFont(QFont& font);
 
 	void setAxisVisible(bool on, AxisType type);
 	void setAxisTickLabelShow(bool on, AxisType type);
@@ -50,6 +50,18 @@ public:
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
+	virtual void setGridVisible(bool enable);
+	virtual void setTickLabelColor(QColor& color);
+	virtual void setTickLabelFont(QFont& font);
+	virtual void setTickLabelFontSize(int size);
+	virtual void setGridStyle(GridStyle style);
+	virtual void setGridDensity(GridDensity density);
+	virtual bool getGridVisible() { return m_gridVisible; }
+	virtual QColor getTickLabelColor() { return m_tickLabelColor; }
+	virtual QFont getTickLabelFont() { return m_tickLabelFont; }
+	virtual int getTickLabelFontSize() { return m_tickLabelFontSize; }
+	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
+	virtual GridDensity getGridDensity() { return m_gridDensity; }
 
 	virtual void setUnitsShowX(bool on);
 	virtual void setUnitsShowY(bool on);
@@ -59,6 +71,7 @@ public:
 	void setTitleColor(QColor& color);
 	void setTitleFont(QFont& font);
 	void setTitleVisible(bool show);
+	virtual void setTitleFontSize(int size);
 	virtual void setTitleFillColor(QColor& color);
 	virtual bool unitsShowX() { return m_showUnits_x; }
 	virtual bool unitsShowY() { return m_showUnits_y; }
@@ -69,6 +82,7 @@ public:
 	virtual QColor getTitleColor() { return m_titleColor; }
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
+	virtual int getTitleFontSize() { return m_titleFontSize; }
 
 
 public:
@@ -82,7 +96,8 @@ private:
 	double m_leftPadding;				//绘图间隔-left
 	double m_rightPadding;				//绘图间隔-right
 
-	QFont	m_axisFont;					//坐标标题字体
+	QColor	m_axisLabelColor;			//坐标标题颜色
+	QFont	m_axisLabelFont;			//坐标标题字体
 	QString m_xAxisLabel;
 	QString m_yAxisLabel;
 

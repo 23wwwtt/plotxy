@@ -25,11 +25,25 @@ public:
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
 
+	virtual void setGridVisible(bool enable);
+	virtual void setTickLabelColor(QColor& color);
+	virtual void setTickLabelFont(QFont& font);
+	virtual void setTickLabelFontSize(int size);
+	virtual void setGridStyle(GridStyle style);
+	virtual void setGridDensity(GridDensity density);
+	virtual bool getGridVisible() { return m_gridVisible; }
+	virtual QColor getTickLabelColor() { return m_tickLabelColor; }
+	virtual QFont getTickLabelFont() { return m_tickLabelFont; }
+	virtual int getTickLabelFontSize() { return m_tickLabelFontSize; }
+	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
+	virtual GridDensity getGridDensity() { return m_gridDensity; }
+
 	//title
 	void setTitle(QString&);
 	void setTitleColor(QColor &color);
 	virtual void setTitleFillColor(QColor& color);
 	void setTitleFont(QFont &font);
+	virtual void setTitleFontSize(int size);
 	void setTitleVisible(bool show);
 	//unit
 	void setUnitsShowX(bool on);
@@ -45,6 +59,7 @@ public:
 	virtual QColor getTitleColor() { return m_titleColor; }
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
+	virtual int getTitleFontSize() { return m_titleFontSize; }
 
 public slots:
 	void onUpdateColorThresholdMap(QMap<QString, QMap<int, QColor>>);

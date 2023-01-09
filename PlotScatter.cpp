@@ -22,13 +22,14 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_title = "Scatter Plot";
 	m_titleColor = Qt::white;
 	m_titleFillColor = Qt::black;
+	m_titleFontSize = 16;
 	m_titleFont.setFamily("Microsoft YaHei");
-	m_titleFont.setPointSizeF(16.0);
+	m_titleFont.setPointSizeF(m_titleFontSize);
 	m_titleVisible = true;
 
 	m_axisLabelColor = Qt::white;
-	m_axisFont.setFamily("Microsoft YaHei");
-	m_axisFont.setPointSizeF(10.0);
+	m_axisLabelFont.setFamily("Microsoft YaHei");
+	m_axisLabelFont.setPointSizeF(10.0);
 	m_xAxisLabel = "X Axis";
 	m_yAxisLabel = "Y Axis";
 
@@ -48,6 +49,13 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
 	m_gridColor = QColor(200, 200, 200);
+	m_gridVisible = true;
+	m_tickLabelColor = Qt::white;
+	m_tickLabelFontSize = 8;
+	m_tickLabelFont.setFamily("Microsoft YaHei");
+	m_tickLabelFont.setPointSizeF(m_tickLabelFontSize);
+	m_gridStyle = Qt::DotLine;
+	m_gridDensity = GridDensity::LESS;
 
 
 	m_showUnits_x = false;
@@ -72,12 +80,16 @@ void PlotScatter::initPlot()
 	m_customPlot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
 	m_customPlot->xAxis->ticker()->setTickCount(m_vertGrids);
 	m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
+	m_customPlot->xAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->yAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->xAxis->setTickLabelFont(m_tickLabelFont);
+	m_customPlot->yAxis->setTickLabelFont(m_tickLabelFont);
 	m_customPlot->xAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->yAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->xAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->yAxis2->setBasePen(QPen(m_axisColor, m_axisWidth));
-	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
-	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
 	m_customPlot->xAxis->setLabel(m_xAxisLabel);
 	m_customPlot->yAxis->setLabel(m_yAxisLabel);
 	m_customPlot->xAxis->setRange(m_coordBgn_x, m_coordEnd_x);
@@ -89,10 +101,8 @@ void PlotScatter::initPlot()
 	m_customPlot->setBackground(m_backgroundBrush);
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
-	m_customPlot->xAxis->setLabelFont(m_axisFont);
-	m_customPlot->yAxis->setLabelFont(m_axisFont);
-	m_customPlot->xAxis->setTickLabelColor(QColor(255, 255, 255));
-	m_customPlot->yAxis->setTickLabelColor(QColor(255, 255, 255));
+	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
+	m_customPlot->yAxis->setLabelFont(m_axisLabelFont);
 
 	m_customPlot->replot();
 }
@@ -120,11 +130,30 @@ void PlotScatter::getDataInfo(double secs)
 
 void PlotScatter::updateData(QString xEntityType, QString yEntityType, double secs, int index, QColor color)
 {
+	QVector<double> x, y;
     QStringList xlist = xEntityType.split("+");
     QStringList ylist = yEntityType.split("+");
-	QVector<double> x = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(xlist.at(0), xlist.at(1), secs).toVector();
-	QVector<double> y = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(ylist.at(0), ylist.at(1), secs).toVector();
-
+	if (xlist.size() == 1 && ylist.size() == 1)
+	{
+		x = DataManager::getInstance()->getTimeData_vector();
+		y = DataManager::getInstance()->getTimeData_vector();
+	}
+	else if (xlist.size() == 1 && ylist.size() == 2)
+	{
+		x = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(ylist.at(0), xlist.at(0), secs).toVector();
+		y = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(ylist.at(0), ylist.at(1), secs).toVector();
+	}
+	else if (xlist.size() == 2 && ylist.size() == 1)
+	{
+		x = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(xlist.at(0), xlist.at(1), secs).toVector();
+		y = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(xlist.at(0), ylist.at(0), secs).toVector();
+	}
+	else
+	{
+		x = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(xlist.at(0), xlist.at(1), secs).toVector();
+		y = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(ylist.at(0), ylist.at(1), secs).toVector();
+	}
+	
     if (x.isEmpty() || y.isEmpty())
         return;
 
@@ -208,6 +237,13 @@ void PlotScatter::setTitleFont(QFont & font)
 	update();
 }
 
+void PlotScatter::setTitleFontSize(int size)
+{
+	m_titleFontSize = size;
+	m_titleFont.setPointSize(size);
+	update();
+}
+
 void PlotScatter::setTitleVisible(bool show)
 {
 	m_titleVisible = show;
@@ -227,7 +263,7 @@ void PlotScatter::setyAxisLabel(QString & str)
 	m_customPlot->replot();
 }
 
-void PlotScatter::setAxisColor(QColor & color)
+void PlotScatter::setAxisLabelColor(QColor & color)
 {
 	m_axisLabelColor = color;
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
@@ -235,11 +271,11 @@ void PlotScatter::setAxisColor(QColor & color)
 	m_customPlot->replot();
 }
 
-void PlotScatter::setAxisFont(QFont & font)
+void PlotScatter::setAxisLabelFont(QFont & font)
 {
-	m_axisFont = font;
-	m_customPlot->xAxis->setLabelFont(m_axisFont);
-	m_customPlot->yAxis->setLabelFont(m_axisFont);
+	m_axisLabelFont = font;
+	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
+	m_customPlot->yAxis->setLabelFont(m_axisLabelFont);
 	m_customPlot->replot();
 }
 
@@ -356,7 +392,7 @@ void PlotScatter::setHorzGrids(uint count)
 	}
 	else
 	{
-		m_customPlot->yAxis->grid()->setVisible(true);
+		m_customPlot->yAxis->grid()->setVisible(m_gridVisible);
 		m_customPlot->yAxis->ticker()->setTickCount(m_horzGrids);
 	}
 	m_customPlot->replot();
@@ -406,8 +442,8 @@ void PlotScatter::setGridColorWidth(QColor color, uint width)
 {
 	m_gridColor = color;
 	m_gridWidth = width;
-	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
-	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, Qt::DotLine));
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
 	m_customPlot->replot();
 }
 
@@ -429,6 +465,67 @@ QColor PlotScatter::getAxisColor()
 QColor PlotScatter::getGridColor()
 {
 	return m_gridColor;
+}
+
+
+void PlotScatter::setGridVisible(bool enable)
+{
+	m_gridVisible = enable;
+	m_customPlot->xAxis->grid()->setVisible(enable);
+	m_customPlot->yAxis->grid()->setVisible(enable);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setTickLabelColor(QColor & color)
+{
+	m_tickLabelColor = color;
+	m_customPlot->xAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->yAxis->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setTickLabelFont(QFont & font)
+{
+	m_tickLabelFont = font;
+	m_customPlot->xAxis->setTickLabelFont(m_tickLabelFont);
+	m_customPlot->yAxis->setTickLabelFont(m_tickLabelFont);
+	m_customPlot->replot();
+}
+
+void PlotScatter::setTickLabelFontSize(int size)
+{
+	m_tickLabelFontSize = size;
+	m_tickLabelFont.setPointSize(size);
+	setTickLabelFont(m_tickLabelFont);
+}
+
+void PlotScatter::setGridStyle(GridStyle style)
+{
+	switch (style)
+	{
+	case GridStyle::SOLIDLINE:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	case GridStyle::DASHLINE:
+		m_gridStyle = Qt::DashLine;
+		break;
+	case GridStyle::DOTLINE:
+		m_gridStyle = Qt::DotLine;
+		break;
+	case GridStyle::DASHDOTLINE:
+		m_gridStyle = Qt::DashDotLine;
+		break;
+	default:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	}
+	m_customPlot->xAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->yAxis->grid()->setPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->replot();
+}
+
+void PlotScatter::setGridDensity(GridDensity density)
+{
 }
 
 

@@ -6,7 +6,6 @@
 
 #include "PlotItemBase.h"
 
-
 PlotItemBase::PlotItemBase(QWidget* parent)
     : QWidget(parent)
 {
@@ -27,6 +26,13 @@ PlotItemBase::PlotItemBase(QWidget* parent)
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
 	m_gridColor = QColor(200, 200, 200);
+	m_gridVisible = true;
+	m_tickLabelColor = Qt::white;
+	m_tickLabelFontSize = 8;
+	m_tickLabelFont.setFamily("Microsoft YaHei");
+	m_tickLabelFont.setPointSizeF(m_tickLabelFontSize);
+	m_gridStyle = Qt::DotLine;
+	m_gridDensity = GridDensity::LESS;
 
 
 	m_units_x = nullptr;
@@ -37,8 +43,9 @@ PlotItemBase::PlotItemBase(QWidget* parent)
 	m_titleVisible = true;
 	m_titleColor = Qt::white;
 	m_titleFillColor = Qt::black;
+	m_titleFontSize = 16;
 	m_titleFont.setFamily("Microsoft YaHei");
-	m_titleFont.setPointSizeF(16.0);
+	m_titleFont.setPointSizeF(m_titleFontSize);
 }
    
 PlotItemBase::~PlotItemBase()
@@ -172,6 +179,54 @@ void PlotItemBase::setGridColorWidth(QColor color, uint width)
 	m_gridWidth = width;
 }
 
+void PlotItemBase::setGridVisible(bool enable)
+{
+	m_gridVisible = enable;
+}
+
+void PlotItemBase::setTickLabelColor(QColor & color)
+{
+	m_tickLabelColor = color;
+}
+
+void PlotItemBase::setTickLabelFont(QFont & font)
+{
+	m_tickLabelFont = font;
+}
+
+void PlotItemBase::setTickLabelFontSize(int size)
+{
+	m_tickLabelFontSize = size;
+	m_tickLabelFont.setPixelSize(size);
+}
+
+void PlotItemBase::setGridStyle(GridStyle style)
+{
+	switch (style)
+	{
+	case GridStyle::SOLIDLINE:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	case GridStyle::DASHLINE:
+		m_gridStyle = Qt::DashLine;
+		break;
+	case GridStyle::DOTLINE:
+		m_gridStyle = Qt::DotLine;
+		break;
+	case GridStyle::DASHDOTLINE:
+		m_gridStyle = Qt::DashDotLine;
+		break;
+	default:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	}
+}
+
+void PlotItemBase::setGridDensity(GridDensity density)
+{
+	m_gridDensity = density;
+}
+
 void PlotItemBase::setUnitsShowX(bool on)
 {
 	m_showUnits_x = on;
@@ -215,6 +270,12 @@ void PlotItemBase::setTitleFillColor(QColor& color)
 void PlotItemBase::setTitleFont(QFont& font)
 {
 	m_titleFont = font;
+}
+
+void PlotItemBase::setTitleFontSize(int size)
+{
+	m_titleFontSize = size;
+	m_titleFont.setPointSize(size);
 }
 
 void PlotItemBase::addPlotPairData(QPair<QString, QString> pair)

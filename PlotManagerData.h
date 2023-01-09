@@ -1,3 +1,6 @@
+/* * 
+* @brief: 用于管理软件添加的所有plotItemBase，方便在更改plotItemBase后可以同步刷新
+*  */
 #pragma once
 
 #include <QObject>

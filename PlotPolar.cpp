@@ -11,8 +11,9 @@ PlotPolar::PlotPolar(QWidget * parent)
 	m_instanceCount += 1;
 	m_title = "Polar";
 	m_titleColor = Qt::white;
+	m_titleFontSize = 16;
 	m_titleFont.setFamily("Microsoft YaHei");
-	m_titleFont.setPointSizeF(16.0);
+	m_titleFont.setPointSizeF(m_titleFontSize);
 	m_titleVisible = true;
 
 	m_units_x = QString::fromLocal8Bit("бу");
@@ -30,6 +31,14 @@ PlotPolar::PlotPolar(QWidget * parent)
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
 	m_gridColor = QColor(200, 200, 200);
+
+	m_gridVisible = true;
+	m_tickLabelColor = Qt::white;
+	m_tickLabelFontSize = 8;
+	m_tickLabelFont.setFamily("Microsoft YaHei");
+	m_tickLabelFont.setPointSizeF(m_tickLabelFontSize);
+	m_gridStyle = Qt::SolidLine;
+	m_gridDensity = GridDensity::LESS;
 
 	initPlot();
 }
@@ -55,10 +64,12 @@ void PlotPolar::initPlot()
 	m_angularAxis->setRangeDrag(false);
 	m_angularAxis->setTickLabelMode(QCPPolarAxisAngular::lmUpright);
 	m_angularAxis->setFormat(m_units_x);
-	m_angularAxis->setTickLabelColor(QColor(255, 255, 255));
-	m_angularAxis->setTickPen(QPen(QColor(255, 255, 255),1));
+	m_angularAxis->setTickLabelColor(m_tickLabelColor);
+	m_angularAxis->setTickLabelFont(m_tickLabelFont);
+	m_angularAxis->setTickPen(QPen(m_gridColor, 1));
 
-	m_angularAxis->radialAxis()->setTickLabelColor(QColor(255, 255, 255));
+	m_angularAxis->radialAxis()->setTickLabelColor(m_tickLabelColor);
+	m_angularAxis->radialAxis()->setTickLabelFont(m_tickLabelFont);
 	m_angularAxis->radialAxis()->setFormat(m_units_y);
 	m_angularAxis->radialAxis()->setTickLabelMode(QCPPolarAxisRadial::lmUpright);
 	m_angularAxis->radialAxis()->setTickLabelRotation(0);
@@ -66,8 +77,8 @@ void PlotPolar::initPlot()
 	m_angularAxis->radialAxis()->setAngle(0);
 
 	//angularAxis->radialAxis()->setNumberFormat("e");
-	m_angularAxis->grid()->setAngularPen(QPen(m_gridColor, m_gridWidth, Qt::SolidLine));
-	m_angularAxis->grid()->setRadialPen(QPen(m_gridColor, m_gridWidth, Qt::SolidLine));
+	m_angularAxis->grid()->setAngularPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_angularAxis->grid()->setRadialPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
 	m_angularAxis->grid()->setSubGridType(QCPPolarGrid::gtNone);
 
 	m_angularAxis->setRange(m_angularRange_lower, m_angularRange_upper);
@@ -105,6 +116,7 @@ void PlotPolar::setGridColorWidth(QColor color, uint width)
 	m_gridWidth = width;
 	m_angularAxis->grid()->setAngularPen(QPen(m_gridColor, m_gridWidth, Qt::SolidLine));
 	m_angularAxis->grid()->setRadialPen(QPen(m_gridColor, m_gridWidth, Qt::SolidLine));
+	m_angularAxis->setTickPen(QPen(m_gridColor, 1));
 	m_customPlot->replot();
 }
 
@@ -137,6 +149,65 @@ void PlotPolar::setVertGrids(uint count)
 		m_angularAxis->radialAxis()->ticker()->setTickCount(count);
 	}
 	m_customPlot->replot();
+}
+
+void PlotPolar::setGridVisible(bool enable)
+{
+	m_gridVisible = enable;
+	m_angularAxis->grid()->setVisible(enable);
+	m_customPlot->replot();
+}
+
+void PlotPolar::setTickLabelColor(QColor & color)
+{
+	m_tickLabelColor = color;
+	m_angularAxis->setTickLabelColor(m_tickLabelColor);
+	m_angularAxis->radialAxis()->setTickLabelColor(m_tickLabelColor);
+	m_customPlot->replot();
+}
+
+void PlotPolar::setTickLabelFont(QFont & font)
+{
+	m_tickLabelFont = font;
+	m_angularAxis->setTickLabelFont(font);
+	m_angularAxis->radialAxis()->setTickLabelFont(font);
+	m_customPlot->replot();
+}
+
+void PlotPolar::setTickLabelFontSize(int size)
+{
+	m_tickLabelFontSize = size;
+	m_tickLabelFont.setPointSize(size);
+	setTickLabelFont(m_tickLabelFont);
+}
+
+void PlotPolar::setGridStyle(GridStyle style)
+{
+	switch (style)
+	{
+	case GridStyle::SOLIDLINE:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	case GridStyle::DASHLINE:
+		m_gridStyle = Qt::DashLine;
+		break;
+	case GridStyle::DOTLINE:
+		m_gridStyle = Qt::DotLine;
+		break;
+	case GridStyle::DASHDOTLINE:
+		m_gridStyle = Qt::DashDotLine;
+		break;
+	default:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	}
+	m_angularAxis->grid()->setAngularPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_angularAxis->grid()->setRadialPen(QPen(m_gridColor, m_gridWidth, m_gridStyle));
+	m_customPlot->replot();
+}
+
+void PlotPolar::setGridDensity(GridDensity density)
+{
 }
 
 
@@ -191,6 +262,13 @@ void PlotPolar::setTitleFillColor(QColor & color)
 void PlotPolar::setTitleFont(QFont & font)
 {
 	m_titleFont = font;
+	update();
+}
+
+void PlotPolar::setTitleFontSize(int size)
+{
+	m_titleFontSize = size;
+	m_titleFont.setPointSize(size);
 	update();
 }
 

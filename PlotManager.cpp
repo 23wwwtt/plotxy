@@ -36,11 +36,11 @@ PlotManager::PlotManager(QWidget* parent)
 	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
 
 
-	
+
 	ui.stackedWidget->setCurrentIndex(0);
 
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
-	
+
 
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
 	connect(ui.spinBox_left, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxLeftChanged);
@@ -144,8 +144,10 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
 	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
 
-	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
+	//	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
 	m_itemScatterPlot->setExpanded(true);
+
+	ui.treeWidget_settings->setEnabled(false);
 }
 
 void PlotManager::initGeneralUI()
@@ -170,12 +172,15 @@ void PlotManager::initAxisGridUI()
 	ui.pushButton_flipXValues->setVisible(false);
 	ui.pushButton_flipYValues->setVisible(false);
 
+	ui.lineEdit_23->setText("1");
+	/*ui.pushButton_gridColor->setColor(Qt::gray);*/
 	ui.lineEdit_10->setEnabled(false);
 	ui.lineEdit_11->setEnabled(false);
 	ui.lineEdit_12->setEnabled(false);
 	ui.lineEdit_13->setEnabled(false);
 	ui.tableWidget->setEnabled(false);
 	ui.tableWidget_2->setEnabled(false);
+
 	connect(ui.checkBox_4, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_4StateChanged);
 	connect(ui.checkBox_5, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_5StateChanged);
 	connect(ui.lineEdit_limitBgnX, &QLineEdit::editingFinished, this, &PlotManager::onLineEdit_limitXEditingFinished);
@@ -190,20 +195,38 @@ void PlotManager::initAxisGridUI()
 	connect(ui.lineEdit_23, &QLineEdit::editingFinished, this, &PlotManager::onSetGridColorWidth);
 	connect(ui.pushButton_axisColor, &QPushButton::clicked, this, &PlotManager::onSetAxisColorWidth);
 	connect(ui.pushButton_gridColor, &QPushButton::clicked, this, &PlotManager::onSetGridColorWidth);
+	connect(ui.pushButton_gridFill, &QPushButton::clicked, this, &PlotManager::onPushButton_gridFillClicked);
+	connect(ui.checkBox_6, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_6StateChanged);
+	connect(ui.pushButton_10, &QPushButton::clicked, this, &PlotManager::onPushButton_10Clicked);
+	connect(ui.fontComboBox_3, &QFontComboBox::currentFontChanged, this, &PlotManager::onfontComboBox_3CurrentFontChanged);
+	connect(ui.comboBox_AxisGrid_FontSize, &QComboBox::currentTextChanged, this, &PlotManager::onComboBox_AxisGrid_FontSizeCurrentTextChanged);
+	connect(ui.comboBox_2, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBox_2CurrentIndexChanged(int)));
+	connect(ui.comboBox_3, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBox_3CurrentIndexChanged(int)));
+	QFontDatabase FontDb;
+	foreach(int size, FontDb.standardSizes()) {
+		ui.comboBox_AxisGrid_FontSize->addItem(QString::number(size));
+	}
 }
 
 
 void PlotManager::initTextLightUI()
 {
-	ui.groupBox_29->setVisible(false);
-	ui.radioButton_3->setEnabled(false);
-	ui.radioButton_4->setEnabled(false);
-	ui.spinBox_14->setEnabled(false);
-	ui.spinBox_15->setEnabled(false);
-	ui.spinBox_16->setEnabled(false);
-	ui.spinBox_17->setEnabled(false);
+	ui.label_171->setVisible(false);
+	ui.checkBox_30->setVisible(false);
+	ui.label_172->setVisible(false);
+	ui.checkBox_31->setVisible(false);
+	connect(ui.lineEdit_23, &QLineEdit::editingFinished, this, [=]() {
+		ui.spinBox_10->setValue(ui.lineEdit_23->text().toInt());
+	});
+	connect(ui.pushButton_gridColor, &QPushButton::clicked, this, [=]() {
+		ui.pushButton_71->setColor(ui.pushButton_gridColor->color());
+	});
+	connect(ui.pushButton_gridFill, &QPushButton::clicked, this, [=]() {
+		ui.pushButton_73->setColor(ui.pushButton_gridFill->color());
+	});
+	connect(ui.spinBox_10, &QSpinBox::editingFinished, this, &PlotManager::onSpinbox_10Changed);
 	connect(ui.pushButton_71, &QPushButton::clicked, this, &PlotManager::onPushButton_71Clicked);
-	connect(ui.spinBox_10, &QSpinBox::editingFinished, this, &PlotManager::onPushButton_71Clicked);
+	connect(ui.pushButton_73, &QPushButton::clicked, this, &PlotManager::onPushButton_73Clicked);
 }
 void PlotManager::initPlotDataUI()
 {
@@ -229,6 +252,7 @@ void PlotManager::initTextEditUI()
 
 void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 {
+	ui.treeWidget_settings->setEnabled(true);
 	QString name = plot->metaObject()->className();
 
 	if (name.compare("PlotScatter") == 0)
@@ -240,25 +264,17 @@ void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 		enableItem_AScope();
 	}
 	else if (name.compare("PlotRTI") == 0)
-
-	if (name.compare("PlotScatter") == 0) 
-	{
-		enableItem_Scatter();
-	}
-	else if (name.compare("PlotAScope") == 0) 
-	{
-		enableItem_AScope();
-	}
-	else if (name.compare("PlotRTI") == 0) 
-
 	{
 		enableItem_RTI();
 	}
-	else if (name.compare("PlotText") == 0 || name.compare("PlotLight") == 0)
+	else if (name.compare("PlotText") == 0)
 	{
 		enableItem_Text_Light();
 	}
-
+	else if (name.compare("PlotLight") == 0)
+	{
+		enableItem_Text_Light();
+	}
 	else if (name.compare("PlotBar") == 0)
 	{
 		enableItem_Bar();
@@ -280,30 +296,6 @@ void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 		enableItem_Track();
 	}
 	else if (name.compare("PlotDoppler") == 0)
-	{
-		enableItem_Doppler();
-	}
-	else if (name.compare("PlotBar") == 0) 
-	{
-		enableItem_Bar();
-	}
-	else if (name.compare("PlotDial") == 0) 
-	{
-		enableItem_Dial();
-	}
-	else if (name.compare("PlotAttitude") == 0) 
-	{
-		enableItem_Attitude();
-	}
-	else if (name.compare("PlotPolar") == 0) 
-	{
-		enableItem_Polar();
-	}
-	else if (name.compare("PlotTrack") == 0) 
-	{
-		enableItem_Track();
-	}
-	else if (name.compare("PlotDoppler") == 0) 
 	{
 		enableItem_Doppler();
 	}
@@ -347,7 +339,24 @@ void PlotManager::refreshAxisGridUI(PlotItemBase * plot)
 	ui.lineEdit_23->setText(QString("%1").arg(plot->getGridWidth()));
 	ui.pushButton_axisColor->setColor(plot->getAxisColor());
 	ui.pushButton_gridColor->setColor(plot->getGridColor());
-
+	ui.pushButton_gridFill->setColor(plot->getGridFillColor());
+	ui.checkBox_6->setChecked(plot->getGridVisible());
+	ui.pushButton_10->setColor(plot->getTickLabelColor());
+	ui.fontComboBox_3->setCurrentFont(plot->getTickLabelFont());
+	ui.comboBox_AxisGrid_FontSize->setCurrentText(QString("%1").arg(plot->getTickLabelFontSize()));
+	ui.comboBox_2->setCurrentIndex(int(plot->getGridStyle()) - 1);
+	switch (plot->getGridDensity())
+	{
+	case GridDensity::LESS:
+		ui.comboBox_3->setCurrentIndex(0);
+		break;
+	case GridDensity::NORMAL:
+		ui.comboBox_3->setCurrentIndex(1);
+		break;
+	case GridDensity::MORE:
+		ui.comboBox_3->setCurrentIndex(2);
+		break;
+	}
 }
 
 void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
@@ -369,14 +378,23 @@ void PlotManager::refreshLightTextUI(PlotItemBase * plot)
 {
 	if (!(plot == nullptr))
 	{
+		ui.pushButton_73->setColor(plot->getGridFillColor());
 		if (plot->currName().startsWith("Text"))
-			ui.stackedWidget_LightTextDataSort->setCurrentIndex(0);
-		else
-			ui.stackedWidget_LightTextDataSort->setCurrentIndex(1);
-
-		for (int i = ui.tableWidget_TextDataSort->rowCount(); i >0 ; i--)
 		{
-			ui.tableWidget_TextDataSort->removeRow(ui.tableWidget_TextDataSort->rowCount()-1);
+			ui.stackedWidget_LightTextDataSort->setCurrentIndex(0);
+			ui.groupBox_29->setVisible(false);
+
+		}
+		else
+		{
+			ui.stackedWidget_LightTextDataSort->setCurrentIndex(1);
+			ui.groupBox_29->setVisible(true);
+
+		}
+
+		for (int i = ui.tableWidget_TextDataSort->rowCount(); i > 0; i--)
+		{
+			ui.tableWidget_TextDataSort->removeRow(ui.tableWidget_TextDataSort->rowCount() - 1);
 		}
 
 		for (int i = 0; i < plot->getPlotPairData().size(); i++)
@@ -391,9 +409,7 @@ void PlotManager::refreshLightTextUI(PlotItemBase * plot)
 			ui.tableWidget_TextDataSort->setItem(temRow, 0, temEntity);
 			ui.tableWidget_TextDataSort->setItem(temRow, 1, temAttri);
 		}
-
 	}
-
 }
 
 
@@ -408,7 +424,7 @@ void PlotManager::refreshTextEditUI(PlotItemBase * plot)
 	ui.pushButton_22->setColor(plot->getTitleColor());
 	ui.pushButton_23->setColor(plot->getTitleFillColor());
 	ui.fontComboBox_2->setCurrentFont(plot->getTitleFont());
-	ui.comboBox_Text_fontSize->setCurrentText(QString("%1").arg(plot->getTitleFont().pointSize()));
+	ui.comboBox_Text_fontSize->setCurrentText(QString("%1").arg(plot->getTitleFontSize()));
 }
 
 
@@ -583,15 +599,12 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 				refreshTreeWidgetSettingEnabled(m_curSelectPlot);
 				//general界面
 				refreshGeneralUI(m_curSelectPlot);
+				//Text&Light界面
+				refreshLightTextUI(m_curSelectPlot);
 				//Axis&Grid界面
 				refreshAxisGridUI(m_curSelectPlot);
 				//plotPair界面
 				refreshPlotDataUI(m_curSelectPlot);
-
-				//Text&Light界面
-				refreshLightTextUI(m_curSelectPlot);
-
-
 				//Text Edit
 				refreshTextEditUI(m_curSelectPlot);
 
@@ -617,6 +630,26 @@ void PlotManager::onAddNewClicked()
 	addPlotPair->show();*/
 
 	emit sigAddPlotPair();
+}
+
+void PlotManager::onSelectedPlot(QString tabName, QString plotName)
+{
+	if (tabName == nullptr || plotName == nullptr)
+		return;
+
+	QList<QTreeWidgetItem*> items = ui.treeWidget_selectedPlots->findItems(plotName, Qt::MatchExactly | Qt::MatchRecursive);
+	if (items.size() != 0)
+	{
+		for each (QTreeWidgetItem* item in items)
+		{
+			if (item->parent() != NULL && item->parent()->text(0) == tabName)
+			{
+				ui.treeWidget_selectedPlots->itemClicked(item, 0);
+				item->setSelected(true);
+				break;
+			}
+		}
+	}
 }
 
 void PlotManager::onUpdatePlotManager()
@@ -827,14 +860,34 @@ void PlotManager::onBtnCloseClicked()
 	close();
 }
 
-
 void PlotManager::onPushButton_71Clicked()
 {
-	bool on;
-	uint width = ui.spinBox_10->text().toInt(&on);
-	QColor color = ui.pushButton_71->color();
-	if (on)
-		m_curSelectPlot->setGridColorWidth(color, width);
+	ui.pushButton_gridColor->setColor(ui.pushButton_71->color());
+	ui.lineEdit_23->setText(QString("%1").arg(ui.spinBox_10->value()));
+	m_curSelectPlot->setGridColorWidth(ui.pushButton_71->color(), ui.spinBox_10->value());
+}
+
+void PlotManager::onSpinbox_10Changed()
+{
+	ui.pushButton_gridColor->setColor(ui.pushButton_71->color());
+	ui.lineEdit_23->setText(QString("%1").arg(ui.spinBox_10->value()));
+	m_curSelectPlot->setGridColorWidth(ui.pushButton_71->color(), ui.spinBox_10->value());
+}
+
+void PlotManager::onPushButton_73Clicked()
+{
+	QColor color = ui.pushButton_73->color();
+	if (!(color == ui.pushButton_gridFill->color()))
+	{
+		m_curSelectPlot->setGridFillColor(color);
+	}
+	ui.pushButton_gridFill->setColor(color);
+}
+
+void PlotManager::onPushButton_gridFillClicked()
+{
+	QColor color = ui.pushButton_gridFill->color();
+	m_curSelectPlot->setGridFillColor(color);
 }
 
 void PlotManager::onPlotRectEditFinished()
@@ -1015,162 +1068,83 @@ void PlotManager::onSetGridColorWidth()
 	QColor color = ui.pushButton_gridColor->color();
 	if (on)
 		m_curSelectPlot->setGridColorWidth(color, width);
-
 }
-//
-//void PlotManager::onLineEditPlotNameEditingFinished()
-//{
-//	if (m_curSelectPlot != nullptr)
-//	{
-//		QString oldName = m_curSelectPlot->currName();
-//		QString newName = ui.lineEdit_plotName->text();
-//		if (newName.compare(oldName) != 0)
-//		{
-//			m_curSelectPlot->setName(newName);
-//			emit sigChangePlotName();
-//		}
-//	}
-//}
-//
-//void PlotManager::onCheckBox_drawStateChanged()
-//{
-//	if (m_curSelectPlot != nullptr)
-//	{
-//		connect(this, SIGNAL(sigSetPlotVisible(bool)), m_curSelectPlot, SLOT(slot_setVisible(bool)));
-//		emit sigSetPlotVisible(ui.checkBox_draw->isChecked());
-//		disconnect(this, SIGNAL(sigSetPlotVisible(bool)), m_curSelectPlot, SLOT(slot_setVisible(bool)));
-//	}
-//}
-//
-//void PlotManager::onCheckBox_4StateChanged()
-//{
-//	ui.lineEdit_10->setEnabled(ui.checkBox_4->isChecked());
-//	ui.lineEdit_11->setEnabled(ui.checkBox_4->isChecked());
-//	ui.tableWidget->setEnabled(ui.checkBox_4->isChecked());
-//}
-//
-//void PlotManager::onCheckBox_5StateChanged()
-//{
-//	ui.lineEdit_12->setEnabled(ui.checkBox_5->isChecked());
-//	ui.lineEdit_13->setEnabled(ui.checkBox_5->isChecked());
-//	ui.tableWidget_2->setEnabled(ui.checkBox_5->isChecked());
-//}
-//
-//void PlotManager::onLineEdit_limitXEditingFinished()
-//{
-//	if (m_curSelectPlot == nullptr)
-//		return;
-//
-//	bool bx0, bx1;
-//	double x0 = ui.lineEdit_limitBgnX->text().toDouble(&bx0);
-//	double x1 = ui.lineEdit_limitEndX->text().toDouble(&bx1);
-//	if (bx0 && bx1)
-//		m_curSelectPlot->setCoordRangeX(x0, x1);
-//}
-//
-//void PlotManager::onLineEdit_limitYEditingFinished()
-//{
-//	if (m_curSelectPlot == nullptr)
-//		return;
-//
-//	bool by0, by1;
-//	double y0 = ui.lineEdit_LimitBgnY->text().toDouble(&by0);
-//	double y1 = ui.lineEdit_limitEndY->text().toDouble(&by1);
-//	if(by0 && by1)
-//		m_curSelectPlot->setCoordRangeY(y0, y1);
-//}
-//
-//void PlotManager::onPushButton_flipXValuesClicked()
-//{
-//	if (m_curSelectPlot == nullptr)
-//		return;
-//
-//	bool bx0, bx1;
-//	double x0 = ui.lineEdit_limitBgnX->text().toDouble(&bx0);
-//	double x1 = ui.lineEdit_limitEndX->text().toDouble(&bx1);
-//	if (bx0 && bx1)
-//	{
-//		m_curSelectPlot->setCoordRangeX(x1, x0);
-//		ui.lineEdit_limitBgnX->setText(QString("%1").arg(x1));
-//		ui.lineEdit_limitEndX->setText(QString("%1").arg(x0));
-//	}
-//}
-//
-//void PlotManager::onPushButton_flipYValuesClicked()
-//{
-//	if (m_curSelectPlot == nullptr)
-//		return;
-//
-//	bool by0, by1;
-//	double y0 = ui.lineEdit_LimitBgnY->text().toDouble(&by0);
-//	double y1 = ui.lineEdit_limitEndY->text().toDouble(&by1);
-//	if (by0 && by1)
-//	{
-//		m_curSelectPlot->setCoordRangeX(y1, y0);
-//		ui.lineEdit_LimitBgnY->setText(QString("%1").arg(y1));
-//		ui.lineEdit_limitEndY->setText(QString("%1").arg(y0));
-//	}
-//}
-//
-//void PlotManager::onLineEdit_horzGridsEditingFinished()
-//{
-//	if (m_curSelectPlot == nullptr)
-//	{
-//		return;
-//	}
-//	bool on;
-//	uint count = ui.lineEdit_hrozGrids->text().toUInt(&on);
-//	if (!on || count < 0)
-//	{
-//		return;
-//	}
-//
-//	m_curSelectPlot->setHorzGrids(count);
-//}
-//
-//void PlotManager::onLineEdit_vertGridsEditingFinished()
-//{
-//	if (m_curSelectPlot == nullptr)
-//	{
-//		return;
-//	}
-//	bool on;
-//	uint count = ui.lineEdit_vertGrids->text().toUInt(&on);
-//	if (!on || count < 0)
-//	{
-//		return;
-//	}
-//
-//	m_curSelectPlot->setVertGrids(count);
-//}
-//
-//void PlotManager::onSetAxisColorWidth()
-//{
-//	if (m_curSelectPlot == nullptr)
-//	{
-//		return;
-//	}
-//
-//	bool on;
-//	uint width = ui.lineEdit_21->text().toInt(&on);
-//	QColor color = ui.pushButton_axisColor->color();
-//	if (on)
-//		m_curSelectPlot->setAxisColorWidth(color, width);
-//}
-//
-//void PlotManager::onSetGridColorWidth()
-//{
-//	if (m_curSelectPlot == nullptr)
-//	{
-//		return;
-//	}
-//
-//	bool on;
-//	uint width = ui.lineEdit_23->text().toInt(&on);
-//	QColor color = ui.pushButton_gridColor->color();
-//	if (on)
-//		m_curSelectPlot->setGridColorWidth(color, width);
-//}
+
+void PlotManager::onCheckBox_6StateChanged()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setGridVisible(ui.checkBox_6->isChecked());
+}
+
+void PlotManager::onPushButton_10Clicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTickLabelColor(ui.pushButton_10->color());
+}
+
+void PlotManager::onfontComboBox_3CurrentFontChanged(const QFont & font)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+	int fontSize = ui.comboBox_AxisGrid_FontSize->currentText().toInt();
+	QFont newFont;
+	newFont.setFamily(font.family());
+	newFont.setPointSize(fontSize);
+	m_curSelectPlot->setTickLabelFont(newFont);
+}
+
+void PlotManager::onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString & text)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setTickLabelFontSize(text.toInt());
+}
+
+void PlotManager::onComboBox_2CurrentIndexChanged(int index)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setGridStyle(GridStyle(index));
+}
+
+void PlotManager::onComboBox_3CurrentIndexChanged(int index)
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	GridDensity density;
+	switch (index)
+	{
+	case 0:
+		density = GridDensity::LESS;
+		break;
+	case 1:
+		density = GridDensity::NORMAL;
+		break;
+	case 2:
+		density = GridDensity::MORE;
+		break;
+	}
+	m_curSelectPlot->setGridDensity(density);
+}
 
 void PlotManager::onCheckBox_12StateChanged()
 {
@@ -1252,8 +1226,9 @@ void PlotManager::onComboBox_Text_fontSizeCurrentTextChanged(const QString & tex
 		return;
 	}
 
-	QFont font = ui.fontComboBox_2->currentFont();
-	font.setPointSizeF(text.toFloat());
-	m_curSelectPlot->setTitleFont(font);
+	// 	QFont font = ui.fontComboBox_2->currentFont();
+	// 	font.setPointSizeF(text.toFloat());
+	// 	m_curSelectPlot->setTitleFont(font);
+	m_curSelectPlot->setTitleFontSize(text.toInt());
 }
 

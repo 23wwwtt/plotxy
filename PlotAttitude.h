@@ -105,6 +105,7 @@ public:
 	virtual void setTitleColor(QColor &titleColor);
 	virtual void setTitleFillColor(QColor& color);
 	virtual void setTitleFont(QFont &font);
+	virtual void setTitleFontSize(int size);
 	virtual bool unitsShowX() { return m_showUnits_x; }
 	virtual bool unitsShowY() { return m_showUnits_y; }
 	virtual QString getUnitsX() { return m_units_x; }
@@ -114,6 +115,7 @@ public:
 	virtual QColor getTitleColor() { return m_titleColor; }
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
+	virtual int getTitleFontSize() { return m_titleFontSize; }
 
 	void updateItems();
 
