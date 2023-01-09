@@ -35,7 +35,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
 
     //m_plotItem = nullptr;
     //m_freeWidgetWraper = nullptr;
-    m_AdvancedDataManager = new AdvancedDataManager(this);
+    m_AdvancedDataManager = new AdvancedDataManager();
     m_plotManager = new PlotManager();
     m_addPlotPair = AddPlotPair::m_getInstance();
 
@@ -48,6 +48,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
     connect(this, &PlotXYDemo::sgn_sliderValueChanged, m_timeCtrl, &TimeControls::onRemoteSliderValueChanged);
     connect(m_timeCtrl, &TimeControls::sgn_sliderValueChanged, this, &PlotXYDemo::onRemoteSliderValueChanged);
     connect(this, &PlotXYDemo::sgn_enableActionStop, m_timeCtrl, &TimeControls::onEnableActionStop);
+	connect(this, SIGNAL(sgn_renameTabPage(QString, QString)), PlotManagerData::getInstance(), SLOT(slotChangeTabName(QString, QString)));
 
     m_curBaseInfo.Base_TabName = nullptr;
     m_curBaseInfo.Base_PlotName = nullptr;
@@ -66,6 +67,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
     connect(ui.actionopen, &QAction::triggered, this, &PlotXYDemo::onOpenFile);
 
     connect(m_plotManager, SIGNAL(sigAddPlotPair()), this, SLOT(onAddPlotPair()));
+	connect(m_plotManager, SIGNAL(sigAdvancedDataManager()), this, SLOT(onAdvancedData()));
 	connect(this, &PlotXYDemo::sgn_sendTabWidgetRect, m_plotManager, &PlotManager::onGetTabWidgetRect);
 	connect(m_plotManager, &PlotManager::sigGetTabRect, this, &PlotXYDemo::onSendTabRect);
 	QRect tabRect = ui.tabWidget->rect();
@@ -96,6 +98,7 @@ PlotXYDemo::~PlotXYDemo()
 void PlotXYDemo::onAdvancedData()
 {
     m_AdvancedDataManager->show();
+	m_AdvancedDataManager->activateWindow();
 }
 
 void PlotXYDemo::onPlotManager()
@@ -105,6 +108,7 @@ void PlotXYDemo::onPlotManager()
     }
 	m_plotManager->onSelectedPlot(m_curBaseInfo.Base_TabName, m_curBaseInfo.Base_PlotName);
     m_plotManager->show();
+	m_plotManager->activateWindow();
 }
 
 void PlotXYDemo::onAddPlotPair()
@@ -117,6 +121,7 @@ void PlotXYDemo::onAddPlotPair()
     m_addPlotPair->onChangeStackIndex(m_lastSelectedType);
     m_addPlotPair->setPlotBaseInfo(m_curBaseInfo);
     m_addPlotPair->show();
+	m_addPlotPair->activateWindow();
 }
 
 void PlotXYDemo::onOpenFile()
@@ -131,6 +136,7 @@ void PlotXYDemo::onOpenFile()
 void PlotXYDemo::onActionTimeControl()
 {
     m_timeCtrl->show();
+	m_timeCtrl->activateWindow();
 }
 
 void PlotXYDemo::onCustomContextMenuRequested(const QPoint &point)
@@ -305,9 +311,12 @@ void PlotXYDemo::onRenameTabPage()
 	int ret = renameDlg->exec();
 	if (ret == QDialog::Accepted)
 	{
-		//todo:
 		int currTabIndex = ui.tabWidget->currentIndex();
-		ui.tabWidget->setTabText(currTabIndex, renameDlg->getNewTabName());
+		QString oldName = ui.tabWidget->tabText(currTabIndex);
+		QString newName = renameDlg->getNewTabName();
+		ui.tabWidget->setTabText(currTabIndex, newName);
+
+		emit sgn_renameTabPage(oldName, newName);
 	}
 	renameDlg->deleteLater();
 }
@@ -903,10 +912,11 @@ void PlotXYDemo::initStatusBar()
     m_localTimer->start(1000);
 }
 
-void PlotXYDemo::initWidget(QWidget *w)
+void PlotXYDemo::initWidget(PlotItemBase *w)
 {
     //设置无边框属性
     w->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::Widget);
+//	w->setWindowFlags(Qt::WindowStaysOnTopHint | Qt::Widget);
     //w->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint);
     //w->setAttribute(Qt::WA_ShowModal,true);
     w->setAutoFillBackground(true);
@@ -915,7 +925,7 @@ void PlotXYDemo::initWidget(QWidget *w)
 
     //设置下背景颜色区别看
     QPalette palette = w->palette();
-    palette.setColor(QPalette::Window, QColor(0, 0, 0));
+    palette.setColor(QPalette::Window, w->getOuterFillColor());
     w->setPalette(palette);
 
     QPushButton *btn = new QPushButton(w);

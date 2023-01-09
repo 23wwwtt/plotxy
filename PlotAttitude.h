@@ -30,7 +30,6 @@ public:
 private:
 	QColor m_border_ColorStart;			//边框渐变开始颜色
 	QColor m_border_ColorEnd;			//边框渐变结束颜色
-	QColor m_bgColor;					//背景颜色
 	QColor m_scaleColor_roll;			//刻度尺颜色roll
 	QColor m_scaleColor_pitch;			//刻度尺颜色pitch
 	QColor m_lineColor_roll;			//线条颜色roll
@@ -66,7 +65,6 @@ public:
 public:
 	QColor getBorderOutColorStart() const;
 	QColor getBorderOutColorEnd()   const;
-	QColor getBgColor()             const;
 	QColor getScaleColor_roll()     const;
 	QColor getScaleColor_pitch()    const;
 	QColor getLineColor_roll()      const;
@@ -125,7 +123,7 @@ public slots:
 	void slot_setBorderColorEnd(const QColor &borderOutColorEnd);
 
 	//设置背景色
-	void slot_setBgColor(const QColor &bgColor);
+	void setGridFillColor(QColor bgColor);
 
 	//设置刻度尺颜色
 	void slot_setScaleColor_roll(const QColor &scaleColor);

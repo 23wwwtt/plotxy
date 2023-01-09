@@ -17,11 +17,17 @@ public:
 	QPair<QString, QString> getDataPair() { return m_dataPair; }
 	void setDataPair(QPair<QString, QString> data);
 
+	int lineWidth() { return m_lineWidth; }
+	void setLineWidth(int width);
+
 	bool isDraw() { return m_isDraw; }
 	void setDraw(bool on);
 
 	QColor dataColor() { return m_color; }
 	void setColor(QColor color);
+
+	bool isLineMode() { return m_isLineMode; }
+	void setLineMode(bool on);
 
 	bool hasIcon() { return m_hasIcon; }
 	void setHasIcon(bool on);
@@ -41,8 +47,10 @@ public:
 
 private:
 	QPair<QString, QString> m_dataPair;
+	int m_lineWidth;
 	bool m_isDraw;
 	QColor m_color;
+	bool m_isLineMode;
 	bool m_hasIcon;
 	QString m_iconName;
 	QSize m_iconSize;

@@ -18,7 +18,8 @@ PlotScatter::PlotScatter(QWidget *parent)
 //     for (int i = 0; i < 20; i++) {
 //         m_clrList << QColor::fromRgb(qrand() % 255, qrand() % 255, qrand() % 255);
 //     }
-	m_backgroundBrush = QBrush(QColor(0,0,0));
+	m_outerFillColor = Qt::black;
+	m_gridFillColor = Qt::black;
 	m_title = "Scatter Plot";
 	m_titleColor = Qt::white;
 	m_titleFillColor = Qt::black;
@@ -36,7 +37,7 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_leftPadding = 10;
 	m_rightPadding = 10;
 	m_topPadding = 10;
-	m_bottomPadding = 20;
+	m_bottomPadding = 10;
 
 	m_coordBgn_x = 0;
 	m_coordEnd_x = 2000;
@@ -73,6 +74,7 @@ void PlotScatter::initPlot()
 	m_customPlot = new QCustomPlot(this);
 	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
  	m_customPlot->axisRect()->setupFullAxesBox(true);
+	m_customPlot->axisRect()->setMinimumMargins(QMargins(30, 15, 30, 15));
 
 	m_customPlot->xAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
 	m_customPlot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
@@ -96,7 +98,8 @@ void PlotScatter::initPlot()
 //  	m_customPlot->xAxis->setNumberPrecision(3);
 //  	m_customPlot->yAxis->setNumberPrecision(3);
 
-	m_customPlot->setBackground(m_backgroundBrush);
+	m_customPlot->setBackground(m_outerFillColor);
+	m_customPlot->axisRect()->setBackground(m_gridFillColor);
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
@@ -194,12 +197,6 @@ void PlotScatter::paintEvent(QPaintEvent *event)
 		width - m_leftPadding - m_rightPadding, height - h - m_topPadding - m_bottomPadding);
 
 //    getDataInfo(m_curSeconds);
-}
-
-void PlotScatter::setBackground(QBrush brush)
-{
-	m_backgroundBrush = brush;
-	m_customPlot->setBackground(m_backgroundBrush);
 }
 
 void PlotScatter::setPaddings(double top, double bottom, double left, double right)
@@ -339,6 +336,18 @@ void PlotScatter::rescaleAxis(bool on)
 	m_customPlot->replot(QCustomPlot::rpQueuedRefresh);
 }
 
+void PlotScatter::setOuterFillColor(QColor color)
+{
+	setAutoFillBackground(true);
+	m_outerFillColor = color;
+	QPalette palette = this->palette();
+	palette.setColor(QPalette::Window, m_outerFillColor);
+	this->setPalette(palette);
+
+	m_customPlot->setBackground(color);
+	m_customPlot->replot();
+}
+
 void PlotScatter::setCoordRangeX(double lower, double upper)
 {
 	if (m_coordBgn_x == lower && m_coordEnd_x == upper)
@@ -463,6 +472,13 @@ QColor PlotScatter::getAxisColor()
 QColor PlotScatter::getGridColor()
 {
 	return m_gridColor;
+}
+
+void PlotScatter::setGridFillColor(QColor color)
+{
+	m_gridFillColor = color;
+	m_customPlot->axisRect()->setBackground(color);
+	m_customPlot->replot();
 }
 
 void PlotScatter::setGridVisible(bool enable)

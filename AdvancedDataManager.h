@@ -1,7 +1,7 @@
 #ifndef _ADVANCED_DATA_MANAGER_H_
 #define _ADVANCED_DATA_MANAGER_H_
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QColor>
 #include <QColorDialog>
 #include <QVBoxLayout>
@@ -9,7 +9,7 @@
 #include "PlotItemBase.h"
 
 
-class AdvancedDataManager : public QMainWindow
+class AdvancedDataManager : public QWidget
 {
     Q_OBJECT
 

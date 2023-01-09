@@ -11,12 +11,15 @@ public:
 
 	void initPlot();
 
+	virtual void setOuterFillColor(QColor color);
+	virtual QColor getOuterFillColor() { return m_outerFillColor; }
 	virtual void getCoordRangeX(double& lower, double& upper);
 	virtual void getCoordRangeY(double& lower, double& upper);
 	virtual void setAxisColorWidth(QColor color, uint width);
 	virtual void setGridColorWidth(QColor color, uint width);
 	virtual void setHorzGrids(uint count);
 	virtual void setVertGrids(uint count);
+	virtual void setGridFillColor(QColor color);
 
 	virtual uint getHorzGrids() { return m_horzGrids; }
 	virtual uint getVertGrids() { return m_vertGrids; }
@@ -24,6 +27,7 @@ public:
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
+	virtual QColor getGridFillColor() { return m_gridFillColor; }
 
 	virtual void setGridVisible(bool enable);
 	virtual void setTickLabelColor(QColor& color);

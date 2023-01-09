@@ -8,6 +8,8 @@ PlotDoppler::PlotDoppler(QWidget* parent)
 	this->setName(name);
 	m_instanceCount += 1;
 
+	m_outerFillColor = Qt::black;
+	m_gridFillColor = Qt::black;
 	m_title = "Range Doppler";
 	m_titleColor = Qt::white;
 	m_titleFillColor = Qt::black;
@@ -82,7 +84,7 @@ void PlotDoppler::initPlot()
 	m_customPlot->xAxis->setVisible(false);
 	m_customPlot->yAxis->setVisible(false);
 
-	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
+	m_customPlot->setBackground(m_outerFillColor);
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
@@ -115,8 +117,10 @@ void PlotDoppler::initPlot()
 	m_horizon_AScope->setMinimumMargins(QMargins(15,1,15,15));
 	m_horizon_AScope->setVertGrids(m_vertGrids);
 //	m_horizon_AScope->setHorzGrids(m_horzGrids);
+	m_horizon_AScope->setOuterFillColor(m_outerFillColor);
 	m_horizon_AScope->setAxisColorWidth(m_axisColor, m_axisWidth);
 	m_horizon_AScope->setGridColorWidth(m_gridColor, m_gridWidth);
+	m_horizon_AScope->setGridFillColor(m_gridFillColor);
 	m_horizon_AScope->setGridStyle(GridStyle(m_gridStyle - 1));
 	m_horizon_AScope->setTickLabelColor(m_tickLabelColor);
 	m_horizon_AScope->setTickLabelFont(m_tickLabelFont);
@@ -130,11 +134,13 @@ void PlotDoppler::initPlot()
 	m_vertical_AScope->setxAxisLabel(QString(""));
 	m_vertical_AScope->setyAxisLabel(QString(""));
 	m_vertical_AScope->setAxisTickLabelShow(false, PlotAScope::xAxis);
-	m_vertical_AScope->setMinimumMargins(QMargins(15, 15, 3, 15));
+	m_vertical_AScope->setMinimumMargins(QMargins(15, 15, 1, 15));
 //	m_vertical_AScope->setVertGrids(m_vertGrids);
 	m_vertical_AScope->setHorzGrids(m_horzGrids);
+	m_vertical_AScope->setOuterFillColor(m_outerFillColor);
 	m_vertical_AScope->setAxisColorWidth(m_axisColor, m_axisWidth);
 	m_vertical_AScope->setGridColorWidth(m_gridColor, m_gridWidth);
+	m_vertical_AScope->setGridFillColor(m_gridFillColor);
 	m_vertical_AScope->setGridStyle(GridStyle(m_gridStyle - 1));
 	m_vertical_AScope->setTickLabelColor(m_tickLabelColor);
 	m_vertical_AScope->setTickLabelFont(m_tickLabelFont);
@@ -332,6 +338,19 @@ void PlotDoppler::setAxisTickLabelShow(bool on, AxisType type)
 	m_customPlot->replot();
 }
 
+void PlotDoppler::setOuterFillColor(QColor color)
+{
+	m_outerFillColor = color;
+	QPalette palette = this->palette();
+	palette.setColor(QPalette::Window, m_outerFillColor);
+	this->setPalette(palette);
+
+	m_customPlot->setBackground(color);
+	m_horizon_AScope->setOuterFillColor(color);
+	m_vertical_AScope->setOuterFillColor(color);
+	m_customPlot->replot();
+}
+
 void PlotDoppler::setCoordRangeX(double lower, double upper)
 {
 	if (m_coordBgn_x == lower && m_coordEnd_x == upper)
@@ -442,6 +461,13 @@ void PlotDoppler::setGridColorWidth(QColor color, uint width)
 	m_horizon_AScope->setGridColorWidth(m_gridColor, m_gridWidth);
 	m_vertical_AScope->setGridColorWidth(m_gridColor, m_gridWidth);
 	m_customPlot->replot();
+}
+
+void PlotDoppler::setGridFillColor(QColor color)
+{
+	m_gridFillColor = color;
+	m_horizon_AScope->setGridFillColor(color);
+	m_vertical_AScope->setGridFillColor(color);
 }
 
 void PlotDoppler::setGridVisible(bool enable)

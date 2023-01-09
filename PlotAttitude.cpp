@@ -12,7 +12,7 @@ PlotAttitude::PlotAttitude(QWidget* parent)
 	m_titleFillColor = Qt::black;
 	m_border_ColorStart = Qt::white;
 	m_border_ColorEnd = Qt::white;
-	m_bgColor = Qt::black;
+	m_gridFillColor = Qt::black;
 	m_scaleColor_roll = Qt::white;
 	m_lineColor_roll = Qt::white;
 	m_textColor_roll = Qt::white;
@@ -138,10 +138,10 @@ void PlotAttitude::drawBg(QPainter *painter, int radius)
 	painter->save();
 	painter->setPen(Qt::NoPen);
 	QLinearGradient borderGradient(0, -radius, 0, radius);
-	m_bgColor.setAlpha(255);
-	borderGradient.setColorAt(0, m_bgColor);
-	m_bgColor.setAlpha(255);
-	borderGradient.setColorAt(1, m_bgColor);
+	m_gridFillColor.setAlpha(255);
+	borderGradient.setColorAt(0, m_gridFillColor);
+	m_gridFillColor.setAlpha(255);
+	borderGradient.setColorAt(1, m_gridFillColor);
 	painter->setBrush(borderGradient);
 	painter->drawEllipse(-radius, -radius, radius * 2, radius * 2);
 
@@ -293,11 +293,6 @@ QColor PlotAttitude::getBorderOutColorStart() const
 QColor PlotAttitude::getBorderOutColorEnd() const
 {
 	return m_border_ColorEnd;
-}
-
-QColor PlotAttitude::getBgColor() const
-{
-	return m_bgColor;
 }
 
 QColor PlotAttitude::getScaleColor_roll() const
@@ -487,9 +482,9 @@ void PlotAttitude::slot_setBorderColorEnd(const QColor &borderOutColorEnd)
 	update();
 }
 
-void PlotAttitude::slot_setBgColor(const QColor &bgColor)
+void PlotAttitude::setGridFillColor(QColor bgColor)
 {
-	m_bgColor = bgColor;
+	m_gridFillColor = bgColor;
 	update();
 }
 

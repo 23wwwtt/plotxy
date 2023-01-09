@@ -3,8 +3,10 @@
 DataPair::DataPair(QObject *parent)
 	: QObject(parent)
 {
+	m_lineWidth = 1;
 	m_isDraw = true;
 	m_color = Qt::white;
+	m_isLineMode = false;
 	m_hasIcon = false;
 	m_iconName = nullptr;
 	m_iconSize = QSize(64, 64);
@@ -18,8 +20,10 @@ DataPair::DataPair(QObject *parent)
 DataPair::DataPair(QPair<QString, QString> pair)
 {
 	m_dataPair = pair;
+	m_lineWidth = 1;
 	m_isDraw = true;
 	m_color = Qt::white;
+	m_isLineMode = false;
 	m_hasIcon = false;
 	m_iconName = nullptr;
 	m_iconSize = QSize(64, 64);
@@ -35,6 +39,12 @@ void DataPair::setDataPair(QPair<QString, QString> data)
 	emit dataUpdate();
 }
 
+void DataPair::setLineWidth(int width)
+{
+	m_lineWidth = width;
+	emit dataUpdate();
+}
+
 void DataPair::setDraw(bool on)
 {
 	m_isDraw = on;
@@ -44,6 +54,12 @@ void DataPair::setDraw(bool on)
 void DataPair::setColor(QColor color)
 {
 	m_color = color;
+	emit dataUpdate();
+}
+
+void DataPair::setLineMode(bool on)
+{
+	m_isLineMode = on;
 	emit dataUpdate();
 }
 
