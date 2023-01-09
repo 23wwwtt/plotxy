@@ -6,7 +6,7 @@
 #include <QColor>
 
 AdvancedDataManager::AdvancedDataManager(QWidget *parent) :
-    QMainWindow(parent)
+    QWidget(parent)
 {
     ui.setupUi(this);
     this->setWindowTitle(QString::fromLocal8Bit("AdvancedDataManager"));

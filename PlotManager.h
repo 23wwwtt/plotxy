@@ -100,10 +100,12 @@ public slots:
 	void onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString& text);
 	void onComboBox_2CurrentIndexChanged(int index);
 	void onComboBox_3CurrentIndexChanged(int index);
-
+	void onPushButton_gridFillClicked();
 
 	//Light/Text
 	void onPushButton_71Clicked();
+	void onPushButton_73Clicked();
+	void onSpinbox_10Changed();
 
 	//Text Edit
 	void onCheckBox_12StateChanged();
@@ -122,7 +124,8 @@ signals:
 	void sigGetTabRect();
 	void sigSetPlotVisible(bool);
 	void sigChangePlotName();
-	void sigOnTextGridColorChanged();
+
+
 
 
 private:

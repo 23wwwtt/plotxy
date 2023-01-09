@@ -25,13 +25,18 @@ PlotText::PlotText(QWidget* parent)
 	m_horiGridNum = m_verGridNum = 1;
 	m_currTimeIndex = 0;
 
+
+	m_gridWidth = 1;
+	m_gridColor = Qt::white;
 	m_started = false;
+	m_axisColor = Qt::white;
+	m_axisWidth = 1;
+
 
 	QString name = QString("Text%1").arg(m_instanceCount);
 	this->setName(name);
 	m_instanceCount += 1;
 
-	m_defaultColor = Qt::gray;
 	//connect(m_timer, &QTimer::timeout, this, &PlotText::onTimeout);
 }
 
@@ -42,10 +47,9 @@ PlotText::~PlotText()
 
 void PlotText::paintEvent(QPaintEvent* event)
 {
-	//以下绘制标题“Text Plot”
 	QPainter painter(this);
 	QPen pen;
-	QFont font;
+	QFont font,titleFont;
 	QRect rect;
 	QList<QPair<QString, QString>> dataList;
 	QSet<QString> xset, yset;
@@ -55,8 +59,9 @@ void PlotText::paintEvent(QPaintEvent* event)
 	pen.setColor(Qt::white);
 	painter.setPen(pen);
 	font.setPointSize(20);
+	titleFont.setPointSize(getTitleFontSize());
 	painter.setFont(font);
-	QFontMetricsF fm(font);
+	QFontMetricsF fm(titleFont);
 	double as = fm.ascent();
 	rect.setRect(0, 0, width(), as);
 	int horiGridWidth = 0;
@@ -73,11 +78,10 @@ void PlotText::paintEvent(QPaintEvent* event)
 	setTitle(painter, rect);
 	//以下绘制n×m的格子
 
-	pen.setColor(m_gridColor);
-	pen.setWidth(m_gridWidth);
-	painter.setPen(pen);
+
 	drawNMCell(painter, xset, yset, dataList, horiGridWidth, verGridWidth,as);
 	//以下为绘制X/Y轴item名字
+
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
 	painter.setPen(pen);
@@ -133,7 +137,18 @@ void PlotText::paintEvent(QPaintEvent* event)
 
 void PlotText::setTitle(QPainter& painter, QRect& rect)
 {
-	painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, "Text Plot");
+	QFont titleFont;
+	QPen pen;
+	titleFont = getTitleFont();
+	titleFont.setPointSize(getTitleFontSize());
+	pen.setColor(getTitleColor());
+	painter.setFont(titleFont);
+	QString titleName = getTitle();
+	painter.setPen(pen);
+	if (titleName.isEmpty())
+		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, "Text Plot");
+	else
+		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, titleName);
 }
 
 void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridWidth, int& verGridWidth)
@@ -238,6 +253,13 @@ void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWi
 	int i = 0, j = 0;
 	dataList = getPlotPairData();
 	int icount = 0;
+	QFont font;
+	QPen fontPen;
+	fontPen.setColor(getTickLabelColor());
+	font = getTickLabelFont();
+	font.setPointSize(getTickLabelFontSize());
+	painter.setFont(font);
+	painter.setPen(fontPen);
 	for (int i = 0; i < dataList.size(); i++)
 	{
 		QString xIncludePlus = dataList.at(i).first;
@@ -313,27 +335,44 @@ void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>&
 	}
 	if (!dataList.empty())
 	{
-		for (int i = 0; i < m_horiGridNum; i++)
-		{
-			QRect gridRect;
-			//gridRect.setRect(  0.05*width()+i* horiGridWidth, 0.1*height(), horiGridWidth, 0.85*height());
-			//painter.drawRect(gridRect);
-			painter.drawLine(0.05*width() + i* horiGridWidth, 0.02*height() + as, 0.05*width() + i* horiGridWidth, 0.02*height() + as+verGridWidth*m_verGridNum);
-		}
+		//先画GridFill
 		for (int i = 0; i < m_verGridNum; i++)
 		{
-			QRect gridRect;
-			gridRect.setRect(0.05*width(), i * verGridWidth + 0.02*height()+as, 0.9*width(), verGridWidth);
-			painter.drawRect(gridRect);
+			QRect gridFillRect;
+			gridFillRect.setRect(0.05*width(), i * verGridWidth + 0.02*height() + as, 0.9*width(), verGridWidth);
+			painter.fillRect(gridFillRect, getGridFillColor());
+			//painter.drawRect(gridFillRect);
+		}
+		//改变Axis画笔
+		QPen pen;
+		pen.setColor(getAxisColor());
+		pen.setWidth(getAxisWidth());
+		painter.setPen(pen);
+		//再画Axis
+		QRect gridRect;
+		gridRect.setRect(0.05*width(),as+0.02*height(),0.9*width(),m_verGridNum*verGridWidth);
+		painter.drawRect(gridRect);
+		//改变Grid画笔
+
+		pen.setColor(getGridColor());
+		pen.setWidth(getGridWidth());
+		painter.setPen(pen);
+		//再画HorizonGrid
+		for (int i = 1; i < m_verGridNum; i++)
+		{
+			painter.drawLine(0.05*width() +0.5* getGridWidth() + 0.5 *getAxisWidth(),as + 0.02*height() + i*verGridWidth,
+				0.05*width()+m_horiGridNum*horiGridWidth- 0.5*getGridWidth() - 0.5 *getAxisWidth(), as + 0.02*height() + i*verGridWidth);
+		}
+		//自后画VerticalGrid
+		for (int i = 1; i < m_horiGridNum; i++)
+		{
+			painter.drawLine(0.05*width() + i* horiGridWidth, 0.02*height() + as + 0.5*getGridWidth() + 0.5 *getAxisWidth(),
+				0.05*width() + i* horiGridWidth, 0.02*height() + as+verGridWidth*m_verGridNum - 0.5* getGridWidth() - 0.5 *getAxisWidth());
 		}
 	}
 	update();
-}
 
-void PlotText::setGridColorWidth(QColor color, uint width)
-{
-	m_gridColor = color;
-	m_gridWidth = width;
+	
 }
 
 void PlotText::dataPairOrder()
@@ -349,3 +388,10 @@ void PlotText::dataPairOrder()
 		}
 	}
 }
+
+void PlotText::setGridColorWidth(QColor color, uint width)
+{
+	m_gridColor = color;
+	m_gridWidth = width;
+}
+

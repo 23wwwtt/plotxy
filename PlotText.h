@@ -37,8 +37,17 @@ protected:
 
 private:
 	//void updateItems(QPainter*);
-	virtual void setGridColorWidth(QColor, uint);
+	//virtual void setGridColorWidth(QColor, uint);
+	//QColor m_gridColor;
+	//uint m_gridWidth;
+	//virtual void setAxisColorWidth(QColor, uint);
+	//QColor m_axisColor;
+	//uint m_axisWidth;
 	virtual void dataPairOrder();
+	//virtual QFont getTickLabelFont();
+	virtual void setGridColorWidth(QColor color, uint width);
+	virtual uint getGridWidth() { return m_gridWidth; }
+	virtual QColor getGridColor() { return m_gridColor; }
 
 	bool m_bHorizontal;
 	bool m_started;
@@ -47,8 +56,8 @@ private:
 	QStringList m_xColumnList;
 	QStringList m_yColumnList;
 
-	QColor m_gridFillColor;
-	QColor m_axisColor;
+
+	
 	
 	QStringList m_entityTypeList;
 	QStringList m_entityAttrList;

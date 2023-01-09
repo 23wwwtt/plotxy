@@ -36,7 +36,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
 
     //m_plotItem = nullptr;
     //m_freeWidgetWraper = nullptr;
-    m_AdvancedDataManager = new AdvancedDataManager(this);
+    m_AdvancedDataManager = new AdvancedDataManager;
     m_plotManager = new PlotManager();
     m_addPlotPair = AddPlotPair::m_getInstance();
 
@@ -97,6 +97,7 @@ PlotXYDemo::~PlotXYDemo()
 void PlotXYDemo::onAdvancedData()
 {
     m_AdvancedDataManager->show();
+	m_AdvancedDataManager->activateWindow();
 }
 
 void PlotXYDemo::onPlotManager()
@@ -106,6 +107,7 @@ void PlotXYDemo::onPlotManager()
     }
 	m_plotManager->onSelectedPlot(m_curBaseInfo.Base_TabName, m_curBaseInfo.Base_PlotName);
     m_plotManager->show();
+	m_plotManager->activateWindow();
 }
 
 void PlotXYDemo::onAddPlotPair()
@@ -118,6 +120,7 @@ void PlotXYDemo::onAddPlotPair()
     m_addPlotPair->onChangeStackIndex(m_lastSelectedType);
     m_addPlotPair->setPlotBaseInfo(m_curBaseInfo);
     m_addPlotPair->show();
+	m_addPlotPair->activateWindow();
 }
 
 void PlotXYDemo::onOpenFile()
@@ -132,6 +135,7 @@ void PlotXYDemo::onOpenFile()
 void PlotXYDemo::onActionTimeControl()
 {
     m_timeCtrl->show();
+	m_timeCtrl->activateWindow();
 }
 
 void PlotXYDemo::onCustomContextMenuRequested(const QPoint &point)

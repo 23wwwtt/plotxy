@@ -7,7 +7,7 @@
 #ifndef  _PLOT_ITEM_BASE_H_
 #define  _PLOT_ITEM_BASE_H_
 
-#include <QtWidgets/QMainWindow>
+#include <QWidget>
 #include "ui_PlotItemBase.h"
 #include "DataPair.h"
 #include "constdef.h"
@@ -41,25 +41,21 @@ public:
     QString currName();
     QString currTabName();
 
+	virtual void setOuterFillColor(QColor color);
+	virtual void setOutlineColor(QColor color);
+	virtual QColor getOuterFillColor() { return m_outerFillColor; }
+	virtual QColor getOutlineColor() { return m_outlineColor; }
+
 	virtual void setCoordRangeX(double lower, double upper);
 	virtual void setCoordRangeY(double lower, double upper);
 	virtual void getCoordRangeX(double& lower, double& upper);
 	virtual void getCoordRangeY(double& lower, double& upper);
-
-	//virtual void setHorzGrids(uint);
-	//virtual void setVertGrids(uint);
-	//virtual uint getHorzGrids() { return m_horzGrids; }
-	//virtual uint getVertGrids() { return m_vertGrids; }
-	//virtual void setAxisColorWidth(QColor, uint);
-	//virtual void setGridColorWidth(QColor, uint);
-
 	virtual void setHorzGrids(uint count);
 	virtual void setVertGrids(uint count);
 	virtual uint getHorzGrids() { return m_horzGrids; }
 	virtual uint getVertGrids() { return m_vertGrids; }
 	virtual void setAxisColorWidth(QColor color, uint width);
 	virtual void setGridColorWidth(QColor color, uint width);
-
 	virtual uint getAxisWidth() { return m_axisWidth; }
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
@@ -76,7 +72,8 @@ public:
 	virtual int getTickLabelFontSize() { return m_tickLabelFontSize; }
 	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
 	virtual GridDensity getGridDensity() { return m_gridDensity; }
-
+	virtual void setGridFillColor(QColor color);
+	virtual QColor getGridFillColor() { return m_gridFillColor; }
 
 	virtual void setUnitsShowX(bool on);
 	virtual void setUnitsShowY(bool on);
@@ -99,11 +96,9 @@ public:
 	virtual QFont getTitleFont() { return m_titleFont; }
 	virtual int getTitleFontSize() { return m_titleFontSize; }
 
-
 	virtual void addPlotPairData(QPair<QString, QString>);
 	virtual void delPlotPairData(QPair<QString, QString>);
 	virtual void updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair);
-	//virtual void dataPairrOrder();
 	QList<QPair<QString, QString>> getPlotPairData();
 	QVector<DataPair*> getDataPair() { return m_dataPair; }
 
@@ -111,16 +106,9 @@ protected:
     //virtual void paintEvent(QPaintEvent* event);
 	QList<QPair<QString, QString>> m_plotPairData;
 	QVector<DataPair*> m_dataPair;
-	//double  m_coordBgn_x;	//x坐标起始值
-	//double  m_coordEnd_x;	//x坐标结束值
-	//double  m_coordBgn_y;	//y坐标起始值
-	//double  m_coordEnd_y;	//y坐标结束值
-	//uint	m_horzGrids;
-	//uint	m_vertGrids;
-	//uint	m_axisWidth;
-	//uint	m_gridWidth;
-	//QColor	m_axisColor;
-	//QColor	m_gridColor;
+	//General
+	QColor m_outerFillColor;
+	QColor m_outlineColor;
 
 	//Axis and Grid
 	double  m_coordBgn_x;	//x坐标起始值
@@ -139,6 +127,7 @@ protected:
 	int		m_tickLabelFontSize;
 	Qt::PenStyle m_gridStyle;
 	GridDensity m_gridDensity;
+	QColor	m_gridFillColor;
 
 	//Text
 	QString m_units_x;
