@@ -861,6 +861,32 @@ void PlotManager::onPushButton_outlineColorClicked()
 	m_curSelectPlot->setOutlineColor(ui.pushButton_outlineColor->color());
 }
 
+void PlotManager::onMouseEventDone()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	emit sigGetTabRect();
+
+	if (ui.radioButton_pixel->isChecked())
+	{
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg(m_curSelectPlot->currPosition().x()));
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg(m_curSelectPlot->currPosition().y()));
+		ui.lineEdit_plotWidth->setText(QString("%1").arg(m_curSelectPlot->currWidth()));
+		ui.lineEdit_plotHeight->setText(QString("%1").arg(m_curSelectPlot->currHeight()));
+
+	}
+	else if (ui.radioButton_percent->isChecked())
+	{
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg((float)m_curSelectPlot->currPosition().x() / m_tabWidgetRect.width()));
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg((float)m_curSelectPlot->currPosition().y() / m_tabWidgetRect.height()));
+		ui.lineEdit_plotWidth->setText(QString("%1").arg((float)m_curSelectPlot->currWidth() / m_tabWidgetRect.width()));
+		ui.lineEdit_plotHeight->setText(QString("%1").arg((float)m_curSelectPlot->currHeight() / m_tabWidgetRect.height()));
+	}
+}
+
 void PlotManager::onCheckBox_4StateChanged()
 {
 	ui.lineEdit_10->setEnabled(ui.checkBox_4->isChecked());

@@ -75,6 +75,7 @@ public slots:
 	void onCheckBox_drawStateChanged();
 	void onPushButton_outerFillColorClicked();
 	void onPushButton_outlineColorClicked();
+	void onMouseEventDone();
 
 	//Axis and Grid
 	void onCheckBox_4StateChanged();
