@@ -24,7 +24,7 @@ public:
     void init();            //初始化函数，连接信号槽
     void initTime();
     void initStatusBar();
-    void initWidget(QWidget *w);
+    void initWidget(PlotItemBase *w);
     PlotType getCurrentFocusPlot();
 
 public slots:
@@ -80,6 +80,7 @@ signals:
     void sgn_sendCurrentSeconds(double);
     void sgn_enableActionStop(bool);
 	void sgn_sendTabWidgetRect(QRect);
+	void sgn_renameTabPage(QString, QString);
 private:
     Ui::PlotXYDemo ui;
     QWidget *m_nowFocusWidget;

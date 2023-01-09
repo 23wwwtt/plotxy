@@ -59,7 +59,7 @@ private:
 
 signals:
 	void sgn_addPlotPair(QString, QString, QString, QString);
-	void sgn_updatePlotPair();
+	void sgn_updatePlotPair(QString, QString);	//tabName, plotName
 	void sgn_getLightData(QList<QList<QString>>);
 	void sgn_onTextLightBtnClicked();
 

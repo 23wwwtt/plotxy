@@ -8,6 +8,8 @@ PlotAScope::PlotAScope(QWidget* parent)
 	this->setName(name);
 	m_instanceCount += 1;
 
+	m_outerFillColor = Qt::black;
+	m_gridFillColor = Qt::black;
 	m_title = "A-Scope";
 	m_titleColor = Qt::white;
 	m_titleFillColor = Qt::black;
@@ -86,7 +88,8 @@ void PlotAScope::initPlot()
 	m_customPlot->xAxis->setRange(m_coordBgn_x, m_coordEnd_x);
 	m_customPlot->yAxis->setRange(m_coordBgn_y, m_coordEnd_y);
 
-	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
+	m_customPlot->setBackground(m_outerFillColor);
+	m_customPlot->axisRect()->setBackground(m_gridFillColor);
 	m_customPlot->xAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->yAxis->setLabelColor(m_axisLabelColor);
 	m_customPlot->xAxis->setLabelFont(m_axisLabelFont);
@@ -394,6 +397,13 @@ void PlotAScope::setGridColorWidth(QColor color, uint width)
 	m_customPlot->replot();
 }
 
+void PlotAScope::setGridFillColor(QColor color)
+{
+	m_gridFillColor = color;
+	m_customPlot->axisRect()->setBackground(color);
+	m_customPlot->replot();
+}
+
 void PlotAScope::setGridVisible(bool enable)
 {
 	m_gridVisible = enable;
@@ -457,5 +467,16 @@ void PlotAScope::setGridDensity(GridDensity density)
 void PlotAScope::setMinimumMargins(const QMargins & margins)
 {
 	m_customPlot->axisRect()->setMinimumMargins(margins);
+}
+
+void PlotAScope::setOuterFillColor(QColor color)
+{
+	m_outerFillColor = color;
+	QPalette palette = this->palette();
+	palette.setColor(QPalette::Window, m_outerFillColor);
+	this->setPalette(palette);
+
+	m_customPlot->setBackground(color);
+	m_customPlot->replot();
 }
 

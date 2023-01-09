@@ -101,6 +101,7 @@ public:
 	virtual void updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair);
 	QList<QPair<QString, QString>> getPlotPairData();
 	QVector<DataPair*> getDataPair() { return m_dataPair; }
+	void setDataPair(QVector<DataPair*> newVector);
 
 protected:
     //virtual void paintEvent(QPaintEvent* event);

@@ -97,6 +97,7 @@
        </property>
        <property name="currentIndex">
         <number>12</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QVBoxLayout" name="verticalLayout_64" stretch="0,1,0,0,0,1">
@@ -393,8 +394,8 @@ color: rgb(255, 255, 255);</string>
                  <widget class="ColorButton" name="pushButton_outerFillColor">
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>25</width>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="text">
@@ -413,8 +414,8 @@ color: rgb(255, 255, 255);</string>
                  <widget class="ColorButton" name="pushButton_outlineColor">
                   <property name="maximumSize">
                    <size>
-                    <width>30</width>
-                    <height>30</height>
+                    <width>25</width>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1436,23 +1437,33 @@ color: rgb(255, 255, 255);</string>
             <number>10</number>
            </property>
            <item>
-            <widget class="QTreeWidget" name="treeWidget_4">
-             <attribute name="headerDefaultSectionSize">
+            <widget class="QTableWidget" name="tableWidget_plotData">
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <attribute name="horizontalHeaderDefaultSectionSize">
               <number>300</number>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
              </attribute>
              <column>
               <property name="text">
                <string>X Column</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
               </property>
              </column>
              <column>
               <property name="text">
                <string>Y Column</string>
               </property>
-             </column>
-             <column>
-              <property name="text">
-               <string/>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
               </property>
              </column>
             </widget>

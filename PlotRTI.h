@@ -32,6 +32,8 @@ public:
 	void setAxisVisible(bool on, AxisType type);
 	void setAxisTickLabelShow(bool on, AxisType type);
 
+	virtual void setOuterFillColor(QColor color);
+	virtual QColor getOuterFillColor() { return m_outerFillColor; }
 	void setCoordRangeX(double lower, double upper);
 	void setCoordRangeY(double lower, double upper);
 	void getCoordRangeX(double& lower, double& upper);
@@ -47,6 +49,8 @@ public:
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
+	virtual void setGridFillColor(QColor color);
+	virtual QColor getGridFillColor() { return m_gridFillColor; }
 	virtual void setGridVisible(bool enable);
 	virtual void setTickLabelColor(QColor& color);
 	virtual void setTickLabelFont(QFont& font);

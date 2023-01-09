@@ -23,13 +23,11 @@ public:
 
     static int m_instanceCount;         //Plot实体个数
 
-	QBrush getBackground() const { return m_backgroundBrush; }
 	QString getxAxisLabel() const { return m_xAxisLabel; }
 	QString getyAxisLabel() const { return m_yAxisLabel; }
 	QColor getAxisLabelColor() const { return m_axisLabelColor; }
 	QFont getAxisLabelFont() const { return m_axisLabelFont; }
 
-	void setBackground(QBrush brush);
 	void setPaddings(double top, double bottom, double left, double right);
 	
 	void setxAxisLabel(QString& str);
@@ -44,6 +42,8 @@ public:
 	void rescale_yAxis(bool);
 	void rescaleAxis(bool);
 
+	virtual void setOuterFillColor(QColor color);
+	virtual QColor getOuterFillColor() { return m_outerFillColor; }
 	virtual void setCoordRangeX(double lower, double upper);
 	virtual void setCoordRangeY(double lower, double upper);
 	virtual void getCoordRangeX(double& lower, double& upper);
@@ -58,6 +58,8 @@ public:
 	virtual uint getGridWidth();
 	virtual QColor getAxisColor();
 	virtual QColor getGridColor();
+	virtual void setGridFillColor(QColor color);
+	virtual QColor getGridFillColor(){ return m_gridFillColor; }
 	virtual void setGridVisible(bool enable);
 	virtual void setTickLabelColor(QColor& color);
 	virtual void setTickLabelFont(QFont& font);
@@ -107,7 +109,6 @@ private:
 
 private:
     double m_curSeconds;
-	QBrush m_backgroundBrush;			//背景刷
 	double m_topPadding;				//绘图间隔-top
 	double m_bottomPadding;				//绘图间隔-bottom
 	double m_leftPadding;				//绘图间隔-left

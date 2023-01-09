@@ -494,7 +494,8 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 		}
 		break;
 	}
-
+	default:
+		break;
 	}
 }
 
@@ -519,7 +520,7 @@ void AddPlotPair::onBtnAddClicked()
 				break;
 			}
 		}
-		emit sgn_updatePlotPair();
+		emit sgn_updatePlotPair(m_curPlotInfo.Base_TabName, m_curPlotInfo.Base_PlotName);
 	}
 
 	QTableWidgetItem* addplot1 = new QTableWidgetItem(strSum1);
@@ -872,7 +873,7 @@ void AddPlotPair::onBtnUpdateClicked()
 					break;
 				}
 			}
-			emit sgn_updatePlotPair();
+			emit sgn_updatePlotPair(m_curPlotInfo.Base_TabName, m_curPlotInfo.Base_PlotName);
 		}
 
 	}
@@ -899,7 +900,7 @@ void AddPlotPair::onBtnRemoveClicked()
 					break;
 				}
 			}
-			emit sgn_updatePlotPair();
+			emit sgn_updatePlotPair(m_curPlotInfo.Base_TabName, m_curPlotInfo.Base_PlotName);
 		}
 
 		ui.tableWidget_union->removeRow(row);

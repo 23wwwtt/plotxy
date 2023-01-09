@@ -165,6 +165,8 @@ void PlotManager::initGeneralUI()
 	connect(ui.lineEdit_plotHeight, &QLineEdit::editingFinished, this, &PlotManager::onPlotRectEditFinished);
 	connect(ui.checkBox_draw, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_drawStateChanged);
 	connect(ui.lineEdit_plotName, &QLineEdit::editingFinished, this, &PlotManager::onLineEditPlotNameEditingFinished);
+	connect(ui.pushButton_outerFillColor, &QPushButton::clicked, this, &PlotManager::onPushButton_outerFillColorClicked);
+	connect(ui.pushButton_outlineColor, &QPushButton::clicked, this, &PlotManager::onPushButton_outlineColorClicked);
 }
 
 void PlotManager::initAxisGridUI()
@@ -231,6 +233,23 @@ void PlotManager::initTextLightUI()
 void PlotManager::initPlotDataUI()
 {
 	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
+	connect(ui.tableWidget_plotData, &QTableWidget::itemSelectionChanged, this, &PlotManager::onTableWidget_plotDataItemSelectionChanged);
+	connect(ui.lineEdit_24, &QLineEdit::editingFinished, this, &PlotManager::onLineEdit_24EditingFinished);
+	connect(ui.pushButton_15, &QPushButton::clicked, this, &PlotManager::onPushButton_15Clicked);
+	connect(ui.pushButton_16, &QPushButton::clicked, this, &PlotManager::onPushButton_16Clicked);
+	connect(ui.pushButton_18, &QPushButton::clicked, this, &PlotManager::onPushButton_18Clicked);
+	connect(ui.pushButton_19, &QPushButton::clicked, this, &PlotManager::onPushButton_19Clicked);
+	connect(ui.pushButton_20, &QPushButton::clicked, this, &PlotManager::onPushButton_20Clicked);
+	connect(ui.pushButton_21, &QPushButton::clicked, this, &PlotManager::onPushButton_21Clicked);
+	connect(ui.checkBox_10, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_10StateChanged);
+	connect(ui.checkBox_11, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_11StateChanged);
+	connect(ui.toolButton, &QToolButton::clicked, this, &PlotManager::onToolButtonClicked);
+	connect(ui.comboBox_6, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBox_6CurrentIndexChanged(int)));
+
+	ui.pushButton_15->setEnabled(false);
+	ui.pushButton_16->setEnabled(false);
+	ui.pushButton_18->setEnabled(false);
+	ui.pushButton_19->setEnabled(false);
 }
 
 void PlotManager::initTextEditUI()
@@ -307,6 +326,8 @@ void PlotManager::refreshGeneralUI(PlotItemBase * plot)
 
 	ui.lineEdit_plotName->setText(plot->currName());
 	ui.comboBox_tabName->setCurrentText(plot->currTabName());
+	ui.pushButton_outerFillColor->setColor(plot->getOuterFillColor());
+	ui.pushButton_outlineColor->setColor(plot->getOutlineColor());
 	if (ui.radioButton_pixel->isChecked())
 	{
 		ui.lineEdit_plotPositionX->setText(QString("%1").arg(plot->currPosition().x()));
@@ -361,16 +382,18 @@ void PlotManager::refreshAxisGridUI(PlotItemBase * plot)
 
 void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
 {
-	ui.treeWidget_4->clear();
-	QList<QPair<QString, QString>> plotPairData = plot->getPlotPairData();
-	for (int k = 0; k < plotPairData.size(); ++k)
+	ui.tableWidget_plotData->setRowCount(0);
+	QVector<DataPair*> dataPair = plot->getDataPair();
+//	QList<QPair<QString, QString>> plotPairData = plot->getPlotPairData();
+	for (int k = 0; k < dataPair.size(); ++k)
 	{
 		//界面更新
-		QTreeWidgetItem* addplotItem = new QTreeWidgetItem;
-		addplotItem->setText(0, plotPairData[k].first);
-		addplotItem->setText(1, plotPairData[k].second);
-
-		ui.treeWidget_4->addTopLevelItem(addplotItem);
+		QTableWidgetItem* addplot1 = new QTableWidgetItem(dataPair[k]->getDataPair().first);
+		QTableWidgetItem* addplot2 = new QTableWidgetItem(dataPair[k]->getDataPair().second);
+		int row = ui.tableWidget_plotData->rowCount();
+		ui.tableWidget_plotData->insertRow(row);
+		ui.tableWidget_plotData->setItem(row, 0, addplot1);
+		ui.tableWidget_plotData->setItem(row, 1, addplot2);
 	}
 }
 
@@ -660,6 +683,7 @@ void PlotManager::onUpdatePlotManager()
 		return;
 	}
 
+	ui.comboBox_tabName->clear();
 	ui.treeWidget_selectedPlots->clear();
 
 	for (int i = 0; i < m_plotManager.size(); ++i)
@@ -950,6 +974,52 @@ void PlotManager::onCheckBox_drawStateChanged()
 	}
 }
 
+void PlotManager::onPushButton_outerFillColorClicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setOuterFillColor(ui.pushButton_outerFillColor->color());
+}
+
+void PlotManager::onPushButton_outlineColorClicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setOutlineColor(ui.pushButton_outlineColor->color());
+}
+
+void PlotManager::onMouseEventDone()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	emit sigGetTabRect();
+
+	if (ui.radioButton_pixel->isChecked())
+	{
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg(m_curSelectPlot->currPosition().x()));
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg(m_curSelectPlot->currPosition().y()));
+		ui.lineEdit_plotWidth->setText(QString("%1").arg(m_curSelectPlot->currWidth()));
+		ui.lineEdit_plotHeight->setText(QString("%1").arg(m_curSelectPlot->currHeight()));
+
+	}
+	else if (ui.radioButton_percent->isChecked())
+	{
+		ui.lineEdit_plotPositionX->setText(QString("%1").arg((float)m_curSelectPlot->currPosition().x() / m_tabWidgetRect.width()));
+		ui.lineEdit_plotPositionY->setText(QString("%1").arg((float)m_curSelectPlot->currPosition().y() / m_tabWidgetRect.height()));
+		ui.lineEdit_plotWidth->setText(QString("%1").arg((float)m_curSelectPlot->currWidth() / m_tabWidgetRect.width()));
+		ui.lineEdit_plotHeight->setText(QString("%1").arg((float)m_curSelectPlot->currHeight() / m_tabWidgetRect.height()));
+	}
+}
+
 void PlotManager::onCheckBox_4StateChanged()
 {
 	ui.lineEdit_10->setEnabled(ui.checkBox_4->isChecked());
@@ -1070,6 +1140,16 @@ void PlotManager::onSetGridColorWidth()
 		m_curSelectPlot->setGridColorWidth(color, width);
 }
 
+void PlotManager::onPushButton_gridFillClicked()
+{
+	if (m_curSelectPlot == nullptr)
+	{
+		return;
+	}
+
+	m_curSelectPlot->setGridFillColor(ui.pushButton_gridFill->color());
+}
+
 void PlotManager::onCheckBox_6StateChanged()
 {
 	if (m_curSelectPlot == nullptr)
@@ -1144,6 +1224,143 @@ void PlotManager::onComboBox_3CurrentIndexChanged(int index)
 		break;
 	}
 	m_curSelectPlot->setGridDensity(density);
+}
+
+void PlotManager::onTableWidget_plotDataItemSelectionChanged()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0)
+		return;
+
+	ui.pushButton_18->setEnabled(true);
+	ui.pushButton_19->setEnabled(true);
+
+	//判断选中行数，使能move按钮
+	int rowCount = ui.tableWidget_plotData->rowCount();
+	if (rowCount <= 1)
+	{
+		ui.pushButton_15->setEnabled(false);
+		ui.pushButton_16->setEnabled(false);
+	}
+	else if (row == 0)
+	{
+		ui.pushButton_15->setEnabled(false);
+		ui.pushButton_16->setEnabled(true);
+	}
+	else if ((row + 1) == rowCount)
+	{
+		ui.pushButton_15->setEnabled(true);
+		ui.pushButton_16->setEnabled(false);
+	}
+	else
+	{
+		ui.pushButton_15->setEnabled(true);
+		ui.pushButton_16->setEnabled(true);
+	}
+
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	ui.lineEdit_24->setText(QString("%1").arg(m_curSelectPlot->getDataPair().at(row)->lineWidth()));
+	ui.pushButton_21->setColor(m_curSelectPlot->getDataPair().at(row)->dataColor());
+	ui.checkBox_11->setChecked(m_curSelectPlot->getDataPair().at(row)->isDraw());
+	ui.checkBox_10->setChecked(m_curSelectPlot->getDataPair().at(row)->isLineMode());
+}
+
+void PlotManager::onLineEdit_24EditingFinished()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	int width = ui.lineEdit_24->text().toInt();
+	m_curSelectPlot->getDataPair().at(row)->setLineWidth(width);
+}
+
+void PlotManager::onPushButton_21Clicked()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	m_curSelectPlot->getDataPair().at(row)->setColor(ui.pushButton_21->color());
+}
+
+void PlotManager::onCheckBox_10StateChanged()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	m_curSelectPlot->getDataPair().at(row)->setLineMode(ui.checkBox_10->checkState());
+}
+
+void PlotManager::onCheckBox_11StateChanged()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	m_curSelectPlot->getDataPair().at(row)->setDraw(ui.checkBox_11->checkState());
+}
+
+void PlotManager::onPushButton_15Clicked()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row <= 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+	vec.move(row, row - 1);
+	m_curSelectPlot->setDataPair(vec);
+	refreshPlotDataUI(m_curSelectPlot);
+	ui.tableWidget_plotData->setCurrentCell(row - 1, 0);
+}
+
+void PlotManager::onPushButton_16Clicked()
+{
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0 || row >= (ui.tableWidget_plotData->rowCount() - 1))
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+	vec.move(row, row + 1);
+	m_curSelectPlot->setDataPair(vec);
+	refreshPlotDataUI(m_curSelectPlot);
+	ui.tableWidget_plotData->setCurrentCell(row + 1, 0);
+}
+
+void PlotManager::onPushButton_18Clicked()
+{
+}
+
+void PlotManager::onPushButton_19Clicked()
+{
+}
+
+void PlotManager::onPushButton_20Clicked()
+{
+	emit sigAdvancedDataManager();
+}
+
+void PlotManager::onToolButtonClicked()
+{
+}
+
+void PlotManager::onComboBox_6CurrentIndexChanged(int index)
+{
 }
 
 void PlotManager::onCheckBox_12StateChanged()

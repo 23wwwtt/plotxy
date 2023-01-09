@@ -24,6 +24,17 @@ QMap<QString, QList<PlotItemBase*>> PlotManagerData::getPlotManagerData()
 	return m_plotManager;
 }
 
+void PlotManagerData::slotChangeTabName(QString oldName, QString newName)
+{
+	if (m_plotManager.contains(oldName))
+	{
+		QList<PlotItemBase*> plots = m_plotManager.value(oldName);
+		m_plotManager[newName].append(plots);
+		m_plotManager.remove(oldName);
+	}
+	emit sgnUpdatePlotManager();
+}
+
 void PlotManagerData::slotChangePlotName()
 {
 	emit sgnUpdatePlotManager();

@@ -9,9 +9,13 @@ PlotPolar::PlotPolar(QWidget * parent)
 	QString name = QString("Polar%1").arg(m_instanceCount);
 	this->setName(name);
 	m_instanceCount += 1;
+
+	m_outerFillColor = Qt::black;
+	m_gridFillColor = Qt::black;
 	m_title = "Polar";
 	m_titleColor = Qt::white;
 	m_titleFontSize = 16;
+	m_titleFillColor = Qt::black;
 	m_titleFont.setFamily("Microsoft YaHei");
 	m_titleFont.setPointSizeF(m_titleFontSize);
 	m_titleVisible = true;
@@ -53,12 +57,13 @@ void PlotPolar::initPlot()
 	m_customPlot->setSelectionRectMode(QCP::srmNone);
 	m_customPlot->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
-	m_customPlot->setBackground(QBrush(QColor(0, 0, 0)));
 	m_customPlot->plotLayout()->clear();
 
 	m_angularAxis = new QCPPolarAxisAngular(m_customPlot);
 	m_angularAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
 	m_customPlot->plotLayout()->addElement(0, 0, m_angularAxis);
+	m_customPlot->setBackground(m_outerFillColor);
+//	m_angularAxis->setBackground(m_gridFillColor);
 	
 //	m_customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 	m_angularAxis->setRangeDrag(false);
@@ -89,6 +94,21 @@ void PlotPolar::initPlot()
 	m_customPlot->replot();
 }
 
+void PlotPolar::setOuterFillColor(QColor color)
+{
+	if (m_outerFillColor == color)
+		return;
+
+	m_outerFillColor = color;
+	QPalette palette = this->palette();
+	palette.setColor(QPalette::Window, color);
+	this->setPalette(palette);
+
+	m_customPlot->setBackground(color);
+	m_customPlot->replot();
+	update();
+}
+
 void PlotPolar::getCoordRangeX(double & lower, double & upper)
 {
 	lower = m_angularRange_lower;
@@ -103,6 +123,9 @@ void PlotPolar::getCoordRangeY(double & lower, double & upper)
 
 void PlotPolar::setAxisColorWidth(QColor color, uint width)
 {
+	if (m_axisColor == color && m_axisWidth == width)
+		return;
+
 	m_axisColor = color;
 	m_axisWidth = width;
 	m_angularAxis->setBasePen(QPen(m_axisColor, m_axisWidth));
@@ -112,6 +135,9 @@ void PlotPolar::setAxisColorWidth(QColor color, uint width)
 
 void PlotPolar::setGridColorWidth(QColor color, uint width)
 {
+	if (m_gridColor == color && m_gridWidth == width)
+		return;
+
 	m_gridColor = color;
 	m_gridWidth = width;
 	m_angularAxis->grid()->setAngularPen(QPen(m_gridColor, m_gridWidth, Qt::SolidLine));
@@ -149,6 +175,13 @@ void PlotPolar::setVertGrids(uint count)
 		m_angularAxis->radialAxis()->ticker()->setTickCount(count);
 	}
 	m_customPlot->replot();
+}
+
+void PlotPolar::setGridFillColor(QColor color)
+{
+	m_gridFillColor = color;
+// 	m_angularAxis->setBackground(color);
+// 	m_customPlot->replot();
 }
 
 void PlotPolar::setGridVisible(bool enable)
@@ -222,22 +255,28 @@ void PlotPolar::paintEvent(QPaintEvent * event)
 	QFontMetricsF fm(m_titleFont);
 	double w = fm.size(Qt::TextSingleLine, m_title).width();
 	double h = fm.size(Qt::TextSingleLine, m_title).height();
-
-	int radius = qMin(width, int(height - h));
+	double as = fm.ascent();
+	int radius = qMin(width, int(height - 1.25*h));
 
 	painter.setFont(m_titleFont);
 	painter.setPen(m_titleColor);
 	if (width > (height - h))
 	{
-		m_customPlot->setGeometry((width - radius)/2, h, radius, radius);
-		if(m_titleVisible)
+		m_customPlot->setGeometry((width - radius)/2, 1.25*h, radius, radius);
+		if (m_titleVisible)
+		{
+			painter.fillRect((width - w) / 2, h*0.25, w, h, m_titleFillColor);
 			painter.drawText(QPoint((width - w) / 2, h), m_title);
+		}
 	} 
 	else
 	{
-		m_customPlot->setGeometry(0, (height + h - radius)/2, radius, radius);
+		m_customPlot->setGeometry(0, (height + h - radius)/2 + 0.25*h, radius, radius);
 		if (m_titleVisible)
+		{
+			painter.fillRect((width - w) / 2, (height + h - radius) / 2 - 0.75*h, w, h, m_titleFillColor);
 			painter.drawText(QPoint((width - w) / 2, (height + h - radius) / 2), m_title);
+		}
 	}
 }
 

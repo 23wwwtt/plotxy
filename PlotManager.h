@@ -62,7 +62,6 @@ private:
 public slots:
     void onTWSclicked(QTreeWidgetItem* item, int i);
     void onTWSPclicked(QTreeWidgetItem* item, int i);
-    void onAddNewClicked();
 	void onSelectedPlot(QString tabName, QString plotName);	//用于默认点击的Item
 
 	void onUpdatePlotManager();
@@ -82,6 +81,9 @@ public slots:
 	void onPlotRectEditFinished();
 	void onLineEditPlotNameEditingFinished();
 	void onCheckBox_drawStateChanged();
+	void onPushButton_outerFillColorClicked();
+	void onPushButton_outlineColorClicked();
+	void onMouseEventDone();
 
 	//Axis and Grid
 	void onCheckBox_4StateChanged();
@@ -94,6 +96,7 @@ public slots:
 	void onLineEdit_vertGridsEditingFinished();
 	void onSetAxisColorWidth();
 	void onSetGridColorWidth();
+	void onPushButton_gridFillClicked();
 	void onCheckBox_6StateChanged();
 	void onPushButton_10Clicked();
 	void onfontComboBox_3CurrentFontChanged(const QFont& font);
@@ -106,6 +109,21 @@ public slots:
 	void onPushButton_71Clicked();
 	void onPushButton_73Clicked();
 	void onSpinbox_10Changed();
+
+	//Plot Data
+	void onTableWidget_plotDataItemSelectionChanged();
+	void onLineEdit_24EditingFinished();
+	void onPushButton_21Clicked();
+	void onCheckBox_10StateChanged();
+	void onCheckBox_11StateChanged();
+	void onPushButton_15Clicked();
+	void onPushButton_16Clicked();
+	void onAddNewClicked();
+	void onPushButton_18Clicked();
+	void onPushButton_19Clicked();
+	void onPushButton_20Clicked();
+	void onToolButtonClicked();
+	void onComboBox_6CurrentIndexChanged(int index);
 
 	//Text Edit
 	void onCheckBox_12StateChanged();
@@ -120,6 +138,7 @@ public slots:
 
 signals:
 	void sigAddPlotPair();
+	void sigAdvancedDataManager();
 	void sigRectChanged(QRect);
 	void sigGetTabRect();
 	void sigSetPlotVisible(bool);

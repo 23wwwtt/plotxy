@@ -137,6 +137,8 @@ QString PlotItemBase::currTabName()
 
 void PlotItemBase::setOuterFillColor(QColor color)
 {
+
+	setAutoFillBackground(true);
 	m_outerFillColor = color;
 	QPalette palette = this->palette();
 	palette.setColor(QPalette::Window, m_outerFillColor);
@@ -362,6 +364,11 @@ void PlotItemBase::updatePlotPairData(QPair<QString, QString> oldPair, QPair<QSt
 QList<QPair<QString, QString>> PlotItemBase::getPlotPairData()
 {
 	return m_plotPairData;
+}
+
+void PlotItemBase::setDataPair(QVector<DataPair*> newVector)
+{
+	m_dataPair.swap(newVector);
 }
 
 void PlotItemBase::slot_setVisible(bool on)

@@ -46,6 +46,7 @@ public:
 
 public slots:
 	void slotChangePlotName();
+	void slotChangeTabName(QString oldName, QString newName);
 signals:
 	void sgnUpdatePlotManager();
 };
