@@ -24,6 +24,7 @@
 #include "renameTab.h"
 #include "PlotManagerData.h"
 
+
 PlotXYDemo::PlotXYDemo(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -35,6 +36,7 @@ PlotXYDemo::PlotXYDemo(QWidget *parent)
 
     //m_plotItem = nullptr;
     //m_freeWidgetWraper = nullptr;
+    //m_AdvancedDataManager = new AdvancedDataManager;
     m_AdvancedDataManager = new AdvancedDataManager();
     m_plotManager = new PlotManager();
     m_addPlotPair = AddPlotPair::m_getInstance();
@@ -369,6 +371,7 @@ void PlotXYDemo::onAddTextPlot()
 	connect(plotItem, &PlotItemBase::sgn_dataPairChanged, m_addPlotPair, &AddPlotPair::onUpdatePlotPair);
 	connect(plotItem, &PlotItemBase::sgn_dataPairChanged, m_plotManager, &PlotManager::onSelectedPlot);
 	connect(plotItem, &PlotItemBase::sgn_dataPairChanged, m_AdvancedDataManager, &AdvancedDataManager::onUpdatePlotPair);
+
 
     initWidget(plotItem);
 

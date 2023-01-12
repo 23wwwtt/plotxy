@@ -53,7 +53,6 @@ private:
 	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
 	//virtual void getDataPair();
 
-
 	bool m_bHorizontal;
 	bool m_started;
 	
@@ -61,8 +60,6 @@ private:
 	QStringList m_xColumnList;
 	QStringList m_yColumnList;
 
-	
-	
 	QStringList m_entityTypeList;
 	QStringList m_entityAttrList;
 
@@ -86,6 +83,7 @@ private:
 	double m_secValue;
 
 	void setTitle(QPainter& painter, QRect& rect);
+
 	void drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth , QVector<DataPair*> & dataVector ,double &as);
 	void drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>& yset, QVector<DataPair*> dataVector,
 		int& horiGridWidth, int& verGridWidth,double &as);

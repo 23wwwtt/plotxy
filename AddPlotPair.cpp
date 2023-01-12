@@ -455,9 +455,8 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 			strNameUnit1 = ui.tableWidget_nameUnits_4->item(ui.tableWidget_nameUnits_4->currentRow(), 0)->text();
 
 			strSum1 = strEntity1 + "+" + strNameUnit1;
-
 			strSum2 = "Time";
-
+			emit sgn_onTextLightBtnClicked();
 		}
 		else if (ui.radioButton_10->isChecked())
 		{

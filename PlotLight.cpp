@@ -6,6 +6,7 @@
 #include <QList>
 #include <QPainterPath>
 #include <QBrush>
+#include <QFontMetricsF>
 
 #include "PlotLight.h"
 #include "DataManager.h"
@@ -55,9 +56,11 @@ void PlotLight::paintEvent(QPaintEvent* event)
 
 	m_axisColor = Qt::white;
 	pen.setColor(m_axisColor);
-	rect.setRect(0, 0, width(), 0.1*height());
-	painter.setPen(pen);
 	font.setPointSize(20);
+	QFontMetricsF fm(font);
+	double as = fm.ascent();
+	rect.setRect(0, 0, width(), as);
+	painter.setPen(pen);
 	painter.setFont(font);
 	painter.drawText(rect, Qt::AlignCenter, "Events");
 

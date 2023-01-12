@@ -2,6 +2,7 @@
 #include "addplotpair.h"
 #include <QColorDialog>
 #include <QTreeWidget>
+#include <QTableWidgetItem>
 #include <QDebug>
 #include <QAction>
 #include <QString>
@@ -13,9 +14,9 @@
 //#include "PlotBar.h"
 
 PlotManager::PlotManager(QWidget* parent)
-    : QWidget(parent)
+	: QWidget(parent)
 {
-    ui.setupUi(this);
+	ui.setupUi(this);
 
 	connect(ui.pushButton_close, &QPushButton::clicked, this, &PlotManager::onBtnCloseClicked);
 	this->setWindowTitle(QString::fromLocal8Bit("图表管理器"));
@@ -27,14 +28,25 @@ PlotManager::PlotManager(QWidget* parent)
 	ui.treeWidget_selectedPlots->setStyle(QStyleFactory::create("windows"));
 	ui.treeWidget_selectedPlots->setHeaderHidden(true);
 	ui.treeWidget_selectedPlots->expandAll();
-	
+
+
 	ui.stackedWidget->setCurrentIndex(0);
 
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
-	
+
+	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
+
+
+
+	ui.stackedWidget->setCurrentIndex(0);
+
+	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
+
+
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
 	connect(ui.spinBox_left, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxLeftChanged);
 	connect(ui.spinBox_right, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxRightChanged);
+
 }
 
 PlotManager::~PlotManager()
@@ -47,6 +59,8 @@ void PlotManager::init()
 	initTreeWidgetSettings();
 	initGeneralUI();
 	initAxisGridUI();
+
+	initTextLightUI();
 	initPlotDataUI();
 	initTextEditUI();
 	initAttitudeUI();
@@ -65,10 +79,10 @@ void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
 			QTreeWidgetItem* itemselPlotI = new QTreeWidgetItem(QStringList() << plotItem->currName());
 			topWidget[0]->addChild(itemselPlotI);
 		}
-	} 
+	}
 	else
 	{
-		QTreeWidgetItem* itemselPlotH = new QTreeWidgetItem(QStringList()<<tabName);
+		QTreeWidgetItem* itemselPlotH = new QTreeWidgetItem(QStringList() << tabName);
 		ui.treeWidget_selectedPlots->addTopLevelItem(itemselPlotH);
 		ui.treeWidget_selectedPlots->expandAll();
 
@@ -112,7 +126,7 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
 	m_itemHandsOff = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Hands-Off"));
 
-//	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
+	//	ui.treeWidget_settings->setCurrentItem(m_itemGeneral);
 	m_itemScatterPlot->setExpanded(true);
 
 	ui.treeWidget_settings->setEnabled(false);
@@ -142,12 +156,15 @@ void PlotManager::initAxisGridUI()
 	ui.pushButton_flipXValues->setVisible(false);
 	ui.pushButton_flipYValues->setVisible(false);
 
+	ui.lineEdit_23->setText("1");
+	/*ui.pushButton_gridColor->setColor(Qt::gray);*/
 	ui.lineEdit_10->setEnabled(false);
 	ui.lineEdit_11->setEnabled(false);
 	ui.lineEdit_12->setEnabled(false);
 	ui.lineEdit_13->setEnabled(false);
 	ui.tableWidget->setEnabled(false);
 	ui.tableWidget_2->setEnabled(false);
+
 	connect(ui.checkBox_4, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_4StateChanged);
 	connect(ui.checkBox_5, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_5StateChanged);
 	connect(ui.lineEdit_limitBgnX, &QLineEdit::editingFinished, this, &PlotManager::onLineEdit_limitXEditingFinished);
@@ -175,6 +192,26 @@ void PlotManager::initAxisGridUI()
 	}
 }
 
+
+void PlotManager::initTextLightUI()
+{
+	ui.label_171->setVisible(false);
+	ui.checkBox_30->setVisible(false);
+	ui.label_172->setVisible(false);
+	ui.checkBox_31->setVisible(false);
+	connect(ui.lineEdit_23, &QLineEdit::editingFinished, this, [=]() {
+		ui.spinBox_10->setValue(ui.lineEdit_23->text().toInt());
+	});
+	connect(ui.pushButton_gridColor, &QPushButton::clicked, this, [=]() {
+		ui.pushButton_71->setColor(ui.pushButton_gridColor->color());
+	});
+	connect(ui.pushButton_gridFill, &QPushButton::clicked, this, [=]() {
+		ui.pushButton_73->setColor(ui.pushButton_gridFill->color());
+	});
+	connect(ui.spinBox_10, &QSpinBox::editingFinished, this, &PlotManager::onSpinbox_10Changed);
+	connect(ui.pushButton_71, &QPushButton::clicked, this, &PlotManager::onPushButton_71Clicked);
+	connect(ui.pushButton_73, &QPushButton::clicked, this, &PlotManager::onPushButton_73Clicked);
+}
 void PlotManager::initPlotDataUI()
 {
 	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
@@ -211,6 +248,7 @@ void PlotManager::initTextEditUI()
 	}
 	connect(ui.fontComboBox_2, &QFontComboBox::currentFontChanged, this, &PlotManager::onfontComboBox_2CurrentFontChanged);
 	connect(ui.comboBox_Text_fontSize, &QComboBox::currentTextChanged, this, &PlotManager::onComboBox_Text_fontSizeCurrentTextChanged);
+
 }
 
 void PlotManager::initAttitudeUI()
@@ -226,46 +264,51 @@ void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 {
 	ui.treeWidget_settings->setEnabled(true);
 	QString name = plot->metaObject()->className();
-	if (name.compare("PlotScatter") == 0) 
+
+	if (name.compare("PlotScatter") == 0)
 	{
 		enableItem_Scatter();
 		//plotPair界面
 		refreshPlotDataUI(m_curSelectPlot);
 	}
-	else if (name.compare("PlotAScope") == 0) 
+	else if (name.compare("PlotAScope") == 0)
 	{
 		enableItem_AScope();
 	}
-	else if (name.compare("PlotRTI") == 0) 
+	else if (name.compare("PlotRTI") == 0)
 	{
 		enableItem_RTI();
 	}
-	else if (name.compare("PlotText") == 0 || name.compare("PlotLight") == 0)
+	else if (name.compare("PlotText") == 0)
 	{
 		enableItem_Text_Light();
 	}
-	else if (name.compare("PlotBar") == 0) 
+	else if (name.compare("PlotLight") == 0)
+	{
+		enableItem_Text_Light();
+	}
+	else if (name.compare("PlotBar") == 0)
 	{
 		enableItem_Bar();
 	}
-	else if (name.compare("PlotDial") == 0) 
+	else if (name.compare("PlotDial") == 0)
 	{
 		enableItem_Dial();
 	}
-	else if (name.compare("PlotAttitude") == 0) 
+	else if (name.compare("PlotAttitude") == 0)
 	{
 		enableItem_Attitude();
 		refreshAttitudeUI(m_curSelectPlot);
 	}
-	else if (name.compare("PlotPolar") == 0) 
+	else if (name.compare("PlotPolar") == 0)
 	{
 		enableItem_Polar();
 	}
-	else if (name.compare("PlotTrack") == 0) 
+	else if (name.compare("PlotTrack") == 0)
 	{
 		enableItem_Track();
 	}
-	else if (name.compare("PlotDoppler") == 0) 
+	else if (name.compare("PlotDoppler") == 0)
 	{
 		enableItem_Doppler();
 	}
@@ -347,6 +390,47 @@ void PlotManager::refreshPlotDataUI(PlotItemBase * plot)
 		ui.tableWidget_plotData->setItem(row, 1, addplot2);
 	}
 }
+
+void PlotManager::refreshLightTextUI(PlotItemBase * plot)
+{
+	if (!(plot == nullptr))
+	{
+		ui.pushButton_73->setColor(plot->getGridFillColor());
+		if (plot->currName().startsWith("Text"))
+		{
+			ui.stackedWidget_LightTextDataSort->setCurrentIndex(0);
+			ui.groupBox_29->setVisible(false);
+
+		}
+		else
+		{
+			ui.stackedWidget_LightTextDataSort->setCurrentIndex(1);
+			ui.groupBox_29->setVisible(true);
+
+		}
+
+		for (int i = ui.tableWidget_TextDataSort->rowCount(); i > 0; i--)
+		{
+			ui.tableWidget_TextDataSort->removeRow(ui.tableWidget_TextDataSort->rowCount() - 1);
+		}
+
+		for (int i = 0; i < plot->getPlotPairData().size(); i++)
+		{
+			QString temFirst = plot->getPlotPairData().at(i).first;
+			QString temEntityString = temFirst.split("+").front();
+			QString temAttriString = temFirst.split("+").back();
+			QTableWidgetItem *temEntity = new QTableWidgetItem(temEntityString);
+			QTableWidgetItem *temAttri = new QTableWidgetItem(temAttriString);
+			int temRow = ui.tableWidget_TextDataSort->rowCount();
+			ui.tableWidget_TextDataSort->insertRow(temRow);
+			ui.tableWidget_TextDataSort->setItem(temRow, 0, temEntity);
+			ui.tableWidget_TextDataSort->setItem(temRow, 1, temAttri);
+		}
+	}
+}
+
+
+
 
 void PlotManager::refreshTextEditUI(PlotItemBase * plot)
 {
@@ -543,10 +627,13 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 				refreshTreeWidgetSettingEnabled(m_curSelectPlot);
 				//general界面
 				refreshGeneralUI(m_curSelectPlot);
+				//Text&Light界面
+				refreshLightTextUI(m_curSelectPlot);
 				//Axis&Grid界面
 				refreshAxisGridUI(m_curSelectPlot);
 				//Text Edit
 				refreshTextEditUI(m_curSelectPlot);
+
 				//
 			//	tempPlot->deleteLater();
 				break;
@@ -807,6 +894,36 @@ void PlotManager::onBtnCloseClicked()
 	close();
 }
 
+void PlotManager::onPushButton_71Clicked()
+{
+	ui.pushButton_gridColor->setColor(ui.pushButton_71->color());
+	ui.lineEdit_23->setText(QString("%1").arg(ui.spinBox_10->value()));
+	m_curSelectPlot->setGridColorWidth(ui.pushButton_71->color(), ui.spinBox_10->value());
+}
+
+void PlotManager::onSpinbox_10Changed()
+{
+	ui.pushButton_gridColor->setColor(ui.pushButton_71->color());
+	ui.lineEdit_23->setText(QString("%1").arg(ui.spinBox_10->value()));
+	m_curSelectPlot->setGridColorWidth(ui.pushButton_71->color(), ui.spinBox_10->value());
+}
+
+void PlotManager::onPushButton_73Clicked()
+{
+	QColor color = ui.pushButton_73->color();
+	if (!(color == ui.pushButton_gridFill->color()))
+	{
+		m_curSelectPlot->setGridFillColor(color);
+	}
+	ui.pushButton_gridFill->setColor(color);
+}
+
+void PlotManager::onPushButton_gridFillClicked()
+{
+	QColor color = ui.pushButton_gridFill->color();
+	m_curSelectPlot->setGridFillColor(color);
+}
+
 void PlotManager::onPlotRectEditFinished()
 {
 	if (ui.lineEdit_plotPositionX->text() == nullptr || ui.lineEdit_plotPositionY->text() == nullptr ||
@@ -839,7 +956,8 @@ void PlotManager::onPlotRectEditFinished()
 		emit sigRectChanged(QRect(x, y, w, h));
 		disconnect(this, SIGNAL(sigRectChanged(QRect)), m_curSelectPlot, SLOT(slot_updateRect(QRect)));
 	}
-		
+
+
 }
 
 void PlotManager::onLineEditPlotNameEditingFinished()
@@ -946,7 +1064,7 @@ void PlotManager::onLineEdit_limitYEditingFinished()
 	bool by0, by1;
 	double y0 = ui.lineEdit_LimitBgnY->text().toDouble(&by0);
 	double y1 = ui.lineEdit_limitEndY->text().toDouble(&by1);
-	if(by0 && by1)
+	if (by0 && by1)
 		m_curSelectPlot->setCoordRangeY(y0, y1);
 }
 
@@ -1016,11 +1134,6 @@ void PlotManager::onLineEdit_vertGridsEditingFinished()
 
 void PlotManager::onSetAxisColorWidth()
 {
-	if (m_curSelectPlot == nullptr)
-	{
-		return;
-	}
-
 	bool on;
 	uint width = ui.lineEdit_21->text().toInt(&on);
 	QColor color = ui.pushButton_axisColor->color();
@@ -1030,11 +1143,6 @@ void PlotManager::onSetAxisColorWidth()
 
 void PlotManager::onSetGridColorWidth()
 {
-	if (m_curSelectPlot == nullptr)
-	{
-		return;
-	}
-
 	bool on;
 	uint width = ui.lineEdit_23->text().toInt(&on);
 	QColor color = ui.pushButton_gridColor->color();
@@ -1356,9 +1464,9 @@ void PlotManager::onComboBox_Text_fontSizeCurrentTextChanged(const QString & tex
 		return;
 	}
 
-// 	QFont font = ui.fontComboBox_2->currentFont();
-// 	font.setPointSizeF(text.toFloat());
-// 	m_curSelectPlot->setTitleFont(font);
+	// 	QFont font = ui.fontComboBox_2->currentFont();
+	// 	font.setPointSizeF(text.toFloat());
+	// 	m_curSelectPlot->setTitleFont(font);
 	m_curSelectPlot->setTitleFontSize(text.toInt());
 }
 

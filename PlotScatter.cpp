@@ -58,8 +58,10 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_gridStyle = Qt::DotLine;
 	m_gridDensity = GridDensity::LESS;
 
+
 	m_showUnits_x = false;
 	m_showUnits_y = false;
+
 
 	initPlot();
 }
@@ -541,6 +543,7 @@ void PlotScatter::setGridDensity(GridDensity density)
 {
 }
 
+
 void PlotScatter::setUnitsShowX(bool on)
 {
 	m_showUnits_x = on;
@@ -568,3 +571,4 @@ void PlotScatter::setUnitsY(const QString & units)
 	m_customPlot->yAxis->setAxisFormat(units);
 	m_customPlot->replot();
 }
+

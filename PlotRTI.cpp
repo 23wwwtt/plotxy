@@ -29,6 +29,11 @@ PlotRTI::PlotRTI(QWidget* parent)
 	m_bottomPadding = 10;
 
 	m_coordBgn_x = 0;
+
+	m_coordEnd_x = 100;
+	m_coordBgn_y = 0;
+	m_coordEnd_y = 100;
+
 	m_coordEnd_x = 5;
 	m_coordBgn_y = 0;
 	m_coordEnd_y = 5;
@@ -49,6 +54,7 @@ PlotRTI::PlotRTI(QWidget* parent)
 
 	m_showUnits_x = false;
 	m_showUnits_y = false;
+
 
 	initPlot();
 }
@@ -298,7 +304,7 @@ void PlotRTI::setCoordRangeX(double lower, double upper)
 	m_coordBgn_x = lower;
 	m_coordEnd_x = upper;
 	m_customPlot->xAxis->setRange(lower, upper);
-	m_customPlot->replot();
+//	m_customPlot->replot();
 }
 
 void PlotRTI::setCoordRangeY(double lower, double upper)
@@ -311,7 +317,7 @@ void PlotRTI::setCoordRangeY(double lower, double upper)
 	m_coordBgn_y = lower;
 	m_coordEnd_y = upper;
 	m_customPlot->yAxis->setRange(lower, upper);
-	m_customPlot->replot();
+//	m_customPlot->replot();
 }
 
 void PlotRTI::getCoordRangeX(double & lower, double & upper)
@@ -325,6 +331,7 @@ void PlotRTI::getCoordRangeY(double & lower, double & upper)
 	lower = m_coordBgn_y;
 	upper = m_coordEnd_y;
 }
+
 
 void PlotRTI::setHorzGrids(uint count)
 {

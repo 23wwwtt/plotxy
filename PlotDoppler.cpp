@@ -358,6 +358,13 @@ void PlotDoppler::setCoordRangeX(double lower, double upper)
 		return;
 	}
 
+
+	m_coordBgn_x = lower;
+	m_coordEnd_x = upper;
+	m_customPlot->xAxis->setRange(lower, upper);
+	m_horizon_AScope->setCoordRangeX(lower, upper);
+
+
 	m_coordBgn_x = lower;
 	m_coordEnd_x = upper;
 	m_customPlot->xAxis->setRange(lower, upper);
@@ -379,6 +386,12 @@ void PlotDoppler::setCoordRangeY(double lower, double upper)
 	m_customPlot->yAxis->setRange(lower, upper);
 	m_vertical_AScope->setCoordRangeY(lower, upper);
 
+
+	m_coordBgn_y = lower;
+	m_coordEnd_y = upper;
+	m_customPlot->yAxis->setRange(lower, upper);
+	m_vertical_AScope->setCoordRangeY(lower, upper);
+
 //	m_customPlot->rescaleAxes();
 	m_customPlot->replot();
 }
@@ -394,6 +407,7 @@ void PlotDoppler::getCoordRangeY(double & lower, double & upper)
 	lower = m_coordBgn_y;
 	upper = m_coordEnd_y;
 }
+
 
 void PlotDoppler::setHorzGrids(uint count)
 {

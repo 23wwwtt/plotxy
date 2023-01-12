@@ -73,6 +73,7 @@ public:
 	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
 	virtual GridDensity getGridDensity() { return m_gridDensity; }
 
+
 	virtual void setUnitsShowX(bool on);
 	virtual void setUnitsShowY(bool on);
 	virtual void setUnitsX(const QString& units);
@@ -93,6 +94,7 @@ public:
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
 	virtual int getTitleFontSize() { return m_titleFontSize; }
+
 
 public slots:
     void onGetCurrentSeconds(double secs);

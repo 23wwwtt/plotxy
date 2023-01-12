@@ -242,6 +242,7 @@ void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWi
 	font.setPointSize(getTickLabelFontSize());
 	painter.setFont(font);
 	painter.setPen(fontPen);
+
 	for (int i = 0; i < dataVector.size(); i++)
 	{
 		DataPair* temDataPair = new DataPair(nullptr);

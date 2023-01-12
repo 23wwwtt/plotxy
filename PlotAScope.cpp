@@ -33,6 +33,7 @@ PlotAScope::PlotAScope(QWidget* parent)
 	m_coordBgn_y = 0;
 	m_coordEnd_y = 100;
 
+
 	m_horzGrids = 5;
 	m_vertGrids = 5;
 	m_axisWidth = 1;
@@ -49,6 +50,7 @@ PlotAScope::PlotAScope(QWidget* parent)
 
 	m_showUnits_x = false;
 	m_showUnits_y = false;
+
 
 	initPlot();
 
@@ -308,6 +310,7 @@ void PlotAScope::setCoordRangeX(double lower, double upper)
 	m_coordEnd_x = upper;
 	m_customPlot->xAxis->setRange(lower, upper);
 	m_customPlot->replot();
+
 }
 
 void PlotAScope::setCoordRangeY(double lower, double upper)
@@ -321,6 +324,7 @@ void PlotAScope::setCoordRangeY(double lower, double upper)
 	m_coordEnd_y = upper;
 	m_customPlot->yAxis->setRange(lower, upper);
 	m_customPlot->replot();
+
 }
 
 void PlotAScope::getCoordRangeX(double & lower, double & upper)

@@ -26,21 +26,29 @@ public:
 	int m_spinBoxLeft;
 	int m_spinBoxRight;
 
-// 	int m_hrozGrids;
-// 	int m_vertGrids;
+ 	int m_hrozGrids;
+ 	int m_vertGrids;
 private:
 	void initTreeWidgetSettings();
 	void initGeneralUI();
 	void initAxisGridUI();
+
+	void initTextLightUI();
+
 	void initPlotDataUI();
 	void initTextEditUI();
 	void initAttitudeUI();
+
 	void refreshTreeWidgetSettingEnabled(PlotItemBase* plot);
 	void refreshGeneralUI(PlotItemBase* plot);
 	void refreshAxisGridUI(PlotItemBase* plot);
 	void refreshPlotDataUI(PlotItemBase* plot);
+
+	void refreshLightTextUI(PlotItemBase* plot);
+
 	void refreshTextEditUI(PlotItemBase* plot);
 	void refreshAttitudeUI(PlotItemBase* plot);
+
 
 	void enableItem_Scatter();
 	void enableItem_AScope();
@@ -94,6 +102,12 @@ public slots:
 	void onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString& text);
 	void onComboBox_2CurrentIndexChanged(int index);
 	void onComboBox_3CurrentIndexChanged(int index);
+	void onPushButton_gridFillClicked();
+
+	//Light/Text
+	void onPushButton_71Clicked();
+	void onPushButton_73Clicked();
+	void onSpinbox_10Changed();
 
 	//Plot Data
 	void onTableWidget_plotDataItemSelectionChanged();
@@ -127,6 +141,7 @@ public slots:
 	void onSpinBox_30ValueChanged(int);
 	void onSpinBox_31ValueChanged(int);
 
+
 signals:
 	void sigAddPlotPair();
 	void sigAdvancedDataManager();
@@ -134,6 +149,9 @@ signals:
 	void sigGetTabRect();
 	void sigSetPlotVisible(bool);
 	void sigChangePlotName();
+
+
+
 
 private:
     Ui::PlotManager ui;

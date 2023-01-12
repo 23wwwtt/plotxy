@@ -27,10 +27,10 @@ PlotItemBase::PlotItemBase(QWidget* parent)
 	m_axisWidth = 1;
 	m_gridWidth = 1;
 	m_axisColor = Qt::white;
-	m_gridColor = QColor(200, 200, 200);
+	m_gridColor = Qt::white;
 	m_gridVisible = true;
 	m_tickLabelColor = Qt::white;
-	m_tickLabelFontSize = 8;
+	m_tickLabelFontSize = 20;
 	m_tickLabelFont.setFamily("Microsoft YaHei");
 	m_tickLabelFont.setPointSizeF(m_tickLabelFontSize);
 	m_gridStyle = Qt::DotLine;
@@ -137,6 +137,7 @@ QString PlotItemBase::currTabName()
 
 void PlotItemBase::setOuterFillColor(QColor color)
 {
+
 	setAutoFillBackground(true);
 	m_outerFillColor = color;
 	QPalette palette = this->palette();
@@ -147,6 +148,7 @@ void PlotItemBase::setOuterFillColor(QColor color)
 void PlotItemBase::setOutlineColor(QColor color)
 {
 	m_outlineColor = color;
+	this->setStyleSheet(QString("QWidget{border-color:%1)}").arg(color.value()));
 }
 
 void PlotItemBase::setCoordRangeX(double lower, double upper)
@@ -194,6 +196,11 @@ void PlotItemBase::setGridColorWidth(QColor color, uint width)
 	m_gridColor = color;
 	m_gridWidth = width;
 }
+
+//void PlotItemBase::setGridColorWidth(uint width)
+//{
+//
+//}
 
 void PlotItemBase::setGridVisible(bool enable)
 {

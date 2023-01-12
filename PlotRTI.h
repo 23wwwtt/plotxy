@@ -38,6 +38,7 @@ public:
 	void setCoordRangeY(double lower, double upper);
 	void getCoordRangeX(double& lower, double& upper);
 	void getCoordRangeY(double& lower, double& upper);
+
 	virtual void setHorzGrids(uint count);
 	virtual void setVertGrids(uint count);
 	virtual void setAxisColorWidth(QColor color, uint width);
@@ -83,6 +84,7 @@ public:
 	virtual QColor getTitleFillColor() { return m_titleFillColor; }
 	virtual QFont getTitleFont() { return m_titleFont; }
 	virtual int getTitleFontSize() { return m_titleFontSize; }
+
 
 public:
 	static int m_instanceCount;			//实体个数
