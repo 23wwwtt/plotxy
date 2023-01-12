@@ -117,12 +117,12 @@ void AdvancedDataManager::onUpdatePlotPair()
 		for (int j = 0; j < m_plotManager[tabString].size(); ++j)
 		{
 			PlotItemBase *tempPlot = m_plotManager[tabString].at(j);
-			QList<QPair<QString, QString>> plotPairData = tempPlot->getPlotPairData();
-			for (int k = 0; k < plotPairData.size(); ++k)
+			QVector<DataPair*> dataPair = tempPlot->getDataPair();
+			for (int k = 0; k < dataPair.size(); ++k)
 			{
 				//界面更新
-				QTableWidgetItem* data1 = new QTableWidgetItem(plotPairData[k].first);
-				QTableWidgetItem* data2 = new QTableWidgetItem(plotPairData[k].second);
+				QTableWidgetItem* data1 = new QTableWidgetItem(dataPair[k]->getDataPair().first);
+				QTableWidgetItem* data2 = new QTableWidgetItem(dataPair[k]->getDataPair().second);
 				QTableWidgetItem* data3 = new QTableWidgetItem(tempPlot->currName());
 				QTableWidgetItem* data4 = new QTableWidgetItem(tempPlot->currTabName());
 				int row = ui.tableWidget_plotpair->rowCount();

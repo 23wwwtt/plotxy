@@ -30,15 +30,11 @@ public:
 private:
 	QColor m_border_ColorStart;			//边框渐变开始颜色
 	QColor m_border_ColorEnd;			//边框渐变结束颜色
-	QColor m_scaleColor_roll;			//刻度尺颜色roll
-	QColor m_scaleColor_pitch;			//刻度尺颜色pitch
-	QColor m_lineColor_roll;			//线条颜色roll
-	QColor m_lineColor_pitch;			//线条颜色pitch
-	QColor m_textColor_roll;			//文字颜色roll
-	QColor m_textColor_pitch;			//文字颜色pitch
+	QColor m_rollColor;					//roll主题颜色
+	QColor m_pitchColor;				//pitch主题颜色
 
-	QFont m_scaleFont;					//刻度字体
-	QFont m_textFont;					//文本字体
+	QFont m_tickLabelFont;				//刻度字体
+	QFont m_axisLabelFont;					//文本字体
 
 	double m_pitchValue;				//旋转角度
 	double m_rollValue;					//滚动值
@@ -57,6 +53,10 @@ private:
 	double m_leftPadding;				//绘图间隔-left
 	double m_rightPadding;				//绘图间隔-right
 
+	int	   m_tickRadiusPercentage;		//刻度半径百分比
+	int    m_textPercentage;			//文本半径百分比
+	int    m_dialPercentage;			//表盘半径百分比
+
 	QList<double> m_xValueList;
 	QList<double> m_yValueList;
 
@@ -65,12 +65,8 @@ public:
 public:
 	QColor getBorderOutColorStart() const;
 	QColor getBorderOutColorEnd()   const;
-	QColor getScaleColor_roll()     const;
-	QColor getScaleColor_pitch()    const;
-	QColor getLineColor_roll()      const;
-	QColor getLineColor_pitch()     const;
-	QColor getTextColor_roll()      const;
-	QColor getTextColor_pitch()     const;
+	QColor getRollColor()			const;
+	QColor getPitchColor()			const;
 
 	float getPitchValue()           const;
 	float getRollValue()            const;
@@ -93,6 +89,8 @@ public:
 	virtual uint getGridWidth() { return m_gridWidth; }
 	virtual QColor getAxisColor() { return m_axisColor; }
 	virtual QColor getGridColor() { return m_gridColor; }
+	virtual QFont getTickLabelFont() { return m_tickLabelFont; }
+	virtual int getTickLabelFontSize() { return m_tickLabelFontSize; }
 
 	virtual void setUnitsShowX(bool on);
 	virtual void setUnitsShowY(bool on);
@@ -115,9 +113,18 @@ public:
 	virtual QFont getTitleFont() { return m_titleFont; }
 	virtual int getTitleFontSize() { return m_titleFontSize; }
 
+	int getTickRadiusPercentage() { return m_tickRadiusPercentage; }
+	int getTextPercentage() { return m_textPercentage; }
+	int getDialPercentage() { return m_dialPercentage; }
+
 	void updateItems();
 
 public slots:
+	//
+	void setTickRadiusPercentage(int);
+	void setTextPercentage(int);
+	void setDialPercentage(int);
+	
 	//设置边框渐变颜色
 	void slot_setBorderColorStart(const QColor &borderOutColorStart);
 	void slot_setBorderColorEnd(const QColor &borderOutColorEnd);
@@ -126,22 +133,16 @@ public slots:
 	void setGridFillColor(QColor bgColor);
 
 	//设置刻度尺颜色
-	void slot_setScaleColor_roll(const QColor &scaleColor);
-	void slot_setScaleColor_pitch(const QColor &scaleColor);
-
-	//设置线条颜色
-	void slot_setLineColor_roll(const QColor &lineColor);
-	void slot_setLineColor_pitch(const QColor &lineColor);
-
-	//设置文字颜色
-	void slot_setTextColor_roll(const QColor &textColor);
-	void slot_setTextColor_pitch(const QColor &textColor);
+	void setRollColor(const QColor &color);
+	void setPitchColor(const QColor &color);
 
 	//设置刻度字体
-	void slot_setScaleFont(const QFont &font);
+	void setTickLabelFont(QFont &font);
+	void setTickLabelFontSize(int size);
 
 	//设置文本字体
-	void slot_setTextFont(const QFont &font);
+	void setAxisLabelFont(QFont &font);
+	void setAxisLabelFontSize(int size);
 
 	//设置旋转角度值
 	void slot_setPitchValue(double pitchValue);

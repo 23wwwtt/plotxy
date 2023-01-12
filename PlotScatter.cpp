@@ -110,7 +110,7 @@ void PlotScatter::initPlot()
 
 void PlotScatter::getDataInfo(double secs)
 {
-	if (m_plotPairData.isEmpty())
+	if (getDataPair().isEmpty())
 	{
 		return;
 	}

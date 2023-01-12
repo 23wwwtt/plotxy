@@ -8,6 +8,7 @@
 #include <QStyleFactory>
 #include "PlotItemBase.h"
 #include "PlotManagerData.h"
+#include "PlotAttitude.h"
 
 //#include "PlotBar.h"
 
@@ -34,18 +35,12 @@ PlotManager::PlotManager(QWidget* parent)
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
 	connect(ui.spinBox_left, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxLeftChanged);
 	connect(ui.spinBox_right, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxRightChanged);
-
-// 	QFontDatabase FontDb;
-// 	foreach(int size, FontDb.standardSizes()) {
-// 		ui.comboBox_AxisGrid_FontSize->addItem(QString::number(size));
-// 	}
 }
 
 PlotManager::~PlotManager()
 {
 
 }
-
 
 void PlotManager::init()
 {
@@ -54,6 +49,7 @@ void PlotManager::init()
 	initAxisGridUI();
 	initPlotDataUI();
 	initTextEditUI();
+	initAttitudeUI();
 }
 
 void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
@@ -95,12 +91,11 @@ void PlotManager::initTreeWidgetSettings()
 
 	connect(ui.treeWidget_settings, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSclicked(QTreeWidgetItem*, int)));
 
-	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("总体设置")));
-	m_itemAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("坐标轴和网格设置")));
-	m_itemPlotData = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("数据设置")));
+	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("通用")));
+	m_itemAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("坐标轴和网格")));
+	m_itemLinkedAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("链接轴")));
+	m_itemPlotData = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("绘图数据")));
 	m_itemText = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("文本信息")));
-	m_itemGOG = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("GOG曲线")));
-	m_itemLinkedAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("相关的轴")));
 	m_itemScatterPlot = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Scatter设置")));
 	m_itemAScope = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("A-Scope设置")));
 	m_itemRTI = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("RTI设置")));
@@ -111,6 +106,7 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemTrackStatus = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Track Status设置")));
 	m_itemRangeDoppler = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Range Doppler设置")));
 
+	m_itemGOG = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("GOG曲线")));
 	m_itemLimits = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("限制")));
 	m_itemPlotMarkers = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("标记")));
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
@@ -217,6 +213,15 @@ void PlotManager::initTextEditUI()
 	connect(ui.comboBox_Text_fontSize, &QComboBox::currentTextChanged, this, &PlotManager::onComboBox_Text_fontSizeCurrentTextChanged);
 }
 
+void PlotManager::initAttitudeUI()
+{
+	connect(ui.pushButton_80, &QPushButton::clicked, this, &PlotManager::onPushButton_80Clicked);
+	connect(ui.pushButton_81, &QPushButton::clicked, this, &PlotManager::onPushButton_81Clicked);
+	connect(ui.spinBox_29, SIGNAL(valueChanged(int)), this, SLOT(onSpinBox_29ValueChanged(int)));
+	connect(ui.spinBox_30, SIGNAL(valueChanged(int)), this, SLOT(onSpinBox_30ValueChanged(int)));
+	connect(ui.spinBox_31, SIGNAL(valueChanged(int)), this, SLOT(onSpinBox_31ValueChanged(int)));
+}
+
 void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 {
 	ui.treeWidget_settings->setEnabled(true);
@@ -224,6 +229,8 @@ void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 	if (name.compare("PlotScatter") == 0) 
 	{
 		enableItem_Scatter();
+		//plotPair界面
+		refreshPlotDataUI(m_curSelectPlot);
 	}
 	else if (name.compare("PlotAScope") == 0) 
 	{
@@ -248,6 +255,7 @@ void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 	else if (name.compare("PlotAttitude") == 0) 
 	{
 		enableItem_Attitude();
+		refreshAttitudeUI(m_curSelectPlot);
 	}
 	else if (name.compare("PlotPolar") == 0) 
 	{
@@ -352,10 +360,22 @@ void PlotManager::refreshTextEditUI(PlotItemBase * plot)
 	ui.comboBox_Text_fontSize->setCurrentText(QString("%1").arg(plot->getTitleFontSize()));
 }
 
+void PlotManager::refreshAttitudeUI(PlotItemBase * plot)
+{
+	if (dynamic_cast<PlotAttitude*>(plot) == nullptr)
+		return;
+
+	ui.pushButton_80->setColor(dynamic_cast<PlotAttitude*>(plot)->getRollColor());
+	ui.pushButton_81->setColor(dynamic_cast<PlotAttitude*>(plot)->getPitchColor());
+	ui.spinBox_29->setValue(dynamic_cast<PlotAttitude*>(plot)->getTickRadiusPercentage());
+	ui.spinBox_30->setValue(dynamic_cast<PlotAttitude*>(plot)->getTextPercentage());
+	ui.spinBox_31->setValue(dynamic_cast<PlotAttitude*>(plot)->getDialPercentage());
+}
+
 void PlotManager::enableItem_Scatter()
 {
-	m_itemGOG->setDisabled(false);
-	m_itemLinkedAxis->setDisabled(true);
+	m_itemLinkedAxis->setDisabled(false);
+	m_itemPlotData->setDisabled(false);
 	m_itemScatterPlot->setDisabled(false);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -369,8 +389,8 @@ void PlotManager::enableItem_Scatter()
 
 void PlotManager::enableItem_AScope()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(false);
 	m_itemRTI->setDisabled(true);
@@ -384,8 +404,8 @@ void PlotManager::enableItem_AScope()
 
 void PlotManager::enableItem_RTI()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(false);
@@ -399,8 +419,8 @@ void PlotManager::enableItem_RTI()
 
 void PlotManager::enableItem_Text_Light()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -414,8 +434,8 @@ void PlotManager::enableItem_Text_Light()
 
 void PlotManager::enableItem_Bar()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -429,8 +449,8 @@ void PlotManager::enableItem_Bar()
 
 void PlotManager::enableItem_Dial()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -444,8 +464,8 @@ void PlotManager::enableItem_Dial()
 
 void PlotManager::enableItem_Attitude()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -459,8 +479,8 @@ void PlotManager::enableItem_Attitude()
 
 void PlotManager::enableItem_Polar()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -474,8 +494,8 @@ void PlotManager::enableItem_Polar()
 
 void PlotManager::enableItem_Track()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -489,8 +509,8 @@ void PlotManager::enableItem_Track()
 
 void PlotManager::enableItem_Doppler()
 {
-	m_itemGOG->setDisabled(true);
 	m_itemLinkedAxis->setDisabled(true);
+	m_itemPlotData->setDisabled(true);
 	m_itemScatterPlot->setDisabled(true);
 	m_itemAScope->setDisabled(true);
 	m_itemRTI->setDisabled(true);
@@ -525,8 +545,6 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 				refreshGeneralUI(m_curSelectPlot);
 				//Axis&Grid界面
 				refreshAxisGridUI(m_curSelectPlot);
-				//plotPair界面
-				refreshPlotDataUI(m_curSelectPlot);
 				//Text Edit
 				refreshTextEditUI(m_curSelectPlot);
 				//
@@ -565,6 +583,13 @@ void PlotManager::onSelectedPlot(QString tabName, QString plotName)
 		{
 			if (item->parent() != NULL && item->parent()->text(0) == tabName)
 			{
+				QTreeWidgetItemIterator it(ui.treeWidget_selectedPlots);
+				while (*it)
+				{
+					(*it)->setSelected(false);
+					++it;
+				}
+
 				ui.treeWidget_selectedPlots->itemClicked(item, 0);
 				item->setSelected(true);
 				break;
@@ -612,15 +637,15 @@ void PlotManager::onTWSclicked(QTreeWidgetItem* item, int column)
 	}
 	else
 	{
-		if (compare == QString::fromLocal8Bit("总体设置"))
+		if (compare == QString::fromLocal8Bit("通用"))
 		{
 			ui.stackedWidget->setCurrentIndex(0);
 		}
-		else if (compare == QString::fromLocal8Bit("坐标轴和网格设置"))
+		else if (compare == QString::fromLocal8Bit("坐标轴和网格"))
 		{
 			ui.stackedWidget->setCurrentIndex(1);
 		}
-		else if (compare == QString::fromLocal8Bit("数据设置"))
+		else if (compare == QString::fromLocal8Bit("绘图数据"))
 		{
 			ui.stackedWidget->setCurrentIndex(2);
 		}
@@ -628,17 +653,17 @@ void PlotManager::onTWSclicked(QTreeWidgetItem* item, int column)
 		{
 			ui.stackedWidget->setCurrentIndex(3);
 		}
-		else if (compare == QString::fromLocal8Bit("GOG曲线"))
-		{
-			ui.stackedWidget->setCurrentIndex(4);
-		}
-		else if (compare == QString::fromLocal8Bit("相关的轴"))
+		else if (compare == QString::fromLocal8Bit("链接轴"))
 		{
 			ui.stackedWidget->setCurrentIndex(5);
 		}
 		else if (compare == QString::fromLocal8Bit("Scatter设置"))
 		{
-			ui.stackedWidget->setCurrentIndex(6);
+			ui.stackedWidget->setCurrentIndex(4);
+		}
+		else if (compare == QString::fromLocal8Bit("GOG曲线"))
+		{
+			ui.stackedWidget->setCurrentIndex(4);
 		}
 		else if (compare == QString::fromLocal8Bit("限制"))
 		{
@@ -1221,10 +1246,21 @@ void PlotManager::onPushButton_16Clicked()
 
 void PlotManager::onPushButton_18Clicked()
 {
+	
 }
 
 void PlotManager::onPushButton_19Clicked()
 {
+	int row = ui.tableWidget_plotData->currentRow();
+	if (row < 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+	vec.remove(row);
+	m_curSelectPlot->setDataPair(vec);
+	refreshPlotDataUI(m_curSelectPlot);
 }
 
 void PlotManager::onPushButton_20Clicked()
@@ -1324,5 +1360,45 @@ void PlotManager::onComboBox_Text_fontSizeCurrentTextChanged(const QString & tex
 // 	font.setPointSizeF(text.toFloat());
 // 	m_curSelectPlot->setTitleFont(font);
 	m_curSelectPlot->setTitleFontSize(text.toInt());
+}
+
+void PlotManager::onPushButton_80Clicked()
+{
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	dynamic_cast<PlotAttitude*>(m_curSelectPlot)->setRollColor(ui.pushButton_80->color());
+}
+
+void PlotManager::onPushButton_81Clicked()
+{
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	dynamic_cast<PlotAttitude*>(m_curSelectPlot)->setPitchColor(ui.pushButton_81->color());
+}
+
+void PlotManager::onSpinBox_29ValueChanged(int value)
+{
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	dynamic_cast<PlotAttitude*>(m_curSelectPlot)->setTickRadiusPercentage(value);
+}
+
+void PlotManager::onSpinBox_30ValueChanged(int value)
+{
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	dynamic_cast<PlotAttitude*>(m_curSelectPlot)->setTextPercentage(value);
+}
+
+void PlotManager::onSpinBox_31ValueChanged(int value)
+{
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	dynamic_cast<PlotAttitude*>(m_curSelectPlot)->setDialPercentage(value);
 }
 

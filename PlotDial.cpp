@@ -41,11 +41,11 @@ PlotDial::~PlotDial()
 //更新表盘指针
 void PlotDial::updatePointer(double secs)
 {
-    if (getPlotPairData().isEmpty())
+    if (getDataPair().isEmpty())
         return;
 
-    int isize = getPlotPairData().size();
-    QString xcolumn = getPlotPairData().at(isize - 1).first;
+    int isize = getDataPair().size();
+    QString xcolumn = getDataPair().at(isize - 1)->getDataPair().first;
     QStringList list = xcolumn.split("+");
     QList<double> m_valueList = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(list.at(0), list.at(1), secs);
 
