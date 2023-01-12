@@ -4,6 +4,7 @@
 #include "PlotItemBase.h"
 #include "PlotManager.h"
 #include "colorbutton.h"
+#include "constdef.h"
 #include <QPainter>
 #include <QStringList>
 #include <QPen>
@@ -51,6 +52,7 @@ void PlotText::paintEvent(QPaintEvent* event)
 	QPen pen;
 	QFont font,titleFont;
 	QRect rect;
+	QVector<DataPair*> dataVector;
 	QList<QPair<QString, QString>> dataList;
 	QSet<QString> xset, yset;
 	int i = 0, j = 0;
@@ -77,15 +79,13 @@ void PlotText::paintEvent(QPaintEvent* event)
 	//以下为绘制表格title名字
 	setTitle(painter, rect);
 	//以下绘制n×m的格子
-
-
 	drawNMCell(painter, xset, yset, dataList, horiGridWidth, verGridWidth,as);
 	//以下为绘制X/Y轴item名字
-
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
+	pen.setStyle(Qt::SolidLine);
 	painter.setPen(pen);
-	drawXYTitle(painter, horiGridWidth, verGridWidth, dataList,as);
+	drawXYTitle(painter, horiGridWidth, verGridWidth, dataVector,as);
 	//以下为绘制对应的数据
 	if (m_temValueList.isEmpty())
 		return;
@@ -170,24 +170,6 @@ void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridW
 		for (auto it2 = yset.begin(); it2 != yset.end(); it2++)
 		{
 			j++;
-			//动态数据
-		/*	QString currEntityType = *it;
-			QString currEntityAttr = *it2;*/
-			//auto dataMap = DataManager::getInstance()->getDataMap();
-			//if (!dataMap.contains(currEntityType))
-			//{
-			//	continue;
-			//}
-			//if (!dataMap.value(currEntityType).contains(currEntityAttr))
-			//{
-			//	continue;
-			//}
-			//if (m_currTimeIndex >= dataMap.value(currEntityType).value(currEntityAttr).size())
-			//{
-			//	continue;
-			//}
-			//*获取当前Attr值
-
 			rect.setRect(0.05*width() + (1 + i)*horiGridWidth, 0.1*height() + j*verGridWidth, horiGridWidth, verGridWidth);
 			painter.drawText(rect, Qt::AlignCenter | Qt::TextWrapAnywhere, QString::number((m_temValueList.at(j).back()), 'f', 2));
 		}
@@ -247,11 +229,12 @@ void PlotText::slot_getCurrentSeconds(double secs)
 	update();
 }
 
-void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth, QList<QPair<QString, QString>>& dataList,double &as)
+void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWidth, QVector<DataPair*>& dataVector,double &as)
 {
 	QRect rectXName, rectYName;
 	int i = 0, j = 0;
-	dataList = getPlotPairData();
+	dataVector = getDataPair();
+	//dataList = getPlotPairData();
 	int icount = 0;
 	QFont font;
 	QPen fontPen;
@@ -260,12 +243,14 @@ void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWi
 	font.setPointSize(getTickLabelFontSize());
 	painter.setFont(font);
 	painter.setPen(fontPen);
-	for (int i = 0; i < dataList.size(); i++)
+	for (int i = 0; i < dataVector.size(); i++)
 	{
-		QString xIncludePlus = dataList.at(i).first;
-		int pos = xIncludePlus.indexOf("+");
-		QString xColumn = xIncludePlus.mid(0, pos);
-		QString yColumn = xIncludePlus.mid(pos + 1);
+		DataPair* temDataPair = new DataPair(nullptr);
+		temDataPair = dataVector.at(i);
+		QPair<QString, QString> temPair = temDataPair->getDataPair();
+		QString xIncludePlus = temPair.first;
+		QString xColumn = xIncludePlus.split("+").front();
+		QString yColumn = xIncludePlus.split("+").back();
 		if (m_xColumnList.isEmpty())
 			m_xColumnList.push_back(xColumn);
 		else
@@ -303,18 +288,6 @@ void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWi
 		rectXName.setRect(0.05*width(), as + 0.02*height() + (1 + i)*verGridWidth, horiGridWidth, verGridWidth);
 		painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, m_yColumnList.at(i));
 	}
-	//for (auto it = m_entityName.begin(); it != m_entityName.end(); it++)
-	//{
-	//	rectXName.setRect(0.05*width() + (i + 1)* horiGridWidth, 0.1*height(), horiGridWidth, verGridWidth);
-	//	painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
-	//	i++;
-	//}
-	//for (auto it = m_attriName.begin(); it != m_attriName.end(); it++)
-	//{
-	//	rectXName.setRect(0.05*width(), 0.1*height() + (1 + j)*verGridWidth, horiGridWidth, verGridWidth);
-	//	painter.drawText(rectXName, Qt::AlignCenter | Qt::TextWordWrap, *it);
-	//	j++;
-	//}
 	update();
 }
 
@@ -353,9 +326,9 @@ void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>&
 		gridRect.setRect(0.05*width(),as+0.02*height(),0.9*width(),m_verGridNum*verGridWidth);
 		painter.drawRect(gridRect);
 		//改变Grid画笔
-
 		pen.setColor(getGridColor());
 		pen.setWidth(getGridWidth());
+		pen.setStyle(getGridStyle());
 		painter.setPen(pen);
 		//再画HorizonGrid
 		for (int i = 1; i < m_verGridNum; i++)
@@ -363,16 +336,35 @@ void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>&
 			painter.drawLine(0.05*width() +0.5* getGridWidth() + 0.5 *getAxisWidth(),as + 0.02*height() + i*verGridWidth,
 				0.05*width()+m_horiGridNum*horiGridWidth- 0.5*getGridWidth() - 0.5 *getAxisWidth(), as + 0.02*height() + i*verGridWidth);
 		}
-		//自后画VerticalGrid
+		//最后画VerticalGrid
 		for (int i = 1; i < m_horiGridNum; i++)
 		{
 			painter.drawLine(0.05*width() + i* horiGridWidth, 0.02*height() + as + 0.5*getGridWidth() + 0.5 *getAxisWidth(),
 				0.05*width() + i* horiGridWidth, 0.02*height() + as+verGridWidth*m_verGridNum - 0.5* getGridWidth() - 0.5 *getAxisWidth());
 		}
 	}
-	update();
+	update();	
+}
 
-	
+void PlotText::setGridStyle(GridStyle gridStyle)
+{
+	switch (gridStyle)
+	{
+	case SOLIDLINE:
+		m_gridStyle = Qt::SolidLine;
+		break;
+	case DASHLINE:
+		m_gridStyle = Qt::DashLine;
+		break;
+	case DOTLINE:
+		m_gridStyle = Qt::DotLine;
+		break;
+	case DASHDOTLINE:
+		m_gridStyle = Qt::DashDotLine;
+		break;
+	default:
+		break;
+	}
 }
 
 void PlotText::dataPairOrder()

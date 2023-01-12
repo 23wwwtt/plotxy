@@ -33,13 +33,9 @@ PlotManager::PlotManager(QWidget* parent)
 
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
 
+
 	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
 
-
-
-	ui.stackedWidget->setCurrentIndex(0);
-
-	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
 
 
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
@@ -123,12 +119,12 @@ void PlotManager::initTreeWidgetSettings()
 
 	connect(ui.treeWidget_settings, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSclicked(QTreeWidgetItem*, int)));
 
-	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("总体设置")));
+	m_itemGeneral = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("通用设置")));
 	m_itemAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("坐标轴和网格设置")));
+	m_itemLinkedAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("链接轴")));
 	m_itemPlotData = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("数据设置")));
 	m_itemText = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("文本信息")));
-	m_itemGOG = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("GOG曲线")));
-	m_itemLinkedAxis = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("相关的轴")));
+
 	m_itemScatterPlot = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Scatter设置")));
 	m_itemAScope = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("A-Scope设置")));
 	m_itemRTI = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("RTI设置")));
@@ -139,6 +135,7 @@ void PlotManager::initTreeWidgetSettings()
 	m_itemTrackStatus = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Track Status设置")));
 	m_itemRangeDoppler = new QTreeWidgetItem(ui.treeWidget_settings, QStringList(QString::fromLocal8Bit("Range Doppler设置")));
 
+	m_itemGOG = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("GOG曲线")));
 	m_itemLimits = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("限制")));
 	m_itemPlotMarkers = new QTreeWidgetItem(m_itemScatterPlot, QStringList(QString::fromLocal8Bit("标记")));
 	m_itemTimeLine = new QTreeWidgetItem(m_itemScatterPlot, QStringList("Time Line"));
@@ -182,6 +179,7 @@ void PlotManager::initAxisGridUI()
 	ui.lineEdit_13->setEnabled(false);
 	ui.tableWidget->setEnabled(false);
 	ui.tableWidget_2->setEnabled(false);
+	ui.comboBox_2->setCurrentIndex(0);
 
 	connect(ui.checkBox_4, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_4StateChanged);
 	connect(ui.checkBox_5, &QCheckBox::stateChanged, this, &PlotManager::onCheckBox_5StateChanged);
@@ -226,6 +224,9 @@ void PlotManager::initTextLightUI()
 	connect(ui.pushButton_gridFill, &QPushButton::clicked, this, [=]() {
 		ui.pushButton_73->setColor(ui.pushButton_gridFill->color());
 	});
+	connect(ui.pushButton_66,&QPushButton::clicked,this,&PlotManager::onPushButton_66Clicked);
+	connect(ui.pushButton_67, &QPushButton::clicked, this, &PlotManager::onPushButton_67Clicked);
+	connect(ui.tableWidget_TextDataSort, &QTableWidget::itemSelectionChanged, this, &PlotManager::onTableWidget_textDataSortItemSelectionChanged);
 	connect(ui.spinBox_10, &QSpinBox::editingFinished, this, &PlotManager::onSpinbox_10Changed);
 	connect(ui.pushButton_71, &QPushButton::clicked, this, &PlotManager::onPushButton_71Clicked);
 	connect(ui.pushButton_73, &QPushButton::clicked, this, &PlotManager::onPushButton_73Clicked);
@@ -289,10 +290,14 @@ void PlotManager::refreshTreeWidgetSettingEnabled(PlotItemBase * plot)
 	else if (name.compare("PlotText") == 0)
 	{
 		enableItem_Text_Light();
+		//Text&Light界面
+		refreshLightTextUI(m_curSelectPlot);
 	}
 	else if (name.compare("PlotLight") == 0)
 	{
 		enableItem_Text_Light();
+		//Text&Light界面
+		refreshLightTextUI(m_curSelectPlot);
 	}
 	else if (name.compare("PlotBar") == 0)
 	{
@@ -401,18 +406,15 @@ void PlotManager::refreshLightTextUI(PlotItemBase * plot)
 {
 	if (!(plot == nullptr))
 	{
-		ui.pushButton_73->setColor(plot->getGridFillColor());
 		if (plot->currName().startsWith("Text"))
 		{
 			ui.stackedWidget_LightTextDataSort->setCurrentIndex(0);
 			ui.groupBox_29->setVisible(false);
-
 		}
 		else
 		{
 			ui.stackedWidget_LightTextDataSort->setCurrentIndex(1);
 			ui.groupBox_29->setVisible(true);
-
 		}
 
 		for (int i = ui.tableWidget_TextDataSort->rowCount(); i > 0; i--)
@@ -420,17 +422,23 @@ void PlotManager::refreshLightTextUI(PlotItemBase * plot)
 			ui.tableWidget_TextDataSort->removeRow(ui.tableWidget_TextDataSort->rowCount() - 1);
 		}
 
-		for (int i = 0; i < plot->getPlotPairData().size(); i++)
+		auto dataPair = plot->getDataPair();
+
+		for (int i = 0; i < plot->getDataPair().size(); i++)
 		{
-			QString temFirst = plot->getPlotPairData().at(i).first;
+
+			//QTableWidgetItem* addplot1 = new QTableWidgetItem(dataPair[i+1]->getDataPair().first);
+
+			QString temFirst = dataPair[i]->getDataPair().first;
 			QString temEntityString = temFirst.split("+").front();
 			QString temAttriString = temFirst.split("+").back();
 			QTableWidgetItem *temEntity = new QTableWidgetItem(temEntityString);
 			QTableWidgetItem *temAttri = new QTableWidgetItem(temAttriString);
-			int temRow = ui.tableWidget_TextDataSort->rowCount();
-			ui.tableWidget_TextDataSort->insertRow(temRow);
-			ui.tableWidget_TextDataSort->setItem(temRow, 0, temEntity);
-			ui.tableWidget_TextDataSort->setItem(temRow, 1, temAttri);
+
+			int row = ui.tableWidget_TextDataSort->rowCount();
+			ui.tableWidget_TextDataSort->insertRow(row);
+			ui.tableWidget_TextDataSort->setItem(row, 0, temEntity);
+			ui.tableWidget_TextDataSort->setItem(row, 1, temAttri);
 		}
 	}
 }
@@ -622,8 +630,6 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 				refreshTreeWidgetSettingEnabled(m_curSelectPlot);
 				//general界面
 				refreshGeneralUI(m_curSelectPlot);
-				//Text&Light界面
-				refreshLightTextUI(m_curSelectPlot);
 				//Axis&Grid界面
 				refreshAxisGridUI(m_curSelectPlot);
 				//plotPair界面
@@ -714,7 +720,7 @@ void PlotManager::onTWSclicked(QTreeWidgetItem* item, int column)
 	}
 	else
 	{
-		if (compare == QString::fromLocal8Bit("总体设置"))
+		if (compare == QString::fromLocal8Bit("通用设置"))
 		{
 			ui.stackedWidget->setCurrentIndex(0);
 		}
@@ -734,7 +740,7 @@ void PlotManager::onTWSclicked(QTreeWidgetItem* item, int column)
 		{
 			ui.stackedWidget->setCurrentIndex(4);
 		}
-		else if (compare == QString::fromLocal8Bit("相关的轴"))
+		else if (compare == QString::fromLocal8Bit("链接轴"))
 		{
 			ui.stackedWidget->setCurrentIndex(5);
 		}
@@ -769,6 +775,9 @@ void PlotManager::onTWSclicked(QTreeWidgetItem* item, int column)
 		else if (compare == QString::fromLocal8Bit("Text/Light设置"))
 		{
 			ui.stackedWidget->setCurrentIndex(12);
+			if (m_curSelectPlot == nullptr)
+				return;
+			refreshLightTextUI(m_curSelectPlot);
 		}
 		else if (compare == QString::fromLocal8Bit("Bar设置"))
 		{
@@ -908,11 +917,11 @@ void PlotManager::onPushButton_73Clicked()
 	ui.pushButton_gridFill->setColor(color);
 }
 
-void PlotManager::onPushButton_gridFillClicked()
-{
-	QColor color = ui.pushButton_gridFill->color();
-	m_curSelectPlot->setGridFillColor(color);
-}
+//void PlotManager::onPushButton_gridFillClicked()
+//{
+//	QColor color = ui.pushButton_gridFill->color();
+//	m_curSelectPlot->setGridFillColor(color);
+//}
 
 void PlotManager::onPlotRectEditFinished()
 {
@@ -1199,7 +1208,6 @@ void PlotManager::onComboBox_2CurrentIndexChanged(int index)
 	{
 		return;
 	}
-
 	m_curSelectPlot->setGridStyle(GridStyle(index));
 }
 
@@ -1224,6 +1232,37 @@ void PlotManager::onComboBox_3CurrentIndexChanged(int index)
 		break;
 	}
 	m_curSelectPlot->setGridDensity(density);
+}
+
+void PlotManager::onTableWidget_textDataSortItemSelectionChanged()
+{
+	//设置Move Up/Move Down的enable
+	if (ui.tableWidget_TextDataSort->currentRow() < 0)
+		return;
+	int row = ui.tableWidget_TextDataSort->rowCount();
+	ui.pushButton_66->setEnabled(false);
+	ui.pushButton_67->setEnabled(false);
+
+	if (row <= 1)
+	{
+		ui.pushButton_66->setEnabled(false);
+		ui.pushButton_67->setEnabled(false);
+	}
+	else if (ui.tableWidget_TextDataSort->currentRow() == 0)
+	{
+		ui.pushButton_66->setEnabled(false);
+		ui.pushButton_67->setEnabled(true);
+	}
+	else if (ui.tableWidget_TextDataSort->currentRow() == row - 1)
+	{
+		ui.pushButton_66->setEnabled(true);
+		ui.pushButton_67->setEnabled(false);
+	}
+	else
+	{
+		ui.pushButton_66->setEnabled(true);
+		ui.pushButton_67->setEnabled(true);
+	}
 }
 
 void PlotManager::onTableWidget_plotDataItemSelectionChanged()
@@ -1340,6 +1379,156 @@ void PlotManager::onPushButton_16Clicked()
 	m_curSelectPlot->setDataPair(vec);
 	refreshPlotDataUI(m_curSelectPlot);
 	ui.tableWidget_plotData->setCurrentCell(row + 1, 0);
+}
+
+void PlotManager::onPushButton_66Clicked()
+{
+	int row = ui.tableWidget_TextDataSort->currentRow();
+	if (row < 0)
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+	
+	if (ui.tableWidget_TextDataSort->currentColumn() == 0)
+	{
+		QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+		int temRow = ui.tableWidget_TextDataSort->currentRow();
+		DataPair *temNowDataPair = new DataPair(nullptr);
+		temNowDataPair = vec.at(temRow);		
+		QString temNowFirst = temNowDataPair->getDataPair().first;
+		QString temNowFront = temNowFirst.split("+").front();
+		QString temNowBack = temNowFirst.split("+").back();
+		DataPair * temAboveDataPair = new DataPair(nullptr);
+		temAboveDataPair = vec.at(ui.tableWidget_TextDataSort->currentRow() - 1);
+		QString temAboveFirst = temAboveDataPair->getDataPair().first;
+		QString temAboveFront = temAboveFirst.split("+").front();
+		QString temAboveBack = temAboveFirst.split("+").back();
+		QPair<QString, QString> newAbove = qMakePair(temNowFront+"+"+temAboveBack, temAboveDataPair->getDataPair().second);
+		QPair<QString, QString> newNow = qMakePair(temAboveFront + "+" + temNowBack, temNowDataPair->getDataPair().second);
+		DataPair* newAboveDataPair = new DataPair(newAbove);
+		DataPair* newNowDataPair = new DataPair(newNow);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow()-1);
+		vec.insert(ui.tableWidget_TextDataSort->currentRow() - 1,newAboveDataPair);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow());
+		vec.insert(ui.tableWidget_TextDataSort->currentRow(),newNowDataPair);
+		m_curSelectPlot->setDataPair(vec);
+		refreshLightTextUI(m_curSelectPlot);
+		ui.tableWidget_TextDataSort->setCurrentCell(row - 1, 0);
+		delete temNowDataPair;
+		delete temAboveDataPair;
+		delete newAboveDataPair;
+		delete newNowDataPair;
+	}
+	else if (ui.tableWidget_TextDataSort->currentColumn() == 1)
+	{
+		QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+		int temRow = ui.tableWidget_TextDataSort->currentRow();
+		DataPair *temNowDataPair = new DataPair(nullptr);
+		temNowDataPair = vec.at(temRow);
+		QString temNowFirst = temNowDataPair->getDataPair().first;
+		QString temNowFront = temNowFirst.split("+").front();
+		QString temNowBack = temNowFirst.split("+").back();
+		DataPair * temAboveDataPair = new DataPair(nullptr);
+		temAboveDataPair = vec.at(ui.tableWidget_TextDataSort->currentRow() - 1);
+		QString temAboveFirst = temAboveDataPair->getDataPair().first;
+		QString temAboveFront = temAboveFirst.split("+").front();
+		QString temAboveBack = temAboveFirst.split("+").back();
+		QPair<QString, QString> newAbove = qMakePair(temAboveFront + "+" + temNowBack, temAboveDataPair->getDataPair().second);
+		QPair<QString, QString> newNow = qMakePair(temNowFront + "+" + temAboveBack, temNowDataPair->getDataPair().second);
+		DataPair* newAboveDataPair = new DataPair(newAbove);
+		DataPair* newNowDataPair = new DataPair(newNow);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow() - 1);
+		vec.insert(ui.tableWidget_TextDataSort->currentRow() - 1, newAboveDataPair);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow());
+		vec.insert(ui.tableWidget_TextDataSort->currentRow(), newNowDataPair);
+		m_curSelectPlot->setDataPair(vec);
+		refreshLightTextUI(m_curSelectPlot);
+		ui.tableWidget_TextDataSort->setCurrentCell(row - 1, 1);
+		delete temNowDataPair;
+		delete temAboveDataPair;
+		delete newAboveDataPair;
+		delete newNowDataPair;
+	}
+	else
+		return;
+	//Light改变的时候可能会用到
+	//QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+	//vec.move(row, row - 1);
+	//m_curSelectPlot->setDataPair(vec);
+	//refreshLightTextUI(m_curSelectPlot);
+	//ui.tableWidget_TextDataSort->setCurrentCell(row - 1, 0);
+}
+
+void PlotManager::onPushButton_67Clicked()
+{
+	int row = ui.tableWidget_TextDataSort->currentRow();
+	if (row < 0 || row >= (ui.tableWidget_TextDataSort->rowCount() - 1))
+		return;
+	if (m_curSelectPlot == nullptr)
+		return;
+
+	if (ui.tableWidget_TextDataSort->currentColumn() == 0)
+	{
+		QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+		int temRow = ui.tableWidget_TextDataSort->currentRow();
+		DataPair *temNowDataPair = new DataPair(nullptr);
+		temNowDataPair = vec.at(temRow);
+		QString temNowFirst = temNowDataPair->getDataPair().first;
+		QString temNowFront = temNowFirst.split("+").front();
+		QString temNowBack = temNowFirst.split("+").back();
+		DataPair * temAboveDataPair = new DataPair(nullptr);
+		temAboveDataPair = vec.at(ui.tableWidget_TextDataSort->currentRow() + 1);
+		QString temAboveFirst = temAboveDataPair->getDataPair().first;
+		QString temAboveFront = temAboveFirst.split("+").front();
+		QString temAboveBack = temAboveFirst.split("+").back();
+		QPair<QString, QString> newAbove = qMakePair(temNowFront + "+" + temAboveBack, temAboveDataPair->getDataPair().second);
+		QPair<QString, QString> newNow = qMakePair(temAboveFront + "+" + temNowBack, temNowDataPair->getDataPair().second);
+		DataPair* newAboveDataPair = new DataPair(newAbove);
+		DataPair* newNowDataPair = new DataPair(newNow);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow() + 1);
+		vec.insert(ui.tableWidget_TextDataSort->currentRow() + 1, newAboveDataPair);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow());
+		vec.insert(ui.tableWidget_TextDataSort->currentRow(), newNowDataPair);
+		m_curSelectPlot->setDataPair(vec);
+		refreshLightTextUI(m_curSelectPlot);
+		ui.tableWidget_TextDataSort->setCurrentCell(row + 1, 0);
+		delete temNowDataPair;
+		delete temAboveDataPair;
+		delete newAboveDataPair;
+		delete newNowDataPair;
+	}
+	else if (ui.tableWidget_TextDataSort->currentColumn() == 1)
+	{
+		QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
+		int temRow = ui.tableWidget_TextDataSort->currentRow();
+		DataPair *temNowDataPair = new DataPair(nullptr);
+		temNowDataPair = vec.at(temRow);
+		QString temNowFirst = temNowDataPair->getDataPair().first;
+		QString temNowFront = temNowFirst.split("+").front();
+		QString temNowBack = temNowFirst.split("+").back();
+		DataPair * temAboveDataPair = new DataPair(nullptr);
+		temAboveDataPair = vec.at(ui.tableWidget_TextDataSort->currentRow() + 1);
+		QString temAboveFirst = temAboveDataPair->getDataPair().first;
+		QString temAboveFront = temAboveFirst.split("+").front();
+		QString temAboveBack = temAboveFirst.split("+").back();
+		QPair<QString, QString> newAbove = qMakePair(temAboveFront + "+" + temNowBack, temAboveDataPair->getDataPair().second);
+		QPair<QString, QString> newNow = qMakePair(temNowFront + "+" + temAboveBack, temNowDataPair->getDataPair().second);
+		DataPair* newAboveDataPair = new DataPair(newAbove);
+		DataPair* newNowDataPair = new DataPair(newNow);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow() + 1);
+		vec.insert(ui.tableWidget_TextDataSort->currentRow() + 1, newAboveDataPair);
+		vec.remove(ui.tableWidget_TextDataSort->currentRow());
+		vec.insert(ui.tableWidget_TextDataSort->currentRow(), newNowDataPair);
+		m_curSelectPlot->setDataPair(vec);
+		refreshLightTextUI(m_curSelectPlot);
+		ui.tableWidget_TextDataSort->setCurrentCell(row + 1, 1);
+		delete temNowDataPair;
+		delete temAboveDataPair;
+		delete newAboveDataPair;
+		delete newNowDataPair;
+	}
+	else
+		return;
 }
 
 void PlotManager::onPushButton_18Clicked()

@@ -97,7 +97,6 @@
        </property>
        <property name="currentIndex">
         <number>12</number>
-        <number>2</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QVBoxLayout" name="verticalLayout_64" stretch="0,1,0,0,0,1">
@@ -4585,7 +4584,7 @@ background-color: rgb(127, 127, 127);</string>
              <item>
               <widget class="QStackedWidget" name="stackedWidget_LightTextDataSort">
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="page_TextDataSort">
                 <layout class="QVBoxLayout" name="verticalLayout_75">

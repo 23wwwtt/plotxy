@@ -137,7 +137,6 @@ QString PlotItemBase::currTabName()
 
 void PlotItemBase::setOuterFillColor(QColor color)
 {
-
 	setAutoFillBackground(true);
 	m_outerFillColor = color;
 	QPalette palette = this->palette();
@@ -148,7 +147,6 @@ void PlotItemBase::setOuterFillColor(QColor color)
 void PlotItemBase::setOutlineColor(QColor color)
 {
 	m_outlineColor = color;
-	this->setStyleSheet(QString("QWidget{border-color:%1)}").arg(color.value()));
 }
 
 void PlotItemBase::setCoordRangeX(double lower, double upper)

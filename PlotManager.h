@@ -103,12 +103,14 @@ public slots:
 	void onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString& text);
 	void onComboBox_2CurrentIndexChanged(int index);
 	void onComboBox_3CurrentIndexChanged(int index);
-	void onPushButton_gridFillClicked();
 
 	//Light/Text
 	void onPushButton_71Clicked();
 	void onPushButton_73Clicked();
 	void onSpinbox_10Changed();
+	void onPushButton_66Clicked();
+	void onPushButton_67Clicked();
+	void onTableWidget_textDataSortItemSelectionChanged();
 
 	//Plot Data
 	void onTableWidget_plotDataItemSelectionChanged();
