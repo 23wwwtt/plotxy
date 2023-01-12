@@ -83,6 +83,7 @@ public slots:
 	void onBtnLightAddClicked();
 	void onBtnLightDeleteClicked();
 	void onBtnLightUpdateClicked();
+	void onUpdatePlotPair(QString, QString);
 
 private:
     Ui::AddPlotPair ui;

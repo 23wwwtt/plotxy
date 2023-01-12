@@ -53,7 +53,6 @@ void PlotText::paintEvent(QPaintEvent* event)
 	QFont font,titleFont;
 	QRect rect;
 	QVector<DataPair*> dataVector;
-	QList<QPair<QString, QString>> dataList;
 	QSet<QString> xset, yset;
 	int i = 0, j = 0;
 	int horGT = 0;
@@ -79,7 +78,7 @@ void PlotText::paintEvent(QPaintEvent* event)
 	//以下为绘制表格title名字
 	setTitle(painter, rect);
 	//以下绘制n×m的格子
-	drawNMCell(painter, xset, yset, dataList, horiGridWidth, verGridWidth,as);
+	drawNMCell(painter, xset, yset, dataVector, horiGridWidth, verGridWidth, as);
 	//以下为绘制X/Y轴item名字
 	pen.setColor(Qt::white);
 	pen.setWidth(3);
@@ -153,7 +152,7 @@ void PlotText::setTitle(QPainter& painter, QRect& rect)
 
 void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridWidth, int& verGridWidth)
 {
-	if (getPlotPairData().isEmpty())
+	if (getDataPair().isEmpty())
 	{
 		return;
 	}
@@ -182,16 +181,16 @@ void PlotText::drawData(QSet<QString>& xset, QSet<QString>& yset, int& horiGridW
 
 void PlotText::slot_getCurrentSeconds(double secs)
 {
-	if (getPlotPairData().isEmpty())
+	if (getDataPair().isEmpty())
 		return;
-	int isize = getPlotPairData().size();
+	int isize = getDataPair().size();
 	int entityNum = 0;
 	int attriNum = 0;
 	//m_entityName.clear();
 	//m_attriName.clear();
 	for (int i = 0; i < isize; i++)
 	{
-		QString getTextData = getPlotPairData().at(i).first;
+		QString getTextData = getDataPair().at(i)->getDataPair().first;
 		QList<QString> textValueList = getTextData.split("+");
 		if (m_entityName.isEmpty())
 			m_entityName.push_back(textValueList.front());
@@ -291,13 +290,13 @@ void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWi
 	update();
 }
 
-void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>& yset, QList<QPair<QString, QString>> dataList,
+void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>& yset, QVector<DataPair*> dataVector,
 	int& horiGridWidth, int& verGridWidth,double &as)
 {
-	dataList = getPlotPairData();
-	for (int i = 0; i < dataList.size(); i++)
+	dataVector = getDataPair();
+	for (int i = 0; i < dataVector.size(); i++)
 	{
-		QString xIncludePlus = dataList.at(i).first;
+		QString xIncludePlus = dataVector.at(i)->getDataPair().first;
 		int pos = xIncludePlus.indexOf("+");
 		QString xColumn = xIncludePlus.mid(0, pos);
 		QString yColumn = xIncludePlus.mid(pos + 1);
@@ -306,7 +305,7 @@ void PlotText::drawNMCell(QPainter& painter, QSet<QString>& xset, QSet<QString>&
 		m_horiGridNum = xset.size() + 1;
 		m_verGridNum = yset.size() + 1;
 	}
-	if (!dataList.empty())
+	if (!dataVector.empty())
 	{
 		//先画GridFill
 		for (int i = 0; i < m_verGridNum; i++)

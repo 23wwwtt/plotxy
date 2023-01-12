@@ -304,32 +304,52 @@ void PlotItemBase::setTitleFontSize(int size)
 	m_titleFont.setPointSize(size);
 }
 
+void PlotItemBase::setxAxisLabel(int label)
+{
+	m_xAxisLabel = label;
+}
+
+void PlotItemBase::setyAxisLabel(int label)
+{
+	m_yAxisLabel = label;
+}
+
+void PlotItemBase::setAxisLabelColor(QColor & color)
+{
+	m_axisLabelColor = color;
+}
+
+void PlotItemBase::setAxisLabelFont(QFont & font)
+{
+	m_axisLabelFont = font;
+}
+
+void PlotItemBase::setAxisLabelFontSize(int size)
+{
+	m_axisLabelFontSize = size;
+	m_axisLabelFont.setPointSize(size);
+}
+
 void PlotItemBase::addPlotPairData(QPair<QString, QString> pair)
 {
-	m_plotPairData.append(pair);
 	DataPair* data = new DataPair(pair);
 	m_dataPair.append(data);
+
+	emit sgn_dataPairChanged(m_tabName, m_plotItemName);
 }
 
 void PlotItemBase::delPlotPairData(QPair<QString, QString> pair)
 {
-	if (m_plotPairData.isEmpty())
+	if (m_dataPair.isEmpty())
 		return;
-
-	for (auto &i : m_plotPairData)
-	{
-		if (QPair<QString, QString>(i) == pair)
-		{
-			m_plotPairData.removeOne(i);
-			break;
-		}
-	}
 
 	for (int i = 0; i < m_dataPair.size(); ++i)
 	{
 		if (m_dataPair.at(i)->getDataPair() == pair)
 		{
 			m_dataPair.remove(i);
+
+			emit sgn_dataPairChanged(m_tabName, m_plotItemName);
 			break;
 		}
 	}
@@ -337,36 +357,26 @@ void PlotItemBase::delPlotPairData(QPair<QString, QString> pair)
 
 void PlotItemBase::updatePlotPairData(QPair<QString, QString> oldPair, QPair<QString, QString> newPair)
 {
-	if (m_plotPairData.isEmpty())
+	if (m_dataPair.isEmpty())
 		return;
-
-	for (int i = 0; i < m_plotPairData.size(); ++i)
-	{
-		if (m_plotPairData.at(i) == oldPair)
-		{
-			m_plotPairData.replace(i, newPair);
-			break;
-		}
-	}
 
 	for (int i = 0; i < m_dataPair.size(); ++i)
 	{
 		if (m_dataPair.at(i)->getDataPair() == oldPair)
 		{
 			m_dataPair.at(i)->setDataPair(newPair);
+
+			emit sgn_dataPairChanged(m_tabName, m_plotItemName);
 			break;
 		}
 	}
 }
 
-QList<QPair<QString, QString>> PlotItemBase::getPlotPairData()
-{
-	return m_plotPairData;
-}
-
 void PlotItemBase::setDataPair(QVector<DataPair*> newVector)
 {
 	m_dataPair.swap(newVector);
+
+	emit sgn_dataPairChanged(m_tabName, m_plotItemName);
 }
 
 void PlotItemBase::slot_setVisible(bool on)

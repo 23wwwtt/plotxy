@@ -185,7 +185,8 @@ bool FreeWidgetWraper::eventFilter(QObject *watched, QEvent *event)
             pressedArea[i] = false;
         }
 
-		emit sgnMouseEventDone();
+		if (widget->objectName() == "PlotItemBase")
+			emit sgnMouseEventDone(widget);
     }
     
     return QObject::eventFilter(watched, event);

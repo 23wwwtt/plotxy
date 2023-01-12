@@ -25,6 +25,7 @@ public:
     void initTime();
     void initStatusBar();
     void initWidget(PlotItemBase *w);
+	void updateStatusBar_info(QString);
     PlotType getCurrentFocusPlot();
 
 public slots:
@@ -32,6 +33,7 @@ public slots:
     void onPlotManager();
     void onAddPlotPair();
     void onOpenFile();
+	void onSelectedPlot(QWidget*);
 
     void onCustomContextMenuRequested(const QPoint &);
     void onContextMenu(const QPoint &point);
@@ -52,8 +54,6 @@ public slots:
     void onAddDopplerPolt();
     void onAddScatterPlot();
     void onAddDialPlot();
-
-    void onFocusChanged(QWidget *oldWidget, QWidget *newWidget);
 
     void onSetSliderRange(int min, int max, int singleStep);
     void onSliderValueChanged(int);
@@ -83,7 +83,6 @@ signals:
 	void sgn_renameTabPage(QString, QString);
 private:
     Ui::PlotXYDemo ui;
-    QWidget *m_nowFocusWidget;
     //FreeWidgetWraper* m_freeWidgetWraper;
     PlotManager *m_plotManager;
     AddPlotPair *m_addPlotPair;

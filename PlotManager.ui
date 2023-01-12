@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_66">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_14">
+    <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,1">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -38,6 +38,9 @@
           </property>
           <item>
            <widget class="QTreeWidget" name="treeWidget_selectedPlots">
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
             <column>
              <property name="text">
               <string notr="true">1</string>
@@ -86,6 +89,12 @@
      </item>
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Panel</enum>
        </property>
@@ -117,7 +126,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>25</height>
+             <height>22</height>
             </size>
            </property>
            <property name="styleSheet">
@@ -473,6 +482,12 @@ color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_164">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(127, 127, 127);
 color: rgb(255, 255, 255);</string>
@@ -1406,6 +1421,12 @@ color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_165">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(127, 127, 127);
 color: rgb(255, 255, 255);</string>
@@ -1944,6 +1965,12 @@ color: rgb(255, 255, 255);</string>
          </item>
          <item row="0" column="0" colspan="4">
           <widget class="QLabel" name="label_166">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(127, 127, 127);
 color: rgb(255, 255, 255);</string>
@@ -1977,6 +2004,12 @@ color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_167">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(127, 127, 127);
 color: rgb(255, 255, 255);</string>
@@ -2297,6 +2330,12 @@ color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_169">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(127, 127, 127);
 color: rgb(255, 255, 255);</string>
@@ -2603,6 +2642,12 @@ color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_183">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -3148,6 +3193,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_70">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -3424,6 +3475,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_187">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -3624,6 +3681,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_188">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -4001,6 +4064,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_189">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -4171,6 +4240,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_190">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -4546,6 +4621,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_170">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -5149,6 +5230,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_191">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -5288,6 +5375,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_162">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -5798,6 +5891,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_192">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -5866,7 +5965,11 @@ background-color: rgb(127, 127, 127);</string>
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QSpinBox" name="spinBox_29"/>
+                   <widget class="QSpinBox" name="spinBox_29">
+                    <property name="maximum">
+                     <number>200</number>
+                    </property>
+                   </widget>
                   </item>
                   <item row="0" column="2">
                    <spacer name="horizontalSpacer_75">
@@ -5889,7 +5992,11 @@ background-color: rgb(127, 127, 127);</string>
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QSpinBox" name="spinBox_30"/>
+                   <widget class="QSpinBox" name="spinBox_30">
+                    <property name="maximum">
+                     <number>200</number>
+                    </property>
+                   </widget>
                   </item>
                   <item row="1" column="2">
                    <spacer name="horizontalSpacer_76">
@@ -5912,7 +6019,11 @@ background-color: rgb(127, 127, 127);</string>
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QSpinBox" name="spinBox_31"/>
+                   <widget class="QSpinBox" name="spinBox_31">
+                    <property name="maximum">
+                     <number>200</number>
+                    </property>
+                   </widget>
                   </item>
                   <item row="2" column="2">
                    <spacer name="horizontalSpacer_77">
@@ -6059,6 +6170,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_193">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>
@@ -6513,6 +6630,12 @@ background-color: rgb(127, 127, 127);</string>
          </property>
          <item>
           <widget class="QLabel" name="label_194">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(127, 127, 127);</string>

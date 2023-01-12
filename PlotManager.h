@@ -37,6 +37,7 @@ private:
 
 	void initPlotDataUI();
 	void initTextEditUI();
+	void initAttitudeUI();
 
 	void refreshTreeWidgetSettingEnabled(PlotItemBase* plot);
 	void refreshGeneralUI(PlotItemBase* plot);
@@ -46,6 +47,7 @@ private:
 	void refreshLightTextUI(PlotItemBase* plot);
 
 	void refreshTextEditUI(PlotItemBase* plot);
+	void refreshAttitudeUI(PlotItemBase* plot);
 
 
 	void enableItem_Scatter();
@@ -70,9 +72,6 @@ public slots:
 	void spinboxBetweenChanged();
 	void spinboxLeftChanged();
 	void spinboxRightChanged();
-
-// 	void onAddPlotPair(QString,QString);
-// 	void onAddPlotPair(QString tabName, QString plotName, QString xColumn, QString yColumn);
 
 	//General
 	void onRadioPixelClicked();
@@ -136,6 +135,13 @@ public slots:
 	void onPushButton_23Clicked();
 	void onfontComboBox_2CurrentFontChanged(const QFont& font);
 	void onComboBox_Text_fontSizeCurrentTextChanged(const QString& text);
+
+	//Attitude
+	void onPushButton_80Clicked();
+	void onPushButton_81Clicked();
+	void onSpinBox_29ValueChanged(int);
+	void onSpinBox_30ValueChanged(int);
+	void onSpinBox_31ValueChanged(int);
 
 
 signals:

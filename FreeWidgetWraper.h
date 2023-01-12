@@ -60,7 +60,7 @@ public Q_SLOTS:
     void setWidget(QWidget*widget);
 
 signals:
-	void sgnMouseEventDone();
+	void sgnMouseEventDone(QWidget*);
 };
 
 #endif // _FREE_WIDGET_WRAPER_H_

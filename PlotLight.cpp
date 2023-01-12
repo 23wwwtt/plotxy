@@ -52,9 +52,8 @@ void PlotLight::paintEvent(QPaintEvent* event)
 	QRect rect;
 	QSet<QString> yset;
 	QPainterPath path;
-	QList<QPair<QString, QString>> dataList;
+	QVector<DataPair*> dataVector = getDataPair();
 
-	dataList = getPlotPairData();
 	m_axisColor = Qt::white;
 	pen.setColor(m_axisColor);
 	font.setPointSize(20);
@@ -71,22 +70,22 @@ void PlotLight::paintEvent(QPaintEvent* event)
 	double horGridWidth = 0;
 	m_horiGridNum = 1;
 
-	if (!dataList.empty())
+	if (!dataVector.empty())
 	{
 		rect.setRect(0.05*width(), 0.1*height(), 0.9*width(), 0.85*height());
 		painter.drawRect(rect);
 
 	}
 	painter.setBrush(QBrush(Qt::gray));
-	for (int i = 0; i < dataList.size(); i++)
+	for (int i = 0; i < dataVector.size(); i++)
 	{	
 		painter.setBrush(QBrush(Qt::gray));
-		yset.insert(dataList.at(i).first);
-		m_verGridNum = dataList.size();
+		yset.insert(dataVector.at(i)->getDataPair().first);
+		m_verGridNum = dataVector.size();
 		verGridWidth = 0.85*height() / m_verGridNum;
 		horGridWidth = (0.85*width() - 0.1*height()) / m_horiGridNum;//整个宽减去框框宽，减去圆圈占宽
 		rect.setRect(0.1*width() + 0.1*height(), 0.1*height() + i*verGridWidth, horGridWidth, verGridWidth);
-		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, dataList.at(i).first);
+		painter.drawText(rect, Qt::AlignCenter | Qt::TextWordWrap, dataVector.at(i)->getDataPair().first);
 		judgeLight();	
 	}
 	drawLight(painter, verGridWidth);
@@ -96,7 +95,7 @@ void PlotLight::paintEvent(QPaintEvent* event)
 
 void PlotLight::drawLight(QPainter &painter,double &verGridWidth)
 {
-	for (int i = 0; i < getPlotPairData().size(); i++)
+	for (int i = 0; i < getDataPair().size(); i++)
 	{
 		painter.setBrush(QBrush(Qt::gray));
 		if (m_brush.isEmpty())
@@ -124,16 +123,16 @@ void PlotLight::judgeLight()
 	QList<QString> partUserLightData;
 	QStringList docEntityAndAttr;
 	QString temEntityAndAtrr = " ";
-	for (int i = 0; i < getPlotPairData().size(); i++)
+	for (int i = 0; i < getDataPair().size(); i++)
 	{
-		docEntityAndAttr.push_back(getPlotPairData().at(i).first);
+		docEntityAndAttr.push_back(getDataPair().at(i)->getDataPair().first);
 	}
 	int isize = 0;
 	int icount = 0;
 
 	if (m_userLightData.size() > 1)
 	{
-		for (int j = 0; j < getPlotPairData().size(); j++)
+		for (int j = 0; j < getDataPair().size(); j++)
 		{
 			iBrush.setColor(Qt::gray);
 			for (int i = 0; i < m_userLightData.size(); i++)
@@ -261,16 +260,16 @@ void PlotLight::slot_onAddButtonClicked()
 
 void PlotLight::slot_getCurrentSeconds(double secs)
 {
-	if (getPlotPairData().isEmpty())
+	if (getDataPair().isEmpty())
 		return;
-	int isize = getPlotPairData().size();
+	int isize = getDataPair().size();
 	int entityNum = 0;
 	int attriNum = 0;
 	//m_entityName.clear();
 	//m_attriName.clear();
 	for (int i = 0; i < isize; i++)
 	{
-		QString getLightData = getPlotPairData().at(i).first;
+		QString getLightData = getDataPair().at(i)->getDataPair().first;
 		QList<QString> lightValueList = getLightData.split("+");
 		m_valueList = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(lightValueList.front(), lightValueList.back(), secs);
 		m_lightDataList.push_back(m_valueList.back());
