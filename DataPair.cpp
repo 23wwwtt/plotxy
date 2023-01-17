@@ -1,30 +1,27 @@
 #include "DataPair.h"
+#include <QPainter>
+#include <QTransform>
 
 DataPair::DataPair(QObject *parent)
 	: QObject(parent)
 {
-	m_lineWidth = 1;
+	m_lineWidth = 2;
 	m_isDraw = true;
 	m_color = Qt::white;
 	m_isLineMode = false;
-	m_hasIcon = false;
+	m_hasIcon = true;
 	m_iconName = nullptr;
 	m_iconSize = QSize(64, 64);
 }
 
-// DataPair::DataPair()
-// 	:m_isDraw(true), m_color(Qt::white),m_hasIcon(false)
-// {
-// }
-
 DataPair::DataPair(QPair<QString, QString> pair)
 {
 	m_dataPair = pair;
-	m_lineWidth = 1;
+	m_lineWidth = 2;
 	m_isDraw = true;
 	m_color = Qt::white;
 	m_isLineMode = false;
-	m_hasIcon = false;
+	m_hasIcon = true;
 	m_iconName = nullptr;
 	m_iconSize = QSize(64, 64);
 }
@@ -92,3 +89,11 @@ void DataPair::setIconHeight(int h)
 	m_iconSize.setHeight(h);
 	emit dataUpdate();
 }
+
+QPixmap DataPair::rotateIcon(QPixmap pix, float angle)
+{
+	QTransform trans;
+	trans.rotate(angle);
+	return pix.transformed(trans);
+}
+

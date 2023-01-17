@@ -105,7 +105,7 @@ protected:
 private:
 	void initPlot();
     void getDataInfo(double secs);
-    void updateData(QString xEntityType, QString yEntityType, double secs, int index, QColor color = Qt::white);
+	void updateData(double secs, int index, DataPair* data);
 
 private:
     double m_curSeconds;

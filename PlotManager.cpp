@@ -29,24 +29,12 @@ PlotManager::PlotManager(QWidget* parent)
 	ui.treeWidget_selectedPlots->setHeaderHidden(true);
 	ui.treeWidget_selectedPlots->expandAll();
 
-
 	ui.stackedWidget->setCurrentIndex(0);
 
 	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
-
-	connect(ui.pushButton_addNew, SIGNAL(clicked()), this, SLOT(onAddNewClicked()));
-
-
-
-	ui.stackedWidget->setCurrentIndex(0);
-
-	connect(ui.treeWidget_selectedPlots, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(onTWSPclicked(QTreeWidgetItem*, int)));
-
-
 	connect(ui.spinBox_between, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxBetweenChanged);
 	connect(ui.spinBox_left, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxLeftChanged);
 	connect(ui.spinBox_right, QOverload<int>::of(&QSpinBox::valueChanged), this, &PlotManager::spinboxRightChanged);
-
 }
 
 PlotManager::~PlotManager()
@@ -64,37 +52,6 @@ void PlotManager::init()
 	initPlotDataUI();
 	initTextEditUI();
 	initAttitudeUI();
-}
-
-void PlotManager::addPlot(const QString& tabName, PlotItemBase* plotItem)
-{
-	m_plotManager = PlotManagerData::getInstance()->getPlotManagerData();
-
-	//显示层更新
-	if (m_plotManager.contains(tabName))
-	{
-		QList<QTreeWidgetItem*> topWidget = ui.treeWidget_selectedPlots->findItems(tabName, Qt::MatchCaseSensitive, 0);
-		if (topWidget.size() != 0)
-		{
-			QTreeWidgetItem* itemselPlotI = new QTreeWidgetItem(QStringList() << plotItem->currName());
-			topWidget[0]->addChild(itemselPlotI);
-		}
-	}
-	else
-	{
-		QTreeWidgetItem* itemselPlotH = new QTreeWidgetItem(QStringList() << tabName);
-		ui.treeWidget_selectedPlots->addTopLevelItem(itemselPlotH);
-		ui.treeWidget_selectedPlots->expandAll();
-
-		QTreeWidgetItem* itemselPlotI = new QTreeWidgetItem(QStringList() << plotItem->currName());
-		itemselPlotH->addChild(itemselPlotI);
-
-		//comboBox_tabName
-		ui.comboBox_tabName->addItem(tabName);
-	}
-
-	//数据层更新
-//	m_plotManager[tabName].append(plotItem);
 }
 
 void PlotManager::initTreeWidgetSettings()
@@ -414,9 +371,9 @@ void PlotManager::refreshLightTextUI(PlotItemBase * plot)
 			ui.tableWidget_TextDataSort->removeRow(ui.tableWidget_TextDataSort->rowCount() - 1);
 		}
 
-		for (int i = 0; i < plot->getPlotPairData().size(); i++)
+		for (int i = 0; i < plot->getDataPair().size(); i++)
 		{
-			QString temFirst = plot->getPlotPairData().at(i).first;
+			QString temFirst = plot->getDataPair().at(i)->getDataPair().first;
 			QString temEntityString = temFirst.split("+").front();
 			QString temAttriString = temFirst.split("+").back();
 			QTableWidgetItem *temEntity = new QTableWidgetItem(temEntityString);
@@ -652,10 +609,7 @@ void PlotManager::onTWSPclicked(QTreeWidgetItem* item, int column)
 
 void PlotManager::onAddNewClicked()
 {
-	/*AddPlotPair* addPlotPair = new AddPlotPair();
-	addPlotPair->show();*/
-
-	emit sigAddPlotPair();
+	emit sigAddPlotPair(m_curSelectPlot->currTabName(), m_curSelectPlot->currName());
 }
 
 void PlotManager::onSelectedPlot(QString tabName, QString plotName)
@@ -916,12 +870,6 @@ void PlotManager::onPushButton_73Clicked()
 		m_curSelectPlot->setGridFillColor(color);
 	}
 	ui.pushButton_gridFill->setColor(color);
-}
-
-void PlotManager::onPushButton_gridFillClicked()
-{
-	QColor color = ui.pushButton_gridFill->color();
-	m_curSelectPlot->setGridFillColor(color);
 }
 
 void PlotManager::onPlotRectEditFinished()
@@ -1240,7 +1188,13 @@ void PlotManager::onTableWidget_plotDataItemSelectionChanged()
 {
 	int row = ui.tableWidget_plotData->currentRow();
 	if (row < 0)
+	{
+		ui.pushButton_15->setEnabled(false);
+		ui.pushButton_16->setEnabled(false);
+		ui.pushButton_18->setEnabled(false);
+		ui.pushButton_19->setEnabled(false);
 		return;
+	}
 
 	ui.pushButton_18->setEnabled(true);
 	ui.pushButton_19->setEnabled(true);
@@ -1333,7 +1287,6 @@ void PlotManager::onPushButton_15Clicked()
 	QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
 	vec.move(row, row - 1);
 	m_curSelectPlot->setDataPair(vec);
-	refreshPlotDataUI(m_curSelectPlot);
 	ui.tableWidget_plotData->setCurrentCell(row - 1, 0);
 }
 
@@ -1348,7 +1301,6 @@ void PlotManager::onPushButton_16Clicked()
 	QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
 	vec.move(row, row + 1);
 	m_curSelectPlot->setDataPair(vec);
-	refreshPlotDataUI(m_curSelectPlot);
 	ui.tableWidget_plotData->setCurrentCell(row + 1, 0);
 }
 
@@ -1368,7 +1320,6 @@ void PlotManager::onPushButton_19Clicked()
 	QVector<DataPair*> vec = m_curSelectPlot->getDataPair();
 	vec.remove(row);
 	m_curSelectPlot->setDataPair(vec);
-	refreshPlotDataUI(m_curSelectPlot);
 }
 
 void PlotManager::onPushButton_20Clicked()

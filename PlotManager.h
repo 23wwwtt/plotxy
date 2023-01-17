@@ -16,7 +16,6 @@ public:
     ~PlotManager();
 
     void init();								//初始化函数，连接信号槽
-	void addPlot(const QString&, PlotItemBase*);			//添加Plot
 
 	QColor m_axisColor;
 	QColor m_gridColor;
@@ -32,9 +31,7 @@ private:
 	void initTreeWidgetSettings();
 	void initGeneralUI();
 	void initAxisGridUI();
-
 	void initTextLightUI();
-
 	void initPlotDataUI();
 	void initTextEditUI();
 	void initAttitudeUI();
@@ -43,12 +40,9 @@ private:
 	void refreshGeneralUI(PlotItemBase* plot);
 	void refreshAxisGridUI(PlotItemBase* plot);
 	void refreshPlotDataUI(PlotItemBase* plot);
-
 	void refreshLightTextUI(PlotItemBase* plot);
-
 	void refreshTextEditUI(PlotItemBase* plot);
 	void refreshAttitudeUI(PlotItemBase* plot);
-
 
 	void enableItem_Scatter();
 	void enableItem_AScope();
@@ -102,7 +96,6 @@ public slots:
 	void onComboBox_AxisGrid_FontSizeCurrentTextChanged(const QString& text);
 	void onComboBox_2CurrentIndexChanged(int index);
 	void onComboBox_3CurrentIndexChanged(int index);
-	void onPushButton_gridFillClicked();
 
 	//Light/Text
 	void onPushButton_71Clicked();
@@ -141,17 +134,13 @@ public slots:
 	void onSpinBox_30ValueChanged(int);
 	void onSpinBox_31ValueChanged(int);
 
-
 signals:
-	void sigAddPlotPair();
+	void sigAddPlotPair(QString, QString);
 	void sigAdvancedDataManager();
 	void sigRectChanged(QRect);
 	void sigGetTabRect();
 	void sigSetPlotVisible(bool);
 	void sigChangePlotName();
-
-
-
 
 private:
     Ui::PlotManager ui;

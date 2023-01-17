@@ -58,10 +58,8 @@ PlotScatter::PlotScatter(QWidget *parent)
 	m_gridStyle = Qt::DotLine;
 	m_gridDensity = GridDensity::LESS;
 
-
 	m_showUnits_x = false;
 	m_showUnits_y = false;
-
 
 	initPlot();
 }
@@ -113,29 +111,26 @@ void PlotScatter::initPlot()
 void PlotScatter::getDataInfo(double secs)
 {
 	if (getDataPair().isEmpty())
-	{
 		return;
-	}
 
 	m_customPlot->clearGraphs();
 
 	int itemCnt = m_dataPair.size();
 	for (int i = 0; i < itemCnt; ++i)
 	{
-		QColor color = m_dataPair.at(i)->dataColor();
-		QString xcolumn = m_dataPair.at(i)->getDataPair().first;
-		QString ycolumn = m_dataPair.at(i)->getDataPair().second;
-		updateData(xcolumn, ycolumn, secs, i, color);
+		updateData(secs, i, m_dataPair.at(i));
 	}
 	m_customPlot->replot(QCustomPlot::rpQueuedRefresh);
 //	update();
 }
 
-void PlotScatter::updateData(QString xEntityType, QString yEntityType, double secs, int index, QColor color)
+void PlotScatter::updateData(double secs, int index, DataPair * data)
 {
 	QVector<double> x, y;
-    QStringList xlist = xEntityType.split("+");
-    QStringList ylist = yEntityType.split("+");
+	QString xEntityType = data->getDataPair().first;
+	QString yEntityType = data->getDataPair().second;
+	QStringList xlist = xEntityType.split("+");
+	QStringList ylist = yEntityType.split("+");
 	if (xlist.size() == 1 && ylist.size() == 1)
 	{
 		x = DataManager::getInstance()->getTimeData_vector();
@@ -156,15 +151,39 @@ void PlotScatter::updateData(QString xEntityType, QString yEntityType, double se
 		x = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(xlist.at(0), xlist.at(1), secs).toVector();
 		y = DataManager::getInstance()->getEntityAttr_MaxPartValue_List(ylist.at(0), ylist.at(1), secs).toVector();
 	}
-	
-    if (x.isEmpty() || y.isEmpty())
-        return;
+
+	if (x.isEmpty() || y.isEmpty())
+		return;
 
 	m_customPlot->addGraph();
-	m_customPlot->graph(index)->setPen(QPen(color));
-	m_customPlot->graph()->setLineStyle(QCPGraph::lsNone);
-	m_customPlot->graph(index)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 3));
-	m_customPlot->graph(index)->addData(x, y);
+	if (data->isDraw())
+	{
+		m_customPlot->graph(index)->setPen(QPen(data->dataColor(), data->lineWidth()));
+		//line mode
+		if (data->isLineMode())
+		{ 
+			m_customPlot->graph(index)->setLineStyle(QCPGraph::lsLine);
+			m_customPlot->graph(index)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssNone));
+		}
+		else
+		{ 
+			m_customPlot->graph(index)->setLineStyle(QCPGraph::lsNone);
+			m_customPlot->graph(index)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, data->lineWidth()));
+		}
+		//icon
+		if (data->hasIcon())
+		{
+			QPixmap pix(":/statusbar/centerPlot.bmp");
+			pix = pix.scaled(data->iconSize(), Qt::IgnoreAspectRatio);
+			QTransform trans;
+			trans.rotate(45);
+			pix = pix.transformed(trans);
+			QCPScatterStyle style(pix);
+			m_customPlot->graph(index)->setScatterStyle(style);
+		}
+
+		m_customPlot->graph(index)->addData(x, y);
+	}
 }
 
 void PlotScatter::onGetCurrentSeconds(double secs)

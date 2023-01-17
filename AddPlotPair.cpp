@@ -377,8 +377,6 @@ bool AddPlotPair::getCurrentSelectParam(QString &strSum1, QString &strSum2)
 
 		strSum1 = strEntity1 + "+" + strNameUnit1;
 		strSum2 = "Time";
-
-		//		emit sigAddPlotPair(strEntity1, strNameUnit1);
 		break;
 
 	case 1:
@@ -717,75 +715,6 @@ void AddPlotPair::onUpdateData()
 
 		index++;
 	}
-}
-//
-//int AddPlotPair::textRowCount()
-//{
-//	//计算X格子和Y格子
-//	QString temText;
-//	int textCountSum;
-//	for (int row = 0; row < ui.tableWidget_union->rowCount(); row++)
-//	{
-//		
-//		if (ui.tableWidget_union->item(row, 2)->text().isEmpty()==true)
-//		{
-//			temText = ui.tableWidget_union->item(row, 0)->text();
-//			m_temSet1.insert(temText);
-//		}
-//		else
-//			continue;
-//	}
-//	textCountSum = m_temSet1.size();
-//	return textCountSum;
-//}
-//int AddPlotPair::textCloumnCount()
-//{
-//	QString temText;
-//	int textCountSum;
-//	for (int row = 0; row < ui.tableWidget_union->rowCount(); row++)
-//	{
-//		if (ui.tableWidget_union->item(row, 2)->text().isEmpty() == true)
-//		{
-//			temText = ui.tableWidget_union->item(row, 1)->text();
-//			m_temSet2.insert(temText);
-//		}
-//		else
-//			continue;
-//	}
-//	textCountSum = m_temSet2.size();
-//	return  textCountSum;
-//}
-//
-//QList<textUserData> AddPlotPair::getUserText()
-//{
-//	QList<textUserData> mylist;
-//	textUserData tUD1;
-//	tUD1.row = 0;
-//	tUD1.column = 0;
-//	tUD1.str = ' ';
-//	mylist.push_back(tUD1);
-//	for (int row = 0; row < ui.tableWidget_union->rowCount(); row++)
-//	{
-//		if (ui.tableWidget_union->item(row, 2)->text().isEmpty() == false)
-//		{
-//			textUserData tUD;
-//			tUD.row = ui.tableWidget_union->item(row, 0)->text().toInt();
-//			tUD.column = ui.tableWidget_union->item(row, 1)->text().toInt();
-//			tUD.str = ui.tableWidget_union->item(row, 2)->text();
-//
-//			mylist.push_back(tUD);
-//
-//		}
-//	}
-//	return mylist;
-//}
-
-void AddPlotPair::onAddPlot(const QString &tabName, PlotItemBase *plotItem)
-{
-	//数据层更新
-	m_plotManager[tabName].append(plotItem);
-
-	updatePlotTrees();
 }
 
 void AddPlotPair::onDoubleClickedTreeWidgetItem(QTreeWidgetItem * item, int column)

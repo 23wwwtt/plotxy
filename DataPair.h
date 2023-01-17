@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QColor>
 #include <QSize>
+#include <QPixmap>
 
 class DataPair : public QObject
 {
@@ -44,6 +45,9 @@ public:
 	int iconHeight() { return m_iconSize.height(); }
 	void setIconHeight(int);
 
+	QPixmap rotateIcon(QPixmap pix, float angle);
+
+	bool operator==(const DataPair& other) const { return this->m_dataPair == other.m_dataPair; }
 
 private:
 	QPair<QString, QString> m_dataPair;
@@ -54,6 +58,7 @@ private:
 	bool m_hasIcon;
 	QString m_iconName;
 	QSize m_iconSize;
+	QPixmap m_icon;
 
 signals:
 	void dataUpdate();
