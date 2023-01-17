@@ -84,7 +84,7 @@ void PlotText::paintEvent(QPaintEvent* event)
 	pen.setWidth(3);
 	pen.setStyle(Qt::SolidLine);
 	painter.setPen(pen);
-	drawXYTitle(painter, horiGridWidth, verGridWidth, dataVector, as);
+	drawXYTitle(painter, horiGridWidth, verGridWidth, dataVector,as);
 	//以下为绘制对应的数据
 	if (m_temValueList.isEmpty())
 		return;
@@ -242,7 +242,6 @@ void PlotText::drawXYTitle(QPainter& painter, int& horiGridWidth, int& verGridWi
 	font.setPointSize(getTickLabelFontSize());
 	painter.setFont(font);
 	painter.setPen(fontPen);
-
 	for (int i = 0; i < dataVector.size(); i++)
 	{
 		DataPair* temDataPair = new DataPair(nullptr);

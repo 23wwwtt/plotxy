@@ -53,12 +53,14 @@ private:
 	virtual Qt::PenStyle getGridStyle() { return m_gridStyle; }
 	//virtual void getDataPair();
 
+
 	bool m_bHorizontal;
 	bool m_started;
 	
 
 	QStringList m_xColumnList;
 	QStringList m_yColumnList;
+
 
 	QStringList m_entityTypeList;
 	QStringList m_entityAttrList;

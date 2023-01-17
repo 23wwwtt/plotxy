@@ -76,6 +76,7 @@ private:
 public slots:
 	void slot_getLightData(QList<QList<QString>>);
 	void slot_getCurrentSeconds(double secs);
+	//更新后的由base 的sgn_发出
 	void slot_onAddButtonClicked();
 
 
